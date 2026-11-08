@@ -3,154 +3,134 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0b1118">
+<meta name="theme-color" content="#0c0f12">
 <title>1872幽灵船：玛丽·赛勒斯特号第一现场勘查台</title>
 <link rel="icon" href="./icon.png">
 <link rel="stylesheet" href="./assets/style-3c4d5e.css">
 </head>
-<body>
+<body data-field="ink">
 <div class="app" id="app">
 
-  <!-- Top HUD -->
+  <!-- Masthead -->
   <header class="hud" id="hud" role="banner">
-    <div class="hud-brand">
-      <span class="hud-seal" aria-hidden="true">⚓</span>
-      <div class="hud-title">
-        <strong>玛丽·赛勒斯特号</strong>
-        <small>直布罗陀海事法庭 · 第一现场勘查台</small>
-      </div>
+    <div class="hud-brand reveal" style="--d:0ms">
+      <strong>玛丽·赛勒斯特号 · 互动卷宗</strong>
     </div>
     <div class="hud-stats" aria-live="polite">
-      <span class="hud-chip" id="hud-act">第 1 幕 / 6</span>
-      <span class="hud-chip" id="hud-evidence">物证 0 / 5</span>
-      <span class="hud-chip hud-score" id="hud-score">推理值 0</span>
-      <button type="button" class="hud-btn" id="btn-sound" aria-pressed="true" title="音效开关">🔊</button>
+      <span class="hud-chip reveal" id="hud-act" style="--d:60ms">第 1 幕 / 6</span>
+      <span class="hud-chip reveal" id="hud-evidence" style="--d:120ms">物证 0 / 5</span>
+      <span class="hud-chip hud-score reveal" id="hud-score" style="--d:180ms">推理值 0</span>
+      <button type="button" class="hud-btn reveal" id="btn-sound" aria-pressed="true" title="音效开关" style="--d:240ms">声音：开</button>
     </div>
   </header>
 
-  <!-- Act Quick-Jump Bar -->
+  <!-- Act navigation -->
   <nav class="jumpbar" id="act-nav" aria-label="幕间快速跳转">
-    <button type="button" class="jump is-current" data-jump="1">1.反常锚点</button>
-    <button type="button" class="jump" data-jump="2" disabled>2. ???</button>
-    <button type="button" class="jump" data-jump="3" disabled>3. ???</button>
-    <button type="button" class="jump" data-jump="4" disabled>4. ???</button>
-    <button type="button" class="jump" data-jump="5" disabled>5. ???</button>
-    <button type="button" class="jump" data-jump="6" disabled>6. ???</button>
+    <button type="button" class="jump is-current reveal" data-jump="1" style="--d:300ms">1.反常锚点</button>
+    <button type="button" class="jump reveal" data-jump="2" style="--d:340ms" disabled>第二幕 · 未解锁</button>
+    <button type="button" class="jump reveal" data-jump="3" style="--d:380ms" disabled>第三幕 · 未解锁</button>
+    <button type="button" class="jump reveal" data-jump="4" style="--d:420ms" disabled>第四幕 · 未解锁</button>
+    <button type="button" class="jump reveal" data-jump="5" style="--d:460ms" disabled>第五幕 · 未解锁</button>
+    <button type="button" class="jump reveal" data-jump="6" style="--d:500ms" disabled>第六幕 · 未解锁</button>
   </nav>
 
   <main class="stage" id="stage">
 
     <!-- Act 1 -->
     <section class="act is-active" id="act-1" data-act="1" aria-labelledby="act1-title">
-      <p class="eyebrow" id="act1-code">ABNORMAL_ANCHOR</p>
-      <h1 class="act-title" id="act1-title">第一幕 · 反常锚点：时间凝固的船长室</h1>
-      <p class="act-sub" id="act1-sub">1872年12月4日 · 大西洋亚速尔群岛以东400海里</p>
-      <div class="hero-scene">
-        <svg class="hero-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid slice" role="img" aria-label="1872年北大西洋深海迷雾中摇晃的双桅帆船玛丽·赛勒斯特号剪影">
-          <defs>
-            <linearGradient id="hs-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a121b"/><stop offset=".62" stop-color="#1f3447"/><stop offset="1" stop-color="#34536a"/></linearGradient>
-            <linearGradient id="hs-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10222f"/><stop offset="1" stop-color="#050a10"/></linearGradient>
-            <radialGradient id="hs-moon" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e9efe6" stop-opacity=".85"/><stop offset="1" stop-color="#e9efe6" stop-opacity="0"/></radialGradient>
-            <radialGradient id="hs-fog" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#9fb4c4" stop-opacity=".42"/><stop offset="1" stop-color="#9fb4c4" stop-opacity="0"/></radialGradient>
-          </defs>
-          <rect width="360" height="180" fill="url(#hs-sky)"/>
-          <circle cx="262" cy="46" r="46" fill="url(#hs-moon)"/>
-          <circle cx="262" cy="46" r="11" fill="#e9efe6" opacity=".8"/>
-          <rect y="112" width="360" height="68" fill="url(#hs-sea)"/>
-          <g class="hero-ship">
-            <g fill="#04070b">
-              <path d="M118 124 L128 138 L246 138 L258 120 L248 124 Z"/>
-              <rect x="168" y="44" width="2.4" height="82"/>
-              <rect x="214" y="54" width="2.4" height="72"/>
-              <path d="M171 48 Q196 82 172 120 L171 120 Z"/>
-              <path d="M217 58 Q240 88 218 120 L217 120 Z"/>
-              <path d="M166 50 Q142 84 160 118 L166 118 Z"/>
-              <path d="M120 124 L170 46 L168 124 Z" opacity=".9"/>
-              <rect x="226" y="112" width="14" height="12"/>
-            </g>
-            <path d="M120 124 L170 48" stroke="#04070b" stroke-width="1"/>
-          </g>
-          <ellipse cx="120" cy="128" rx="110" ry="20" fill="url(#hs-fog)"/>
-          <ellipse cx="270" cy="142" rx="120" ry="22" fill="url(#hs-fog)"/>
-          <g class="hero-waves" fill="none" stroke="#6f93ac" stroke-width="1.2" opacity=".55">
-            <path d="M-10 138q15 -6 30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0"/>
-            <path d="M-20 154q15 -6 30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0" opacity=".7"/>
-            <path d="M0 169q15 -6 30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0" opacity=".5"/>
-          </g>
-          <g transform="translate(40 40)">
-            <circle r="26" fill="rgba(6,10,15,.78)" stroke="#c9a24b" stroke-width="1.6"/>
-            <circle r="20" fill="none" stroke="#8a6d2f" stroke-width=".8" stroke-dasharray="1.4 3"/>
-            <path d="M0 -18V18M-18 0H18" stroke="#8a6d2f" stroke-width=".7"/>
-            <polygon points="0,-17 3,0 -3,0" fill="#d9372b"/><polygon points="0,17 3,0 -3,0" fill="#d9cfb4"/>
-            <text y="-29" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#c9a24b">N</text>
-            <text y="39" text-anchor="middle" font-family="monospace" font-size="7" fill="#f1d68a">38°20'N · 17°15'W</text>
-          </g>
-          <g transform="translate(322 150) rotate(8)">
-            <circle r="16" fill="#8e1f17" stroke="#c23a2e" stroke-width="1.5"/>
-            <circle r="11" fill="none" stroke="#e46b5d" stroke-width=".8" opacity=".7"/>
-            <text y="3" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="9" fill="#f3b6ad">1872</text>
-          </g>
-        </svg>
-        <p class="hero-caption">1872 · 北大西洋 · 玛丽·赛勒斯特号</p>
+      <div class="a1-text">
+        <h1 class="act-title reveal" id="act1-title" style="--d:0ms">玛丽·赛勒斯特号案卷</h1>
+        <p class="act-sub reveal" id="act1-sub" style="--d:60ms">第一幕 · 1872年12月4日北大西洋现场勘查互动卷宗</p>
+        <p class="hook reveal" id="act1-hook" style="--d:120ms"></p>
+        <p class="interrupt reveal" id="act1-interrupt" style="--d:180ms"></p>
+        <button type="button" class="btn btn-ghost btn-clue reveal" id="btn-first-clue" aria-expanded="false" style="--d:240ms">先看那件未缝完的童装</button>
+        <div class="first-clue-panel" id="first-clue-panel" hidden><strong>微距批注 · 船长室</strong> 缝纫机踏板旁散落着半轴白棉线，两岁幼女的法兰绒睡衣针脚匀称，线轴未收。离船前，船长夫人仍在平静缝衣，没有暴乱或长期海难的征兆。</div>
+        <div class="act-actions">
+          <button type="button" class="btn btn-primary reveal" id="btn-to-act2" style="--d:300ms">登船勘查物证</button>
+        </div>
       </div>
-      <div class="case-file">
-        <div class="case-stamp" aria-hidden="true">机密卷宗<br><span>MARY CELESTE</span></div>
-        <p class="hook" id="act1-hook"></p>
-        <p class="interrupt" id="act1-interrupt"></p>
-        <button type="button" class="btn btn-ghost btn-clue" id="btn-first-clue" aria-expanded="false">🔍 速查首件船长室疑证（未缝完的2岁童装）</button>
-        <div class="first-clue-panel" id="first-clue-panel" hidden><strong>【微距批注 · 船长室】</strong> 缝纫机踏板旁散落着半轴白棉线，2岁幼女索菲亚的法兰绒睡衣针脚匀称，说明弃船前3分钟船长夫人还在平静缝衣——绝无暴乱或长期海难征兆！</div>
-      </div>
-      <ul class="anomaly-list" id="anomaly-list">
-        <li>🧵 缝纫机上的童装，还差最后一针</li>
-        <li>🍳 厨房炉火刚熄，早餐盘里还留着食物</li>
-        <li>🛢️ 1701 桶工业酒精，原封未动</li>
-      </ul>
-      <div class="act-actions">
-        <button type="button" class="btn btn-primary" id="btn-to-act2">登船勘查物证 →</button>
-      </div>
+
+      <figure class="hero-figure reveal" style="--d:120ms">
+        <img src="./assets/mary-celeste-1861-7a8b9c.jpg" width="1140" height="760" alt="1861年玛丽·赛勒斯特号双桅帆船历史油画" decoding="async" fetchpriority="high">
+        <figcaption>馆藏档案 01 · 玛丽·赛勒斯特号（原名 Amazon）1861 年驶入马赛港油画</figcaption>
+      </figure>
+
+      <section class="dossier" aria-labelledby="dossier-title">
+        <h2 class="sec-title reveal" id="dossier-title" style="--d:360ms">皇家海事法庭原始档案卷宗</h2>
+        <ul class="anomaly-list" id="anomaly-list">
+          <li class="reveal" style="--d:400ms">缝纫机上的童装，还差最后一针</li>
+          <li class="reveal" style="--d:440ms">厨房炉火刚熄，早餐盘里还留着食物</li>
+          <li class="reveal" style="--d:480ms">1701 桶工业酒精，原封未动</li>
+        </ul>
+        <div class="plates">
+          <figure class="plate reveal" style="--d:420ms">
+            <img src="./assets/nytimes-1873-4d5e6f.png" width="840" height="1556" alt="1873年2月26日纽约时报与波士顿邮报关于直布罗陀海事调查的剪报" decoding="async">
+            <figcaption>档案 02 · 1873年2月26日 纽约时报与波士顿邮报剪报，报道直布罗陀海事调查</figcaption>
+          </figure>
+          <figure class="plate plate-chart reveal" style="--d:480ms">
+            <img src="./assets/gibraltar-plan-1a2b3c.jpg" width="1400" height="602" alt="19世纪军用地图《直布罗陀平面图》" decoding="async">
+            <figcaption>档案 03 · 19世纪军用地图《直布罗陀平面图》</figcaption>
+          </figure>
+          <figure class="plate reveal" style="--d:540ms">
+            <img src="./assets/sextant-museum-9d8e7f.jpg" width="960" height="960" alt="法国国家海洋博物馆藏19世纪桃花心木与黄铜六分仪" decoding="async">
+            <figcaption>档案 04 · 法国国家海洋博物馆藏 19 世纪桃花心木黄铜六分仪</figcaption>
+          </figure>
+        </div>
+      </section>
     </section>
 
     <!-- Act 2 -->
     <section class="act" id="act-2" data-act="2" aria-labelledby="act2-title" hidden>
-      <p class="eyebrow" id="act2-code">SENSORY_INSPECTION</p>
-      <h2 class="act-title" id="act2-title">第二幕 · 感官勘查：35mm拍立得物证悬浮台</h2>
+      <h2 class="act-title" id="act2-title">五件物证，五处反常</h2>
       <p class="act-sub" id="act2-sub"></p>
 
       <div class="toolbar" id="toolbar" role="toolbar" aria-label="勘查工具">
-        <button type="button" class="tool is-selected" id="tool-fluo" aria-pressed="true">
+        <button type="button" class="tool is-selected" id="tool-fluo" data-ui="tool-fluo" aria-pressed="true">
           <i class="tool-dot fluo" aria-hidden="true"></i>黄色荧光标注刷
         </button>
-        <button type="button" class="tool" id="tool-circle" aria-pressed="false">
+        <button type="button" class="tool" id="tool-circle" data-ui="tool-circle" aria-pressed="false">
           <i class="tool-dot circle" aria-hidden="true"></i>手绘红圈取证笔
         </button>
         <div class="counter" aria-live="polite">已取证 <b id="evidence-counter">0 / 5</b></div>
-        <button type="button" class="btn btn-ghost" id="btn-inspect-all">一键辅助全勘查</button>
+        <button type="button" class="btn btn-ghost" id="btn-inspect-all">直接揭示全部物证</button>
       </div>
 
-      <div class="evidence-grid" id="evidence-grid"></div>
+      <div class="a2-body">
+        <div class="evidence-desk" data-ui="evidence-desk">
+          <div class="evidence-grid" id="evidence-grid"></div>
+        </div>
+        <figure class="side-figure">
+          <img src="./assets/sextant-museum-9d8e7f.jpg" width="960" height="960" alt="法国国家海洋博物馆藏19世纪桃花心木与黄铜六分仪" loading="lazy" decoding="async">
+          <figcaption>馆藏对照 · 19世纪桃花心木黄铜六分仪（法国国家海洋博物馆）。船长带走的，正是这一类导航仪器。</figcaption>
+        </figure>
+      </div>
 
       <p class="tool-hint" id="tool-hint" aria-live="polite">点击任意拍立得，用当前工具标出它的反常死穴。</p>
       <div class="act-actions">
-        <button type="button" class="btn btn-primary" id="btn-to-act3" disabled>5件物证到手，开庭 →</button>
+        <button type="button" class="btn btn-primary" id="btn-to-act3" disabled>带着五件物证出庭</button>
       </div>
     </section>
 
     <!-- Act 3 -->
     <section class="act" id="act-3" data-act="3" aria-labelledby="act3-title" hidden>
-      <p class="eyebrow" id="act3-code">INTUITION_TRAP</p>
-      <h2 class="act-title" id="act3-title">第三幕 · 直觉诱捕：直布罗陀海事庭审博弈</h2>
+      <h2 class="act-title" id="act3-title">直布罗陀海事法庭</h2>
       <p class="act-sub" id="act3-sub"></p>
-      <div class="court-bench" aria-hidden="true">⚖️ 请选择你的结案假说</div>
+      <div class="court-head">
+        <figure class="court-figure">
+          <img src="./assets/gibraltar-plan-1a2b3c.jpg" width="1400" height="602" alt="19世纪军用地图《直布罗陀平面图》" loading="lazy" decoding="async">
+          <figcaption>法庭所在地 · 19世纪军用地图《直布罗陀平面图》</figcaption>
+        </figure>
+        <div class="court-bench">你认为船上发生了什么？</div>
+      </div>
       <div class="hyp-list" id="hyp-list"></div>
       <div class="act-actions">
-        <button type="button" class="btn btn-primary" id="btn-to-act4" disabled>真相锁定，追查幽灵线索 →</button>
+        <button type="button" class="btn btn-primary" id="btn-to-act4" disabled>真相锁定，追查幽灵线索</button>
       </div>
     </section>
 
     <!-- Act 4 -->
     <section class="act" id="act-4" data-act="4" aria-labelledby="act4-title" hidden>
-      <p class="eyebrow" id="act4-code">GHOST_CLUE</p>
-      <h2 class="act-title" id="act4-title">第四幕 · 幽灵线索：为什么火光冲天却没有半点烧焦痕迹？</h2>
+      <h2 class="act-title" id="act4-title">红橡木桶与崩断麻绳</h2>
       <p class="act-sub" id="act4-sub"></p>
       <p class="mechanism" id="act4-mechanism"></p>
 
@@ -171,43 +151,53 @@
 
       <div class="formula" id="formula" hidden>
         <p class="formula-tag">UCL 热力学冷焰公式 · 已解锁</p>
-        <p class="formula-eq">C₂H₅OH(g) + O₂ →(低温氧化) 乙醛 + H₂O + <em>微量热</em></p>
-        <p class="formula-eq">爆炸极限 3.3% ≤ φ ≤ 19% · 火焰峰值温度远低于纸张燃点</p>
-        <p class="formula-note">蒸汽剧烈喷发，却几乎不加热周围木材——所以船上没有焦痕。</p>
+        <p class="formula-eq">乙醇蒸汽 C₂H₅OH + 氧气，经低温氧化，生成乙醛 + 水 + <em>微量热</em></p>
+        <p class="formula-eq">爆炸极限 3.3% ≤ φ ≤ 19%，火焰峰值温度远低于纸张燃点</p>
+        <p class="formula-note">蒸汽剧烈喷发，却几乎不加热周围木材，所以船上没有焦痕。</p>
       </div>
       <div class="act-actions">
-        <button type="button" class="btn btn-primary" id="btn-to-act5" disabled>进入物理还原 →</button>
+        <button type="button" class="btn btn-primary" id="btn-to-act5" disabled>进入物理还原</button>
       </div>
     </section>
 
     <!-- Act 5 -->
     <section class="act" id="act-5" data-act="5" aria-labelledby="act5-title" hidden>
-      <p class="eyebrow" id="act5-code">PHYSICAL_RECONSTRUCTION</p>
-      <h2 class="act-title" id="act5-title">第五幕 · 物理还原：0.7秒核弹级死寂与冷焰闪爆实验</h2>
+      <h2 class="act-title" id="act5-title">死寂留白与幽蓝冷焰</h2>
       <p class="act-sub" id="act5-sub"></p>
-      <ol class="timeline" id="timeline"></ol>
+      <div class="split split-5">
+        <ol class="timeline" id="timeline"></ol>
+        <figure class="side-figure">
+          <img src="./assets/sextant-museum-9d8e7f.jpg" width="960" height="960" alt="法国国家海洋博物馆藏19世纪桃花心木与黄铜六分仪" loading="lazy" decoding="async">
+          <figcaption>船长带走了六分仪，说明离船是有准备的决定，而不是慌乱逃命。</figcaption>
+        </figure>
+      </div>
 
       <div class="flame-stage" id="flame-stage" aria-live="polite">
         <div class="flame-core" aria-hidden="true"></div>
         <span class="wave w1" aria-hidden="true"></span>
         <span class="wave w2" aria-hidden="true"></span>
         <span class="wave w3" aria-hidden="true"></span>
-        <div class="flame-readout" id="flame-readout">舱口待命 · 等待最后一次静电火花</div>
-        <div class="paper-test" id="paper-test" hidden>📄 试纸完好无损 · 0 焦痕</div>
+        <div class="flame-readout" id="flame-readout">舱口待命，等待最后一次静电火花</div>
+        <div class="paper-test" id="paper-test" hidden>试纸完好，没有一处焦痕</div>
       </div>
 
       <div class="act-actions">
-        <button type="button" class="btn btn-flame" id="btn-trigger-flash">⚡ 触发死寂 0.72 秒 → 冷焰闪爆</button>
-        <button type="button" class="btn btn-primary" id="btn-to-act6" hidden disabled>查看宿命终局 →</button>
+        <button type="button" class="btn btn-flame" id="btn-trigger-flash">点燃最后一粒静电火花</button>
+        <button type="button" class="btn btn-primary" id="btn-to-act6" hidden disabled>查看宿命终局</button>
       </div>
     </section>
 
     <!-- Act 6 -->
     <section class="act" id="act-6" data-act="6" aria-labelledby="act6-title" hidden>
-      <p class="eyebrow" id="act6-code">FATE_ECHO</p>
-      <h2 class="act-title" id="act6-title">第六幕 · 宿命回响：最理性的父爱，最残酷的深海</h2>
+      <h2 class="act-title" id="act6-title">最理性的父爱与深海</h2>
       <p class="act-sub" id="act6-sub"></p>
-      <blockquote class="epilogue" id="epilogue"></blockquote>
+      <div class="split split-6">
+        <figure class="side-figure nyt-figure">
+          <img src="./assets/nytimes-1873-4d5e6f.png" width="840" height="1556" alt="1873年2月26日纽约时报与波士顿邮报关于直布罗陀海事调查的剪报" loading="lazy" decoding="async">
+          <figcaption>结案档案 · 1873年2月26日 纽约时报与波士顿邮报剪报，报道直布罗陀海事调查</figcaption>
+        </figure>
+        <blockquote class="epilogue" id="epilogue"></blockquote>
+      </div>
 
       <article class="rank-card" id="rank-card" aria-live="polite">
         <div class="rank-letter" id="rank-letter">B</div>
@@ -219,13 +209,13 @@
       </article>
       <p class="comment-box" id="comment-text"></p>
       <p class="save-status" id="save-status" aria-live="polite"></p>
-      <section class="leaderboard-panel" id="leaderboard-panel" aria-label="B站全站断案官天梯榜"><h3 class="lb-title">🏆 B站全站断案官实时天梯榜（Top 5）</h3><ol class="lb-list" id="lb-list"></ol></section>
+      <section class="leaderboard-panel" id="leaderboard-panel" aria-label="本机断案记录"><h3 class="lb-title">本机断案记录 · 前五</h3><ol class="lb-list" id="lb-list"></ol></section>
       <div class="act-actions">
-        <button type="button" class="btn btn-secondary" id="btn-save-card">📸 生成拍立得结案鉴定卡</button>
+        <button type="button" class="btn btn-secondary" id="btn-save-card">生成结案拍立得</button>
         <button type="button" class="btn btn-primary" id="btn-copy-comment">复制评论区暗号</button>
         <button type="button" class="btn btn-ghost" id="btn-restart">重新勘查</button>
       </div>
-      <div class="card-modal" id="card-modal" hidden role="dialog" aria-label="拍立得结案鉴定卡预览"><div class="card-modal-box"><p class="card-modal-tip">📱 手机端可长按下方拍立得保存相册，电脑端已自动下载 PNG</p><img id="card-modal-img" alt="拍立得结案鉴定卡" /><div class="card-modal-actions"><a id="card-download-link" class="btn btn-primary" download="mary-celeste-1872-rank.png">💾 下载高清拍立得 PNG</a><button type="button" class="btn btn-ghost" id="btn-close-modal">关闭预览</button></div></div></div>
+      <div class="card-modal" id="card-modal" hidden role="dialog" aria-label="拍立得结案鉴定卡预览"><div class="card-modal-box"><p class="card-modal-tip">手机长按图片保存；电脑已自动下载</p><img id="card-modal-img" alt="拍立得结案鉴定卡" /><div class="card-modal-actions"><a id="card-download-link" class="btn btn-primary" download="mary-celeste-1872-rank.png">下载高清拍立得 PNG</a><button type="button" class="btn btn-ghost" id="btn-close-modal">关闭预览</button></div></div></div>
     </section>
   </main>
 

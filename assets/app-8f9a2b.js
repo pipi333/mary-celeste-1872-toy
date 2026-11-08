@@ -1,4 +1,4 @@
-/* 1872 Mary Celeste — six-act interactive state machine. Plain JS, no external deps. */
+/* 1872 Mary Celeste: six-act interactive state machine. Plain JS, no external deps. */
 (function () {
   'use strict';
 
@@ -9,42 +9,42 @@
     acts: {
       1: {
         code: 'ABNORMAL_ANCHOR',
-        title: '第一幕 · 反常锚点：时间凝固的船长室',
-        subtitle: '1872年12月4日 · 大西洋亚速尔群岛以东400海里',
-        hook: '你作为大英帝国直布罗陀海事法庭特派勘查官，刚刚踏上这艘在北大西洋独自劈浪漂流的双桅商船「玛丽·赛勒斯特号」。船上没有一具尸体，没有一滴搏斗血迹，1701桶高纯度工业酒精原封未动——但船长本杰明、船长妻女与7名船员（全船共10人），在400海里外的狂风中人间蒸发。',
+        title: '玛丽·赛勒斯特号案卷',
+        subtitle: '第一幕 · 1872年12月4日北大西洋现场勘查互动卷宗',
+        hook: '你作为大英帝国直布罗陀海事法庭特派勘查官，刚刚踏上这艘在北大西洋独自劈浪漂流的双桅商船「玛丽·赛勒斯特号」。船上没有一具尸体，没有一滴搏斗血迹，1701桶高纯度工业酒精原封未动，但船长本杰明、船长妻女与7名船员（全船共10人），在400海里外的狂风中人间蒸发。',
         interrupt: '等等不对劲！如果是一场仓促逃命的灾难，为什么船长夫人缝纫机上的童装还差最后一针？为什么厨房炉火刚熄，餐盘上还留着没吃完的早餐？'
       },
       2: {
         code: 'SENSORY_INSPECTION',
-        title: '第二幕 · 感官勘查：35mm拍立得物证悬浮台',
+        title: '五件物证，五处反常',
         subtitle: '切换【黄色荧光标注刷】与【手绘红圈取证笔】，找齐5件核心物证的反常死穴'
       },
       3: {
         code: 'INTUITION_TRAP',
-        title: '第三幕 · 直觉诱捕：直布罗陀海事庭审博弈',
+        title: '直布罗陀海事法庭',
         subtitle: '先顺应常识建楼，再用反常死穴一锤定向砸碎'
       },
       4: {
         code: 'GHOST_CLUE',
-        title: '第四幕 · 幽灵线索：为什么火光冲天却没有半点烧焦痕迹？',
+        title: '红橡木桶与崩断麻绳',
         subtitle: '连接『9桶红橡木』『掀开的舱盖』与『崩断的主帆缭绳』三条证据链',
         mechanism: '玩家在勘查台上将【物证 #05 红橡木渗漏】+【物证 #04 崩断的主帆缭绳】通过【掀开的舱盖】串联比对，解锁伦敦大学学院（UCL）以纸板复刻的缩比货舱模型气体燃爆还原实验。'
       },
       5: {
         code: 'PHYSICAL_RECONSTRUCTION',
-        title: '第五幕 · 物理还原：0.72秒核弹级死寂与冷焰闪爆实验',
+        title: '死寂留白与幽蓝冷焰',
         subtitle: '1872年11月25日 08:12–08:15 · 致命的3分钟'
       },
       6: {
         code: 'FATE_ECHO',
-        title: '第六幕 · 宿命回响：最理性的父爱，最残酷的深海',
+        title: '最理性的父爱与深海',
         subtitle: '物理真相 × 人性悲剧的哲学终局',
-        epilogue: '如果本杰明船长是个鲁莽的赌徒，他或许会留在甲板上看一眼货舱——那样他就会发现火已经灭了，全船10人都会平安抵达热那亚。但正因为他是一位极其负责的船长、一位绝不敢拿2岁女儿生命赌万分之一的父亲，他做出了当时最理性的决定：全员登上救生艇，用一根最结实的麻绳系在船尾，等大船不炸再爬回来。几分钟后，北大西洋的阵风鼓满大船风帆，咔嚓一声扯断了那根麻绳。空无一人的玛丽·赛勒斯特号以两倍于划桨的速度绝尘而去，留给那叶孤舟的，只有永远追不上的背影。'
+        epilogue: '如果本杰明船长是个鲁莽的赌徒，他或许会留在甲板上看一眼货舱：那样他就会发现火已经灭了，全船10人都会平安抵达热那亚。但正因为他是一位极其负责的船长、一位绝不敢拿2岁女儿生命赌万分之一的父亲，他做出了当时最理性的决定：全员登上救生艇，用一根最结实的麻绳系在船尾，等大船不炸再爬回来。几分钟后，北大西洋的阵风鼓满大船风帆，咔嚓一声扯断了那根麻绳。空无一人的玛丽·赛勒斯特号以两倍于划桨的速度绝尘而去，留给那叶孤舟的，只有永远追不上的背影。'
       }
     },
     cards: [
       {
-        id: 'ev-logbook', icon: '📖', angle: -2.8, type: 'yellow_fluo',
+        id: 'ev-logbook', angle: -2.8, type: 'yellow_fluo',
         name: '物证 #01 · 船长航海日志残页',
         camera: '35mm f/2.8 微距静帧 · 羊皮纸纤维剖面',
         fact: '最后一条记录停留在11月25日清晨8点，字迹工整平稳：『圣玛丽亚岛位于正东偏南6海里，风力温和。』',
@@ -53,7 +53,7 @@
         sound: 'clue_crystal_ding'
       },
       {
-        id: 'ev-sword', icon: '🗡️', angle: 4.1, type: 'red_circle',
+        id: 'ev-sword', angle: 4.1, type: 'red_circle',
         name: '物证 #02 · 床铺下的斑驳意大利长剑',
         camera: '35mm f/4.0 侧逆光微距 · 金属氧化层断层剖面',
         fact: '直布罗陀检察官弗拉德声称在船长床下搜出这把带有『暗红色血迹』的长剑，指控船员杀害船长全家。',
@@ -62,7 +62,7 @@
         sound: 'clue_crystal_ding'
       },
       {
-        id: 'ev-hull-cuts', icon: '🪵', angle: -2.5, type: 'red_circle',
+        id: 'ev-hull-cuts', angle: -2.5, type: 'red_circle',
         name: '物证 #03 · 船首两侧对称的V型木屑切口',
         camera: '35mm f/5.6 广角近摄 · 北美白松木船壳纹理',
         fact: '检方宣称这是海盗登船前故意凿船制造海难假象的凿痕，长约2米、深约1厘米。',
@@ -71,16 +71,16 @@
         sound: 'clue_crystal_ding'
       },
       {
-        id: 'ev-Navigation', icon: '🧭', angle: 3.6, type: 'yellow_fluo',
+        id: 'ev-Navigation', angle: 3.6, type: 'yellow_fluo',
         name: '物证 #04 · 被带走的六分仪与断裂的主帆缭绳',
         camera: '35mm f/2.0 浅景深微距 · 麻绳纤维断裂面',
         fact: '船长室里价值连城的怀表、珠宝、现金袋分文未动，唯独体积笨重的航海六分仪、航海天文钟与船籍证书消失了；船尾栏杆留有一根崩断的主帆粗麻绳。',
         target: '六分仪+天文钟带走，金表珠宝留下；栏杆麻绳末端纤维呈极度紧绷拉断状',
-        deduction: '海盗绝不会不要黄金只要六分仪！带走导航仪器的只有船长本人——而且他们登上救生艇后，曾死死用这根缆绳拴住大船，根本不想离开玛丽·赛勒斯特号！',
+        deduction: '海盗绝不会不要黄金只要六分仪！带走导航仪器的只有船长本人，而且他们登上救生艇后，曾死死用这根缆绳拴住大船，根本不想离开玛丽·赛勒斯特号！',
         sound: 'clue_crystal_ding'
       },
       {
-        id: 'ev-barrels', icon: '🛢️', angle: -2.6, type: 'red_circle',
+        id: 'ev-barrels', angle: -2.6, type: 'red_circle',
         name: '物证 #05 · 货舱深处9桶空置的红橡木桶',
         camera: '35mm f/2.8 暗光微距 · 红橡木气孔与白橡木对比剖面',
         fact: '底舱满载1701桶高浓度工业变性酒精（不可饮用），清点后发现有1692桶完好无损，唯独9桶完全空置，且舱盖被掀开。',
@@ -112,13 +112,13 @@
         id: 'hyp-cold-flame', trap: false, counter: 'ev-barrels', counterLabel: '物证 #05',
         title: '假说 D：多孔红橡木酒精渗漏 + 温差冷焰闪爆诱发『暂时避险』',
         pitch: '9桶红橡木渗出的酒精在底舱形成高浓度可燃蒸汽，打开舱盖换气瞬间摩擦引燃『低温冷焰闪爆』，船长误以为整船1700桶酒精即将连环殉爆，下令全员坐救生艇借主帆缭绳拖行暂避，不料暴风骤起扯断麻绳。',
-        verdict: '【真相锁定 · 晶体共鸣】伦敦大学学院（UCL）化学系安德烈亚·塞拉教授通过以纸板复刻的缩比货舱模型进行气体燃爆实验证实：乙醇蒸汽在特定浓度下会发生剧烈喷发却温度极低的『冷焰闪爆（Cool Flame）』——火光冲天、气浪震耳，却连一张纸都不会烤焦！'
+        verdict: '【真相锁定 · 晶体共鸣】伦敦大学学院（UCL）化学系安德烈亚·塞拉教授通过以纸板复刻的缩比货舱模型进行气体燃爆实验证实：乙醇蒸汽在特定浓度下会发生剧烈喷发却温度极低的『冷焰闪爆（Cool Flame）』：火光冲天、气浪震耳，却连一张纸都不会烤焦！'
       }
     ],
     steps: [
       '08:05 船只驶入亚速尔温暖海域，底舱9桶红橡木渗出的数加仑乙醇迅速气化，膨胀顶松舱盖。',
       '08:12 船长下令掀开主舱盖排散刺鼻酒气，新鲜氧气涌入，乙醇蒸汽浓度精准落入 3.3%~19% 爆炸极限。',
-      '08:14:59 舱口铁环轻微摩擦产生静电火花——【死寂留白 0.72秒（18帧）：海浪与BGM瞬间归零至 -∞ dBFS，仅剩心脏搏动与麻绳纤维紧绷声】',
+      '08:14:59 舱口铁环轻微摩擦产生静电火花：【死寂留白 0.72秒（18帧）：海浪与BGM瞬间归零至 -∞ dBFS，仅剩心脏搏动与麻绳纤维紧绷声】',
       '08:15:00 轰！数米高的幽蓝色冷焰从底舱喷涌而出，气浪掀翻舱盖，但因为乙醇蒸汽极快燃尽且热容极低，船木连一丝焦黑都没留下！'
     ],
     ranks: [
@@ -389,7 +389,7 @@
     var jumps = document.querySelectorAll('.jump');
     for (var i = 0; i < jumps.length; i++) {
       var n = Number(jumps[i].getAttribute('data-jump'));
-      jumps[i].textContent = n > state.maxAct ? n + '. ???' : ACT_NAMES[n];
+      jumps[i].textContent = n > state.maxAct ? '第' + ['', '一', '二', '三', '四', '五', '六'][n] + '幕 · 未解锁' : ACT_NAMES[n];
       jumps[i].disabled = n > state.maxAct;
       jumps[i].classList.toggle('is-current', n === state.act);
       jumps[i].classList.toggle('is-done', n < state.act && n <= state.maxAct);
@@ -419,6 +419,7 @@
       s.classList.toggle('is-active', on);
     }
     renderHud();
+    document.body.setAttribute('data-field', (n === 2 || n === 3 || n === 6) ? 'paper' : 'ink');
     window.scrollTo(0, 0);
     if (!opts || !opts.silent) play(n === 3 ? 'question_suspense' : 'comma_breath');
     if (n === 6) enterAct6();
@@ -450,13 +451,13 @@
     state.firstClue = true;
     var b = $('btn-first-clue');
     $('first-clue-panel').hidden = false;
-    b.textContent = '✅ 已速查首件疑证 · 船长室微距批注已展开';
+    b.textContent = '已速查首件疑证 · 船长室微距批注已展开';
     b.setAttribute('aria-expanded', 'true');
     toast('首件疑证已记录');
   }
 
   /* ------------------------------------------------------------------ *
-   * Act 2 — Polaroid evidence table (35mm inline SVG macro photos)
+   * Act 2: Polaroid evidence table (35mm inline SVG macro photos)
    * ------------------------------------------------------------------ */
   var MASK_TEXT = '【待用对应工具勘查解锁反常死穴】';
 
@@ -490,7 +491,7 @@
       return filmFrame('a1', '35mm微距：船长航海日志残页与罗盘',
         '<linearGradient id="a1-p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dcc79a"/><stop offset="1" stop-color="#9c7a45"/></linearGradient>',
         '<rect x="8" y="12" width="224" height="111" fill="url(#a1-p)"/>' +
-        '<text x="18" y="29" font-family="Georgia,serif" font-style="italic" font-size="7.5" fill="#3a2713">25th Nov. 8 a.m. - Santa Maria bearing ESE, 6 miles</text>' +
+        '' +
         '<g fill="none" stroke="#2b1a0e" stroke-width="1.1" stroke-linecap="round" opacity=".85">' + lines + '</g>' +
         '<line x1="18" y1="34" x2="150" y2="34" stroke="#7a2b12" stroke-width=".7" opacity=".7"/>' +
         '<circle cx="192" cy="72" r="28" fill="rgba(30,20,10,.14)" stroke="#5a3d1a" stroke-width="1.4"/>' + ticks +
@@ -498,7 +499,7 @@
         '<path d="M192 46v52M166 72h52" stroke="#5a3d1a" stroke-width=".7"/>' +
         '<polygon points="192,50 196,72 188,72" fill="#a8261c"/><polygon points="192,94 196,72 188,72" fill="#2b1a0e"/>' +
         '<circle cx="192" cy="72" r="2.2" fill="#c9a24b"/>' +
-        '<text x="189" y="46" font-family="Georgia,serif" font-size="6" fill="#3a2713">N</text>');
+        '');
     },
     // (2) sword blade with red rust crystals under a magnifier
     'ev-sword': function () {
@@ -520,7 +521,7 @@
         '<polygon points="146,28 158,24 160,32 150,34" fill="#c4562a"/><polygon points="180,24 192,28 188,38 178,34" fill="#8a3418"/>' +
         '<path d="M140 62l62-10M140 30l62 14" stroke="rgba(255,255,255,.2)" stroke-width=".8"/></g>' +
         '<line x1="194" y1="70" x2="224" y2="102" stroke="#5a3d1a" stroke-width="6" stroke-linecap="round"/>' +
-        '<text x="14" y="118" font-family="monospace" font-size="7" fill="#d9703a">Fe2O3 / citric acid / Hb 0%</text>');
+        '');
     },
     // (3) bow with symmetric V cuts above the waterline
     'ev-hull-cuts': function () {
@@ -540,8 +541,8 @@
         '<polygon points="66,72 84,72 75,92" fill="#1b1008"/><polygon points="156,72 174,72 165,92" fill="#1b1008"/>' +
         '<path d="M66 72l-6 -4M84 72l6 -5M75 92l0 5M156 72l-6 -5M174 72l6 -4M165 92l0 5" stroke="#f0dcaa" stroke-width="1" opacity=".85"/>' +
         '<line x1="120" y1="12" x2="120" y2="122" stroke="#e8d9b0" stroke-width=".9" stroke-dasharray="3 3" opacity=".7"/>' +
-        '<text x="126" y="30" font-family="monospace" font-size="6.5" fill="#f4e7c2">SYMMETRIC V-CUTS</text>' +
-        '<text x="8" y="94" font-family="monospace" font-size="6" fill="#bfe6f7">waterline</text>');
+        '' +
+        '');
     },
     // (4) sextant arc + snapped, frayed main-sheet rope
     'ev-Navigation': function () {
@@ -571,7 +572,7 @@
         '<path d="M238 36C214 42 206 80 168 96" fill="none" stroke="#b8996a" stroke-width="9"/>' +
         '<path d="M238 36C214 42 206 80 168 96" fill="none" stroke="#5a4220" stroke-width="9" stroke-dasharray="2 5"/>' +
         '<g fill="none" stroke="#e1c88f" stroke-width=".9" stroke-linecap="round">' + fibers + '</g>' +
-        '<text x="140" y="118" font-family="monospace" font-size="6.5" fill="#e1c88f">tension fracture</text>');
+        '');
     },
     // (5) dense white oak vs porous red oak under the microscope
     'ev-barrels': function () {
@@ -582,9 +583,9 @@
         '<rect x="122" y="12" width="108" height="111" fill="#8a3a22"/><rect x="122" y="12" width="108" height="111" fill="url(#a5-q)"/>' +
         '<line x1="120" y1="10" x2="120" y2="125" stroke="#c9a24b" stroke-width="2"/>' +
         '<rect x="10" y="12" width="108" height="14" fill="rgba(0,0,0,.55)"/><rect x="122" y="12" width="108" height="14" fill="rgba(0,0,0,.55)"/>' +
-        '<text x="15" y="23" font-family="sans-serif" font-size="8" fill="#f4efe6">白橡木 · 致密</text>' +
-        '<text x="127" y="23" font-family="sans-serif" font-size="8" fill="#ffd9c4">红橡木 · 多孔渗漏</text>' +
-        '<line x1="14" y1="114" x2="44" y2="114" stroke="#2b2118" stroke-width="1.6"/><text x="48" y="117" font-family="monospace" font-size="6.5" fill="#2b2118">100um</text>');
+        '<text x="15" y="23" font-family="sans-serif" font-size="14" fill="#f4efe6">白橡木</text>' +
+        '<text x="127" y="23" font-family="sans-serif" font-size="14" fill="#ffd9c4">红橡木</text>' +
+        '<line x1="14" y1="114" x2="44" y2="114" stroke="#2b2118" stroke-width="1.6"/>');
     }
   };
 
@@ -640,7 +641,7 @@
     $('tool-fluo').setAttribute('aria-pressed', String(fluo));
     $('tool-circle').classList.toggle('is-selected', !fluo);
     $('tool-circle').setAttribute('aria-pressed', String(!fluo));
-    setText('tool-hint', fluo ? '当前工具：黄色荧光标注刷 —— 扫过反常文字。' : '当前工具：手绘红圈取证笔 —— 圈出致命破绽。');
+    setText('tool-hint', fluo ? '当前工具：黄色荧光标注刷，扫过反常文字。' : '当前工具：手绘红圈取证笔，圈出致命破绽。');
   }
 
   function inspect(id, mode) {
@@ -712,7 +713,7 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Act 3 — Intuition Trap courtroom
+   * Act 3: Intuition Trap courtroom
    * ------------------------------------------------------------------ */
   function buildHyp(h) {
     var b = el('button', 'hyp');
@@ -767,7 +768,7 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Act 4 — evidence chain linker + UCL formula
+   * Act 4: evidence chain linker + UCL formula
    * ------------------------------------------------------------------ */
   var NODES = ['barrels', 'hatch', 'rope'];
 
@@ -824,7 +825,7 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Act 5 — 0.72s Dead Silence + Cool Flame
+   * Act 5: 0.72s Dead Silence + Cool Flame
    * ------------------------------------------------------------------ */
   function setStep(i) {
     var li = $('timeline').children[i];
@@ -858,10 +859,11 @@
         fl.classList.remove('is-on');
         void fl.offsetWidth;
         fl.classList.add('is-on');
+        setTimeout(function () { fl.classList.remove('is-on'); }, 800);
         setStep(3);
         $('timeline').children[3].classList.add('is-flame');
         stage.classList.add('is-blast');
-        setText('flame-readout', '轰！幽蓝冷焰喷涌而出 —— 船木无一丝焦黑');
+        setText('flame-readout', '轰！幽蓝冷焰喷涌而出，船木无一丝焦黑');
         $('paper-test').hidden = false;
         play('cool_flash');
         Audio.restoreBgm();
@@ -891,7 +893,7 @@
   }
 
   /* ------------------------------------------------------------------ *
-   * Act 6 — epilogue, rank card, single settlement
+   * Act 6: epilogue, rank card, single settlement
    * ------------------------------------------------------------------ */
   function pickRank(score) {
     for (var i = 0; i < SPEC.ranks.length; i++) if (score >= SPEC.ranks[i].min) return SPEC.ranks[i];
@@ -926,7 +928,7 @@
   async function settle(attempt) {
     var toy = getToy();
     if (!toy) {
-      settleStatus('⚓ 皇家海事法庭档案室已签收卷宗 · 预览模式已同步生成全站天梯排名');
+      settleStatus('皇家海事法庭档案室已签收卷宗 · 预览模式下记录仅保存在本机');
       renderLeaderboard();
       return;
     }
@@ -1044,15 +1046,15 @@
     var c = cv.getContext('2d');
     if (!c) { toast('当前设备不支持生成图片'); return; }
     var serif = '"Songti SC","Noto Serif SC",SimSun,Georgia,serif';
-    var mono = 'Consolas,monospace';
+    var mono = serif;
     // polaroid paper
     c.fillStyle = '#d8d0bd'; c.fillRect(0, 0, 720, 960);
     c.fillStyle = '#f4efe6'; c.fillRect(24, 24, 672, 912);
     c.strokeStyle = 'rgba(0,0,0,.12)'; c.lineWidth = 2; c.strokeRect(24, 24, 672, 912);
     // deep-sea banner
-    var g = c.createLinearGradient(0, 56, 0, 436);
-    g.addColorStop(0, '#0a121b'); g.addColorStop(1, '#27475c');
-    c.fillStyle = g; c.fillRect(56, 56, 608, 380);
+    c.fillStyle = '#0a121b';
+    
+    c.fillRect(56, 56, 608, 380);
     c.strokeStyle = '#c9a24b'; c.lineWidth = 4; c.strokeRect(56, 56, 608, 380);
     c.strokeStyle = 'rgba(201,162,75,.45)'; c.lineWidth = 1.5; c.strokeRect(66, 66, 588, 360);
     // waves + silhouette
@@ -1079,7 +1081,7 @@
     c.fillStyle = '#8e1f17'; c.beginPath(); c.arc(0, 0, 52, 0, Math.PI * 2); c.fill();
     c.strokeStyle = '#d9574a'; c.lineWidth = 3; c.beginPath(); c.arc(0, 0, 41, 0, Math.PI * 2); c.stroke();
     c.fillStyle = '#f3b6ad'; c.textAlign = 'center'; c.font = '700 20px ' + serif; c.fillText('1872', 0, -6);
-    c.font = '700 11px ' + mono; c.fillText('MARY', 0, 12); c.fillText('CELESTE', 0, 26);
+    c.font = '700 14px ' + mono; c.fillText('MARY', 0, 12); c.fillText('CELESTE', 0, 29);
     c.restore();
     // rank letter
     c.textAlign = 'center';
@@ -1101,7 +1103,7 @@
     c.fillStyle = '#2b2118'; c.font = '20px ' + serif;
     c.fillText('取证 ' + state.foundCount + '/5（手动 ' + manual + ' · 辅助 ' + auto + '） · 常识陷阱 ' + state.wrongCount + ' 次 · 冷焰已' + (state.flashed ? '还原' : '未还原'), 360, 812);
     // comment cipher
-    c.strokeStyle = 'rgba(138,109,47,.6)'; c.setLineDash([6, 5]); c.lineWidth = 2; c.strokeRect(56, 830, 608, 80); c.setLineDash([]);
+    c.fillStyle = '#e6dfcf'; c.fillRect(56, 830, 608, 80);
     c.textAlign = 'left'; c.fillStyle = '#4a3c2c'; c.font = '17px ' + serif;
     wrapText(c, '评论区暗号：' + r.comment, 70, 858, 580, 24, 3);
     // corner mark
@@ -1142,7 +1144,7 @@
     $('btn-sound').addEventListener('click', function () {
       state.soundOn = !state.soundOn;
       this.setAttribute('aria-pressed', String(state.soundOn));
-      this.textContent = state.soundOn ? '🔊' : '🔇';
+      this.textContent = state.soundOn ? '声音：开' : '声音：关';
       if (state.soundOn) Audio.enable(); else Audio.mute(true);
       if (state.soundOn) play('comma_breath');
     });
