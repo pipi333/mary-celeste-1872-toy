@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1118">
+<title>1872幽灵船：玛丽·赛勒斯特号第一现场勘查台</title>
+<link rel="icon" href="./icon.png">
+<link rel="stylesheet" href="./assets/style-3c4d5e.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- Top HUD -->
+  <header class="hud" id="hud" role="banner">
+    <div class="hud-brand">
+      <span class="hud-seal" aria-hidden="true">⚓</span>
+      <div class="hud-title">
+        <strong>玛丽·赛勒斯特号</strong>
+        <small>直布罗陀海事法庭 · 第一现场勘查台</small>
+      </div>
+    </div>
+    <div class="hud-stats" aria-live="polite">
+      <span class="hud-chip" id="hud-act">第 1 幕 / 6</span>
+      <span class="hud-chip" id="hud-evidence">物证 0 / 5</span>
+      <span class="hud-chip hud-score" id="hud-score">推理值 0</span>
+      <button type="button" class="hud-btn" id="btn-sound" aria-pressed="true" title="音效开关">🔊</button>
+    </div>
+  </header>
+
+  <!-- Act Quick-Jump Bar -->
+  <nav class="jumpbar" id="act-nav" aria-label="幕间快速跳转">
+    <button type="button" class="jump is-current" data-jump="1">1.反常锚点</button>
+    <button type="button" class="jump" data-jump="2" disabled>2.物证勘查</button>
+    <button type="button" class="jump" data-jump="3" disabled>3.庭审博弈</button>
+    <button type="button" class="jump" data-jump="4" disabled>4.幽灵线索</button>
+    <button type="button" class="jump" data-jump="5" disabled>5.冷焰还原</button>
+    <button type="button" class="jump" data-jump="6" disabled>6.宿命终局</button>
+  </nav>
+
+  <main class="stage" id="stage">
+
+    <!-- Act 1 -->
+    <section class="act is-active" id="act-1" data-act="1" aria-labelledby="act1-title">
+      <p class="eyebrow" id="act1-code">ABNORMAL_ANCHOR</p>
+      <h1 class="act-title" id="act1-title">第一幕 · 反常锚点：时间凝固的船长室</h1>
+      <p class="act-sub" id="act1-sub">1872年12月4日 · 大西洋亚速尔群岛以东400海里</p>
+      <div class="case-file">
+        <div class="case-stamp" aria-hidden="true">机密卷宗<br><span>MARY CELESTE</span></div>
+        <p class="hook" id="act1-hook"></p>
+        <p class="interrupt" id="act1-interrupt" hidden></p>
+      </div>
+      <ul class="anomaly-list" id="anomaly-list" hidden>
+        <li>🧵 缝纫机上的童装，还差最后一针</li>
+        <li>🍳 厨房炉火刚熄，早餐盘里还留着食物</li>
+        <li>🛢️ 1701 桶工业酒精，原封未动</li>
+      </ul>
+      <div class="act-actions">
+        <button type="button" class="btn btn-primary" id="btn-to-act2">登船勘查物证 →</button>
+      </div>
+    </section>
+
+    <!-- Act 2 -->
+    <section class="act" id="act-2" data-act="2" aria-labelledby="act2-title" hidden>
+      <p class="eyebrow" id="act2-code">SENSORY_INSPECTION</p>
+      <h2 class="act-title" id="act2-title">第二幕 · 感官勘查：35mm拍立得物证悬浮台</h2>
+      <p class="act-sub" id="act2-sub"></p>
+
+      <div class="toolbar" id="toolbar" role="toolbar" aria-label="勘查工具">
+        <button type="button" class="tool is-selected" id="tool-fluo" aria-pressed="true">
+          <i class="tool-dot fluo" aria-hidden="true"></i>黄色荧光标注刷
+        </button>
+        <button type="button" class="tool" id="tool-circle" aria-pressed="false">
+          <i class="tool-dot circle" aria-hidden="true"></i>手绘红圈取证笔
+        </button>
+        <div class="counter" aria-live="polite">已取证 <b id="evidence-counter">0 / 5</b></div>
+        <button type="button" class="btn btn-ghost" id="btn-inspect-all">一键全勘查</button>
+      </div>
+
+      <div class="evidence-grid" id="evidence-grid"></div>
+
+      <p class="tool-hint" id="tool-hint" aria-live="polite">点击任意拍立得，用当前工具标出它的反常死穴。</p>
+      <div class="act-actions">
+        <button type="button" class="btn btn-primary" id="btn-to-act3" disabled>5件物证到手，开庭 →</button>
+      </div>
+    </section>
+
+    <!-- Act 3 -->
+    <section class="act" id="act-3" data-act="3" aria-labelledby="act3-title" hidden>
+      <p class="eyebrow" id="act3-code">INTUITION_TRAP</p>
+      <h2 class="act-title" id="act3-title">第三幕 · 直觉诱捕：直布罗陀海事庭审博弈</h2>
+      <p class="act-sub" id="act3-sub"></p>
+      <div class="court-bench" aria-hidden="true">⚖️ 请选择你的结案假说</div>
+      <div class="hyp-list" id="hyp-list"></div>
+      <div class="act-actions">
+        <button type="button" class="btn btn-primary" id="btn-to-act4" disabled>真相锁定，追查幽灵线索 →</button>
+      </div>
+    </section>
+
+    <!-- Act 4 -->
+    <section class="act" id="act-4" data-act="4" aria-labelledby="act4-title" hidden>
+      <p class="eyebrow" id="act4-code">GHOST_CLUE</p>
+      <h2 class="act-title" id="act4-title">第四幕 · 幽灵线索：为什么火光冲天却没有半点烧焦痕迹？</h2>
+      <p class="act-sub" id="act4-sub"></p>
+      <p class="mechanism" id="act4-mechanism"></p>
+
+      <div class="chain" id="chain" aria-label="证据链">
+        <button type="button" class="chain-node" id="node-barrels" data-node="barrels">
+          <span class="node-no">物证 #05</span><b>9桶红橡木渗漏</b>
+        </button>
+        <span class="chain-link" id="link-1" aria-hidden="true"></span>
+        <button type="button" class="chain-node" id="node-hatch" data-node="hatch">
+          <span class="node-no">现场细节</span><b>被掀开的舱盖</b>
+        </button>
+        <span class="chain-link" id="link-2" aria-hidden="true"></span>
+        <button type="button" class="chain-node" id="node-rope" data-node="rope">
+          <span class="node-no">物证 #04</span><b>崩断的主帆缭绳</b>
+        </button>
+      </div>
+      <p class="tool-hint" id="chain-hint" aria-live="polite">依次点选两个相邻的证据节点，把它们连成链。</p>
+
+      <div class="formula" id="formula" hidden>
+        <p class="formula-tag">UCL 热力学冷焰公式 · 已解锁</p>
+        <p class="formula-eq">C₂H₅OH(g) + O₂ →(低温氧化) 乙醛 + H₂O + <em>微量热</em></p>
+        <p class="formula-eq">爆炸极限 3.3% ≤ φ ≤ 19% · 火焰峰值温度远低于纸张燃点</p>
+        <p class="formula-note">蒸汽剧烈喷发，却几乎不加热周围木材——所以船上没有焦痕。</p>
+      </div>
+      <div class="act-actions">
+        <button type="button" class="btn btn-primary" id="btn-to-act5" disabled>进入物理还原 →</button>
+      </div>
+    </section>
+
+    <!-- Act 5 -->
+    <section class="act" id="act-5" data-act="5" aria-labelledby="act5-title" hidden>
+      <p class="eyebrow" id="act5-code">PHYSICAL_RECONSTRUCTION</p>
+      <h2 class="act-title" id="act5-title">第五幕 · 物理还原：0.7秒核弹级死寂与冷焰闪爆实验</h2>
+      <p class="act-sub" id="act5-sub"></p>
+      <ol class="timeline" id="timeline"></ol>
+
+      <div class="flame-stage" id="flame-stage" aria-live="polite">
+        <div class="flame-core" aria-hidden="true"></div>
+        <span class="wave w1" aria-hidden="true"></span>
+        <span class="wave w2" aria-hidden="true"></span>
+        <span class="wave w3" aria-hidden="true"></span>
+        <div class="flame-readout" id="flame-readout">舱口待命 · 等待最后一次静电火花</div>
+        <div class="paper-test" id="paper-test" hidden>📄 试纸完好无损 · 0 焦痕</div>
+      </div>
+
+      <div class="act-actions">
+        <button type="button" class="btn btn-flame" id="btn-trigger-flash">⚡ 触发死寂 0.72 秒 → 冷焰闪爆</button>
+        <button type="button" class="btn btn-primary" id="btn-to-act6" hidden disabled>查看宿命终局 →</button>
+      </div>
+    </section>
+
+    <!-- Act 6 -->
+    <section class="act" id="act-6" data-act="6" aria-labelledby="act6-title" hidden>
+      <p class="eyebrow" id="act6-code">FATE_ECHO</p>
+      <h2 class="act-title" id="act6-title">第六幕 · 宿命回响：最理性的父爱，最残酷的深海</h2>
+      <p class="act-sub" id="act6-sub"></p>
+      <blockquote class="epilogue" id="epilogue"></blockquote>
+
+      <article class="rank-card" id="rank-card" aria-live="polite">
+        <div class="rank-letter" id="rank-letter">B</div>
+        <div class="rank-body">
+          <p class="rank-badge" id="rank-badge"></p>
+          <p class="rank-title" id="rank-title"></p>
+          <p class="rank-score">最终推理值 <b id="final-score">0</b> / 100</p>
+        </div>
+      </article>
+      <p class="comment-box" id="comment-text"></p>
+      <p class="save-status" id="save-status" aria-live="polite"></p>
+      <div class="act-actions">
+        <button type="button" class="btn btn-primary" id="btn-copy-comment">复制评论区暗号</button>
+        <button type="button" class="btn btn-ghost" id="btn-restart">重新勘查</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">1872 · 玛丽·赛勒斯特号 · 互动卷宗</footer>
+</div>
+
+<!-- Dead Silence: 0.72s pitch-black -->
+<div class="dead-silence" id="dead-silence" aria-hidden="true"><span>……</span></div>
+<div class="cool-flash" id="cool-flash" aria-hidden="true"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="./assets/app-8f9a2b.js"></script>
+</body>
+</html>
