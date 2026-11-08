@@ -31,11 +31,11 @@
   <!-- Act Quick-Jump Bar -->
   <nav class="jumpbar" id="act-nav" aria-label="幕间快速跳转">
     <button type="button" class="jump is-current" data-jump="1">1.反常锚点</button>
-    <button type="button" class="jump" data-jump="2" disabled>2.物证勘查</button>
-    <button type="button" class="jump" data-jump="3" disabled>3.庭审博弈</button>
-    <button type="button" class="jump" data-jump="4" disabled>4.幽灵线索</button>
-    <button type="button" class="jump" data-jump="5" disabled>5.冷焰还原</button>
-    <button type="button" class="jump" data-jump="6" disabled>6.宿命终局</button>
+    <button type="button" class="jump" data-jump="2" disabled>2. ???</button>
+    <button type="button" class="jump" data-jump="3" disabled>3. ???</button>
+    <button type="button" class="jump" data-jump="4" disabled>4. ???</button>
+    <button type="button" class="jump" data-jump="5" disabled>5. ???</button>
+    <button type="button" class="jump" data-jump="6" disabled>6. ???</button>
   </nav>
 
   <main class="stage" id="stage">
@@ -45,12 +45,62 @@
       <p class="eyebrow" id="act1-code">ABNORMAL_ANCHOR</p>
       <h1 class="act-title" id="act1-title">第一幕 · 反常锚点：时间凝固的船长室</h1>
       <p class="act-sub" id="act1-sub">1872年12月4日 · 大西洋亚速尔群岛以东400海里</p>
+      <div class="hero-scene">
+        <svg class="hero-svg" viewBox="0 0 360 180" preserveAspectRatio="xMidYMid slice" role="img" aria-label="1872年北大西洋深海迷雾中摇晃的双桅帆船玛丽·赛勒斯特号剪影">
+          <defs>
+            <linearGradient id="hs-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0a121b"/><stop offset=".62" stop-color="#1f3447"/><stop offset="1" stop-color="#34536a"/></linearGradient>
+            <linearGradient id="hs-sea" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#10222f"/><stop offset="1" stop-color="#050a10"/></linearGradient>
+            <radialGradient id="hs-moon" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#e9efe6" stop-opacity=".85"/><stop offset="1" stop-color="#e9efe6" stop-opacity="0"/></radialGradient>
+            <radialGradient id="hs-fog" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#9fb4c4" stop-opacity=".42"/><stop offset="1" stop-color="#9fb4c4" stop-opacity="0"/></radialGradient>
+          </defs>
+          <rect width="360" height="180" fill="url(#hs-sky)"/>
+          <circle cx="262" cy="46" r="46" fill="url(#hs-moon)"/>
+          <circle cx="262" cy="46" r="11" fill="#e9efe6" opacity=".8"/>
+          <rect y="112" width="360" height="68" fill="url(#hs-sea)"/>
+          <g class="hero-ship">
+            <g fill="#04070b">
+              <path d="M118 124 L128 138 L246 138 L258 120 L248 124 Z"/>
+              <rect x="168" y="44" width="2.4" height="82"/>
+              <rect x="214" y="54" width="2.4" height="72"/>
+              <path d="M171 48 Q196 82 172 120 L171 120 Z"/>
+              <path d="M217 58 Q240 88 218 120 L217 120 Z"/>
+              <path d="M166 50 Q142 84 160 118 L166 118 Z"/>
+              <path d="M120 124 L170 46 L168 124 Z" opacity=".9"/>
+              <rect x="226" y="112" width="14" height="12"/>
+            </g>
+            <path d="M120 124 L170 48" stroke="#04070b" stroke-width="1"/>
+          </g>
+          <ellipse cx="120" cy="128" rx="110" ry="20" fill="url(#hs-fog)"/>
+          <ellipse cx="270" cy="142" rx="120" ry="22" fill="url(#hs-fog)"/>
+          <g class="hero-waves" fill="none" stroke="#6f93ac" stroke-width="1.2" opacity=".55">
+            <path d="M-10 138q15 -6 30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0"/>
+            <path d="M-20 154q15 -6 30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0" opacity=".7"/>
+            <path d="M0 169q15 -6 30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0" opacity=".5"/>
+          </g>
+          <g transform="translate(40 40)">
+            <circle r="26" fill="rgba(6,10,15,.78)" stroke="#c9a24b" stroke-width="1.6"/>
+            <circle r="20" fill="none" stroke="#8a6d2f" stroke-width=".8" stroke-dasharray="1.4 3"/>
+            <path d="M0 -18V18M-18 0H18" stroke="#8a6d2f" stroke-width=".7"/>
+            <polygon points="0,-17 3,0 -3,0" fill="#d9372b"/><polygon points="0,17 3,0 -3,0" fill="#d9cfb4"/>
+            <text y="-29" text-anchor="middle" font-family="Georgia,serif" font-size="7" fill="#c9a24b">N</text>
+            <text y="39" text-anchor="middle" font-family="monospace" font-size="7" fill="#f1d68a">38°20'N · 17°15'W</text>
+          </g>
+          <g transform="translate(322 150) rotate(8)">
+            <circle r="16" fill="#8e1f17" stroke="#c23a2e" stroke-width="1.5"/>
+            <circle r="11" fill="none" stroke="#e46b5d" stroke-width=".8" opacity=".7"/>
+            <text y="3" text-anchor="middle" font-family="Georgia,serif" font-weight="700" font-size="9" fill="#f3b6ad">1872</text>
+          </g>
+        </svg>
+        <p class="hero-caption">1872 · 北大西洋 · 玛丽·赛勒斯特号</p>
+      </div>
       <div class="case-file">
         <div class="case-stamp" aria-hidden="true">机密卷宗<br><span>MARY CELESTE</span></div>
         <p class="hook" id="act1-hook"></p>
-        <p class="interrupt" id="act1-interrupt" hidden></p>
+        <p class="interrupt" id="act1-interrupt"></p>
+        <button type="button" class="btn btn-ghost btn-clue" id="btn-first-clue" aria-expanded="false">🔍 速查首件船长室疑证（未缝完的2岁童装）</button>
+        <div class="first-clue-panel" id="first-clue-panel" hidden><strong>【微距批注 · 船长室】</strong> 缝纫机踏板旁散落着半轴白棉线，2岁幼女索菲亚的法兰绒睡衣针脚匀称，说明弃船前3分钟船长夫人还在平静缝衣——绝无暴乱或长期海难征兆！</div>
       </div>
-      <ul class="anomaly-list" id="anomaly-list" hidden>
+      <ul class="anomaly-list" id="anomaly-list">
         <li>🧵 缝纫机上的童装，还差最后一针</li>
         <li>🍳 厨房炉火刚熄，早餐盘里还留着食物</li>
         <li>🛢️ 1701 桶工业酒精，原封未动</li>
@@ -74,7 +124,7 @@
           <i class="tool-dot circle" aria-hidden="true"></i>手绘红圈取证笔
         </button>
         <div class="counter" aria-live="polite">已取证 <b id="evidence-counter">0 / 5</b></div>
-        <button type="button" class="btn btn-ghost" id="btn-inspect-all">一键全勘查</button>
+        <button type="button" class="btn btn-ghost" id="btn-inspect-all">一键辅助全勘查</button>
       </div>
 
       <div class="evidence-grid" id="evidence-grid"></div>
@@ -169,10 +219,13 @@
       </article>
       <p class="comment-box" id="comment-text"></p>
       <p class="save-status" id="save-status" aria-live="polite"></p>
+      <section class="leaderboard-panel" id="leaderboard-panel" aria-label="B站全站断案官天梯榜"><h3 class="lb-title">🏆 B站全站断案官实时天梯榜（Top 5）</h3><ol class="lb-list" id="lb-list"></ol></section>
       <div class="act-actions">
+        <button type="button" class="btn btn-secondary" id="btn-save-card">📸 生成拍立得结案鉴定卡</button>
         <button type="button" class="btn btn-primary" id="btn-copy-comment">复制评论区暗号</button>
         <button type="button" class="btn btn-ghost" id="btn-restart">重新勘查</button>
       </div>
+      <div class="card-modal" id="card-modal" hidden role="dialog" aria-label="拍立得结案鉴定卡预览"><div class="card-modal-box"><p class="card-modal-tip">📱 手机端可长按下方拍立得保存相册，电脑端已自动下载 PNG</p><img id="card-modal-img" alt="拍立得结案鉴定卡" /><div class="card-modal-actions"><a id="card-download-link" class="btn btn-primary" download="mary-celeste-1872-rank.png">💾 下载高清拍立得 PNG</a><button type="button" class="btn btn-ghost" id="btn-close-modal">关闭预览</button></div></div></div>
     </section>
   </main>
 
