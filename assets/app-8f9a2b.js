@@ -239,7 +239,7 @@
 
   /* ---------- state ---------- */
   var S = {
-    act: 1, reached: 1, mode: 'daily', intent: 'career', sign: 'fire', sound: true,
+    act: 1, reached: 1, mode: 'daily', intent: 'career', sign: 'fire', sound: true, bgm: true,
     key: null, totemKey: null, points: null, particles: null, stains: null,
     settled: false, swirling: false, zone: null,
     fate: null, drawn: [], drawing: false, result: null, cardURL: null
@@ -305,24 +305,207 @@
     f.classList.add('is-on');
     setTimeout(function () { f.classList.remove('is-on'); }, 700);
   }
-  var actx = null;
-  function beep(freq, dur, type, vol) {
-    if (!S.sound) return;
+  /* ---------- audio: Satie chamber BGM + acoustic foley ---------- */
+  var actx = null, bgmGain = null, sfxBus = null, noiseBuf = null, bgmTimer = null, bgmStep = 0;
+  var NOTE_IDX = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, Ab: 8, A: 9, Bb: 10, B: 11 };
+  function nf(name) {
+    var m = /^([A-G](?:#|b)?)(\d)$/.exec(name);
+    var semis = NOTE_IDX[m[1]] + (parseInt(m[2], 10) + 1) * 12;
+    return 440 * Math.pow(2, (semis - 69) / 12);
+  }
+  function chordOf(a) { return a.map(nf); }
+  var SATIE = (function () {
+    var seq = [];
+    var gm = { bass: 'G2', ch: ['B3', 'D4', 'F#4'] }, dm = { bass: 'D2', ch: ['A3', 'C#4', 'F#4'] };
+    var m1 = ['F#5', 'A5', 'G5', 'F#5', 'C#5', 'B4', 'C#5', 'D5', 'A4', 'F#4'], k = 0, b, i;
+    for (b = 0; b < 5; b++) {
+      var h = (b % 2 === 0) ? gm : dm;
+      seq.push({ bass: h.bass });
+      seq.push({ ch: h.ch, mel: m1[k++] });
+      seq.push({ mel: m1[k++] });
+    }
+    var fm = { bass: 'F2', ch: ['Ab3', 'C4', 'F4'] };
+    var m2 = ['F4', 'G4', 'Ab4', 'B4', 'C5', 'B4', 'Ab4', 'G4', 'F4'];
+    k = 0;
+    for (b = 0; b < 5; b++) {
+      seq.push({ bass: fm.bass });
+      seq.push({ ch: fm.ch, mel: m2[k++] });
+      seq.push({ mel: m2[k++] });
+    }
+    return seq;
+  })();
+
+  function ensureAudio() {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return false;
     try {
-      var AC = window.AudioContext || window.webkitAudioContext;
-      if (!AC) return;
-      actx = actx || new AC();
-      var o = actx.createOscillator();
-      var g = actx.createGain();
-      var now = actx.currentTime;
-      o.type = type || 'sine';
-      o.frequency.value = freq;
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(vol || 0.05, now + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
-      o.connect(g); g.connect(actx.destination);
-      o.start(now); o.stop(now + dur + 0.03);
-    } catch (e) { /* audio unavailable */ }
+      if (!actx) {
+        actx = new AC();
+        bgmGain = actx.createGain();
+        bgmGain.gain.value = S.bgm ? 1 : 0;
+        bgmGain.connect(actx.destination);
+        sfxBus = actx.createGain();
+        sfxBus.gain.value = 1;
+        sfxBus.connect(actx.destination);
+        var len = actx.sampleRate * 2;
+        noiseBuf = actx.createBuffer(1, len, actx.sampleRate);
+        var d = noiseBuf.getChannelData(0), b0 = 0, b1 = 0, b2 = 0;
+        for (var i = 0; i < len; i++) {
+          var w = Math.random() * 2 - 1;
+          b0 = 0.99765 * b0 + w * 0.099046;
+          b1 = 0.963 * b1 + w * 0.2965164;
+          b2 = 0.57 * b2 + w * 1.0526913;
+          d[i] = (b0 + b1 + b2 + w * 0.1848) * 0.25;
+        }
+        var rain = actx.createBufferSource();
+        rain.buffer = noiseBuf; rain.loop = true;
+        var bp = actx.createBiquadFilter();
+        bp.type = 'bandpass'; bp.frequency.value = 1100; bp.Q.value = 0.6;
+        var rg = actx.createGain();
+        rg.gain.value = 0.025;
+        rain.connect(bp); bp.connect(rg); rg.connect(bgmGain);
+        rain.start();
+        bgmTimer = setInterval(bgmTick, 900);
+      }
+      if (actx.state === 'suspended') actx.resume();
+      return true;
+    } catch (e) { return false; }
+  }
+  function piano(freq, t, vol, shimmer) {
+    var lp = actx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 1600;
+    var g = actx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.012);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 2.4);
+    var o1 = actx.createOscillator(), o2 = actx.createOscillator(), g2 = actx.createGain();
+    o1.type = 'triangle'; o1.frequency.value = freq;
+    o2.type = 'sine'; o2.frequency.value = freq * 2;
+    g2.gain.value = 0.35;
+    o1.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.connect(bgmGain);
+    o1.start(t); o2.start(t); o1.stop(t + 2.5); o2.stop(t + 2.5);
+    if (shimmer) {
+      var o3 = actx.createOscillator(), g3 = actx.createGain();
+      o3.type = 'sine'; o3.frequency.value = freq * 2;
+      g3.gain.setValueAtTime(0.0001, t + 0.03);
+      g3.gain.exponentialRampToValueAtTime(vol * 0.22, t + 0.05);
+      g3.gain.exponentialRampToValueAtTime(0.0001, t + 1.1);
+      o3.connect(g3); g3.connect(bgmGain);
+      o3.start(t + 0.03); o3.stop(t + 1.2);
+    }
+  }
+  function bgmTick() {
+    if (!actx || !S.bgm || actx.state !== 'running') return;
+    var ev = SATIE[bgmStep % SATIE.length];
+    bgmStep++;
+    var t = actx.currentTime + 0.03;
+    if (ev.bass) piano(nf(ev.bass), t, 0.07, false);
+    if (ev.ch) chordOf(ev.ch).forEach(function (f, i) { piano(f, t + i * 0.012, 0.035, false); });
+    if (ev.mel) piano(nf(ev.mel), t + (ev.ch ? 0.02 : 0), 0.06, true);
+  }
+  function setBgm(on) {
+    S.bgm = on;
+    var b = $('btn-bgm');
+    b.textContent = on ? '雨夜琴声：开' : '雨夜琴声：关';
+    b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (on) ensureAudio();
+    if (actx && bgmGain) bgmGain.gain.setTargetAtTime(on ? 1 : 0, actx.currentTime, 0.5);
+  }
+  function firstTouch() {
+    document.removeEventListener('pointerdown', firstTouch, true);
+    document.removeEventListener('keydown', firstTouch, true);
+    ensureAudio();
+  }
+  document.addEventListener('pointerdown', firstTouch, true);
+  document.addEventListener('keydown', firstTouch, true);
+
+  function sfxReady() { return S.sound && ensureAudio(); }
+  function pluck(f, t, vol, dur) {
+    var lp = actx.createBiquadFilter();
+    lp.type = 'lowpass'; lp.frequency.value = 3200;
+    var g = actx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.008);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    var o = actx.createOscillator(), o2 = actx.createOscillator(), g2 = actx.createGain();
+    o.type = 'triangle'; o.frequency.value = f;
+    o2.type = 'sine'; o2.frequency.value = f * 2; g2.gain.value = 0.25;
+    o.connect(lp); o2.connect(g2); g2.connect(lp); lp.connect(g); g.connect(sfxBus);
+    o.start(t); o2.start(t); o.stop(t + dur + 0.05); o2.stop(t + dur + 0.05);
+  }
+  function ring(f, t, vol, dur) {
+    var o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine'; o.frequency.value = f;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.004);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(sfxBus);
+    o.start(t); o.stop(t + dur + 0.05);
+  }
+  function grain(t, f0, f1, q, vol, dur) {
+    var src = actx.createBufferSource();
+    src.buffer = noiseBuf;
+    var bp = actx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.Q.value = q;
+    bp.frequency.setValueAtTime(f0, t);
+    if (f1 !== f0) bp.frequency.linearRampToValueAtTime(f1, t + dur);
+    var g = actx.createGain();
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.02, dur / 3));
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    src.connect(bp); bp.connect(g); g.connect(sfxBus);
+    src.start(t, Math.random() * 1.5, dur + 0.05);
+  }
+  function sfxDoor() {
+    if (!sfxReady()) return;
+    var t = actx.currentTime + 0.01;
+    pluck(nf('A4'), t, 0.06, 1.2);
+    pluck(nf('E5'), t + 0.05, 0.05, 1.2);
+  }
+  function sfxClink() {
+    if (!sfxReady()) return;
+    var t = actx.currentTime + 0.01;
+    ring(2380, t, 0.035, 0.7);
+    ring(3910, t + 0.004, 0.022, 0.45);
+    ring(5620, t + 0.008, 0.012, 0.3);
+  }
+  function sfxSwirl() {
+    if (!sfxReady()) return;
+    var t = actx.currentTime + 0.05;
+    grain(t, 500, 1400, 1.4, 0.05, 1.0);
+    grain(t + 1.0, 1400, 600, 1.4, 0.04, 1.0);
+  }
+  function sfxShuffle() {
+    if (!sfxReady()) return;
+    var t = actx.currentTime + 0.01;
+    for (var i = 0; i < 12; i++) grain(t + i * 0.028, 2800, 2800, 1.2, 0.05, 0.05);
+  }
+  function sfxFlip(slot) {
+    if (!sfxReady()) return;
+    grain(actx.currentTime + 0.01, 2400, 3200, 1.0, 0.04, 0.12);
+    setTimeout(function () {
+      if (!S.sound || !actx) return;
+      var t = actx.currentTime + 0.01, k = slot || 0;
+      pluck(nf('E5'), t, 0.05, 1.4);
+      pluck(nf('B5'), t + 0.04, 0.04, 1.4);
+      pluck(nf('E6') * (1 + k * 0.0), t + 0.08, 0.03, 1.4);
+    }, 400);
+  }
+  function sfxSeal() {
+    if (!sfxReady()) return;
+    var t = actx.currentTime + 0.01;
+    var o = actx.createOscillator(), g = actx.createGain();
+    o.type = 'sine';
+    o.frequency.setValueAtTime(150, t);
+    o.frequency.exponentialRampToValueAtTime(120, t + 0.15);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(0.12, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + 0.5);
+    o.connect(g); g.connect(sfxBus);
+    o.start(t); o.stop(t + 0.6);
+    ring(nf('D5'), t + 0.3, 0.04, 2.2);
+    ring(nf('A5'), t + 0.34, 0.03, 2.0);
+    ring(nf('F#6'), t + 0.38, 0.02, 1.8);
   }
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
@@ -385,7 +568,7 @@
         x.setAttribute('aria-pressed', on ? 'true' : 'false');
       });
       $('mode-note').textContent = MODE_NOTES[S.mode];
-      beep(520, 0.12);
+      sfxDoor();
     });
   });
   $$('.intent-btn').forEach(function (b) {
@@ -395,7 +578,7 @@
       $('whisper-label').textContent = INTENTS[S.intent].whisperAsk + '（可在杯底留一句低语）';
       $('whisper-input').placeholder = INTENTS[S.intent].whisperAsk + '轻声写一句，也可以留白';
       updateStartHint();
-      beep(440, 0.1);
+      sfxDoor();
     });
   });
   $$('.sign-btn').forEach(function (b) {
@@ -403,7 +586,7 @@
       S.sign = b.getAttribute('data-sign');
       selectInGroup('.sign-btn', 'data-sign', S.sign);
       updateStartHint();
-      beep(494, 0.1);
+      sfxDoor();
     });
   });
   $('whisper-input').addEventListener('input', updateStartHint);
@@ -412,7 +595,7 @@
     var k = seedKey();
     if (k !== S.key) { resetReading(); S.key = k; S.fate = makeFate(); }
     openStage(2);
-    beep(392, 0.25, 'triangle');
+    sfxDoor();
     showAct(2);
   });
 
@@ -728,13 +911,52 @@
     return { liquid: S.settled ? 0 : 1, stains: S.settled ? S.stains : null,
              points: S.settled ? S.points : null, particles: S.settled ? S.particles : null, zone: S.zone };
   }
+  function drawConstellation(g, pts) {
+    if (!pts.length) return;
+    var n = 7 + (pts.length % 3), left = [], i;
+    for (i = 0; i < n; i++) {
+      var p = pts[Math.floor(i * pts.length / n)];
+      left.push({ x: CUP_OX + p.x * CUP_SC, y: CUP_OY + p.y * CUP_SC });
+    }
+    var cur = left.shift(), path = [cur];
+    while (left.length) {
+      var bi = 0, bd = Infinity;
+      for (i = 0; i < left.length; i++) {
+        var d = Math.hypot(left[i].x - cur.x, left[i].y - cur.y);
+        if (d < bd) { bd = d; bi = i; }
+      }
+      cur = left.splice(bi, 1)[0]; path.push(cur);
+    }
+    g.save();
+    g.strokeStyle = 'rgba(201,162,75,0.42)'; g.lineWidth = 0.9; g.lineJoin = 'round';
+    g.beginPath();
+    path.forEach(function (q, k) { if (k === 0) g.moveTo(q.x, q.y); else g.lineTo(q.x, q.y); });
+    g.stroke();
+    g.fillStyle = 'rgba(201,162,75,0.7)';
+    path.forEach(function (q) { g.beginPath(); g.arc(q.x, q.y, 2.2, 0, TAU); g.fill(); });
+    g.restore();
+  }
+  function drawSteam(g) {
+    g.save();
+    g.strokeStyle = 'rgba(120,92,50,0.22)'; g.lineWidth = 2.5; g.lineCap = 'round';
+    [-34, 0, 34].forEach(function (dx, k) {
+      var x = C + dx, y = C - 130 - k % 2 * 8;
+      g.beginPath();
+      g.moveTo(x, y);
+      g.bezierCurveTo(x - 16, y - 24, x + 16, y - 40, x, y - 66);
+      g.stroke();
+    });
+    g.restore();
+  }
   function drawCup(o) {
     var g = cg;
     drawCupBase(g);
     if (o.stains) drawStains(g, o.stains);
     drawLiquid(g, o.liquid);
     if (o.points) drawPoints(g, o.points, CUP_OX, CUP_OY, CUP_SC, 0.75, PAL_DARK);
+    if (o.points) drawConstellation(g, o.points);
     if (o.particles) drawParticleSet(g, o.particles, 1);
+    if (o.points) drawSteam(g);
     if (o.zone) drawZone(g, o.zone);
   }
 
@@ -791,8 +1013,10 @@
     $('totem-read').textContent = '杯中的渣粒正在旋转，请屏住呼吸，等它们落定。';
     $('totem-intent').textContent = '';
     $('totem-luck').textContent = '';
-    beep(220, 0.5, 'sine', 0.04);
-    var dur = reduced ? 600 : 2200;
+    sfxClink(); sfxSwirl();
+    if (!reduced) cupCanvas.classList.add('cup-invert');
+    cupCanvas.style.transform = '';
+    var dur = reduced ? 600 : 2400;
     var t0 = performance.now();
     function frame(now) {
       var p = Math.min(1, (now - t0) / dur);
@@ -805,6 +1029,7 @@
   }
   function finishSwirl() {
     S.swirling = false; S.settled = true;
+    cupCanvas.classList.remove('cup-invert');
     S.stains = makeStains();
     drawCup(cupOpts());
     var t = TOTEMS[S.totemKey];
@@ -820,8 +1045,8 @@
     btnSwirl.disabled = false; btnReswirl.disabled = false; btnAct3.disabled = false;
     zoneBtns.forEach(function (b) { b.disabled = false; });
     openStage(3);
-    beep(660, 0.3, 'triangle', 0.05);
-    setTimeout(function () { beep(880, 0.35, 'triangle', 0.04); }, 140);
+    sfxClink();
+    setTimeout(sfxClink, 160);
   }
   btnSwirl.addEventListener('click', startSwirl);
   btnReswirl.addEventListener('click', startSwirl);
@@ -838,6 +1063,13 @@
     drag.x = e.clientX; drag.y = e.clientY;
     if (drag.acc > 240 && !S.swirling) { drag.on = false; startSwirl(); }
   });
+  cupCanvas.addEventListener('pointermove', function (e) {
+    if (reduced || S.swirling) return;
+    var r = cupCanvas.getBoundingClientRect();
+    var px = (e.clientX - r.left) / r.width - 0.5, py = (e.clientY - r.top) / r.height - 0.5;
+    cupCanvas.style.transform = 'perspective(900px) rotateX(' + (-py * 14).toFixed(2) + 'deg) rotateY(' + (px * 14).toFixed(2) + 'deg)';
+  });
+  cupCanvas.addEventListener('pointerleave', function () { cupCanvas.style.transform = ''; });
   function endDrag() { drag.on = false; }
   cupCanvas.addEventListener('pointerup', endDrag);
   cupCanvas.addEventListener('pointercancel', endDrag);
@@ -855,14 +1087,14 @@
       drawCup(cupOpts());
       var t = TOTEMS[S.totemKey];
       $('zone-reading').innerHTML = '<h3>' + esc(ZONES[z].label) + '</h3><p>' + esc(t.zones[z]) + '</p>';
-      beep(560, 0.15);
+      sfxClink();
     });
   });
   btnAct3.addEventListener('click', function () {
     if (!S.settled) return;
     openStage(3);
     showAct(3);
-    beep(330, 0.25, 'triangle');
+    sfxDoor();
   });
 
   /* ---------- stage 3 ---------- */
@@ -928,13 +1160,15 @@
     }
     var inner = $('slot-' + slot).querySelector('.slot-inner');
     inner.innerHTML =
-      '<div class="slot-card slot-in"><div class="img-wrap"><img src="' + f.card.img + '" width="460" height="793" alt="1909莱德·伟特塔罗 ' +
-      esc(f.card.name) + (f.rev ? '（逆位）' : '（正位）') + '"' + (f.rev ? ' class="is-rev"' : '') + '></div>' +
+      '<div class="slot-card slot-in"><div class="img-wrap"><div class="card-3d">' +
+      '<div class="card-face card-face-back">' + BACK_SVG + '</div>' +
+      '<div class="card-face card-face-front"><img src="' + f.card.img + '" width="460" height="793" alt="1909莱德·伟特塔罗 ' +
+      esc(f.card.name) + (f.rev ? '（逆位）' : '（正位）') + '"' + (f.rev ? ' class="is-rev"' : '') + '></div></div></div>' +
       '<h4>' + esc(f.card.n + ' ' + f.card.name) + '</h4>' +
       '<span class="orient">' + (f.rev ? '逆位' : '正位') + '</span>' +
       '<p>' + esc(slotReading(slot, f.card, f.rev)) + '</p></div>';
     $('drawn-counter').textContent = S.drawn.length + ' / 3';
-    beep(300 + slot * 120, 0.22, 'triangle', 0.05);
+    sfxFlip(slot);
     if (S.drawn.length === 3) {
       $('btn-to-act4').disabled = false;
       $('btn-draw-all').disabled = true;
@@ -947,15 +1181,46 @@
     if (!b || b.disabled || S.drawn.length >= 3) return;
     drawNext(b);
   });
+  var shuffling = false;
   $('btn-shuffle').addEventListener('click', function () {
+    if (shuffling) return;
+    shuffling = true;
     var cards = $$('.deck-card', deckEl);
-    cards.forEach(function (c) { c.classList.add('is-shuffle'); });
-    beep(180, 0.3, 'sawtooth', 0.025);
-    setTimeout(function () {
+    sfxShuffle();
+    function setVars(fn) {
+      cards.forEach(function (c, i) {
+        var v = fn(c, i, cards.length);
+        c.style.setProperty('--tx', v[0] + 'px');
+        c.style.setProperty('--ty', v[1] + 'px');
+        c.style.setProperty('--rot', v[2] + 'deg');
+      });
+    }
+    function settle() {
       var live = $$('.deck-card', deckEl);
       shuffled(live, Math.random).forEach(function (c) { deckEl.appendChild(c); });
-      live.forEach(function (c) { c.classList.remove('is-shuffle'); });
-    }, reduced ? 50 : 700);
+      setVars(function () { return [0, 0, 0]; });
+      setTimeout(function () {
+        deckEl.classList.remove('is-fanning');
+        shuffling = false;
+      }, reduced ? 0 : 280);
+    }
+    if (reduced) {
+      settle();
+    } else {
+      var dr = deckEl.getBoundingClientRect();
+      var dcx = dr.left + dr.width / 2, dcy = dr.top + dr.height / 2;
+      var rects = cards.map(function (c) { var r = c.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+      deckEl.classList.add('is-fanning');
+      setVars(function (c, i) { return [(dcx - rects[i][0]) * 0.92, (dcy - rects[i][1]) * 0.92, (i % 3 - 1) * 3]; });
+      setTimeout(function () {
+        setVars(function (c, i, n) {
+          var u = n > 1 ? i / (n - 1) : 0.5;
+          var tx = dcx + (u - 0.5) * dr.width * 0.8, ty = dcy - 36 * (1 - Math.pow(2 * u - 1, 2)) + 14;
+          return [tx - rects[i][0], ty - rects[i][1], -24 + 48 * u];
+        });
+      }, 260);
+      setTimeout(settle, 680);
+    }
     if (S.mode === 'free' && S.drawn.length < 3) {
       var used = S.drawn.map(function (d) { return d.card.id; });
       var pool = shuffled(CARDS.filter(function (c) { return used.indexOf(c.id) < 0; }), Math.random);
@@ -976,7 +1241,7 @@
     if (S.drawn.length < 3) return;
     openStage(4);
     showAct(4);
-    beep(440, 0.3, 'triangle');
+    sfxDoor();
   });
 
   /* ---------- stage 4 ---------- */
@@ -1039,9 +1304,7 @@
     $('oracle-dossier').innerHTML = oracleHTML(res);
     saveHistory(res);
     renderHistory();
-    beep(523, 0.3, 'triangle', 0.05);
-    setTimeout(function () { beep(659, 0.3, 'triangle', 0.05); }, 150);
-    setTimeout(function () { beep(784, 0.45, 'triangle', 0.05); }, 300);
+    sfxSeal();
   }
   function countUp(el, target, prefix) {
     prefix = prefix || '';
@@ -1062,6 +1325,11 @@
       cards.filter(function (c) { return !c.rev; })[0].card.name + '」所指的方向上。';
     return '三幅画都倒悬着，这不是判词，只是长夜替你按下的一枚慢板记号，杯底图腾给的那句话，正是逆风里最稳的一步。';
   }
+  var WAX_SEAL = '<svg class="wax-seal" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true">' +
+    '<path d="M32 3C40 2 44 6 50 9C57 13 60 20 61 28C62 38 58 46 52 52C46 58 38 62 30 61C20 60 12 55 8 47C3 39 3 28 7 20C11 11 22 4 32 3Z" fill="#a8281e"/>' +
+    '<circle cx="32" cy="32" r="21" fill="none" stroke="#c9a24b" stroke-width="1.5" opacity="0.8"/>' +
+    '<path d="M36 19A13 13 0 1 0 36 45A10 10 0 1 1 36 19Z" fill="#c9a24b"/>' +
+    '<path d="M42 26L43.5 30.5L48 32L43.5 33.5L42 38L40.5 33.5L36 32L40.5 30.5Z" fill="#c9a24b"/></svg>';
   function oracleHTML(r) {
     var t = TOTEMS[r.totem];
     var I = INTENTS[r.intent];
@@ -1081,7 +1349,7 @@
       synthLine(c) + r.quote;
     return '<section><h3>《摩伊拉夜话笺》</h3>' +
       '<p>' + esc(p1) + '</p><p>' + esc(p2) + '</p><p>' + esc(p3) + '</p>' +
-      '<p class="sign-off">摩伊拉三姊妹 · 书于佩拉区雨夜</p></section>' +
+      '<div class="sign-row"><p class="sign-off">摩伊拉三姊妹 · 书于佩拉区雨夜</p>' + WAX_SEAL + '</div></section>' +
       '<section><h3>今夜行事笺</h3><dl>' +
       '<dt>今日宜</dt><dd>' + esc(r.yi) + '</dd>' +
       '<dt>今日忌</dt><dd>' + esc(r.ji) + '</dd>' +
@@ -1243,7 +1511,7 @@
     openModal();
     renderPoster().then(function () {
       $('modal-note').textContent = S.cardURL ? '拍立得笺已洗印，可以下载留念。' : '拍立得笺已洗印，当前浏览器限制了直接下载，请截图留念。';
-      beep(700, 0.3, 'triangle', 0.05);
+      sfxClink();
     });
   });
   $('btn-download-card').addEventListener('click', function () {
@@ -1326,10 +1594,11 @@
   });
   $('btn-sound').addEventListener('click', function () {
     S.sound = !S.sound;
-    this.textContent = S.sound ? '声音：开' : '声音：关';
+    this.textContent = S.sound ? '器物声效：开' : '器物声效：关';
     this.setAttribute('aria-pressed', S.sound ? 'true' : 'false');
-    if (S.sound) beep(600, 0.15);
+    if (S.sound) sfxDoor();
   });
+  $('btn-bgm').addEventListener('click', function () { setBgm(!S.bgm); });
 
   /* ---------- init ---------- */
   selectInGroup('.intent-btn', 'data-intent', S.intent);

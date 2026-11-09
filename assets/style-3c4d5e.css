@@ -219,7 +219,7 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
 .slot h3 { margin-bottom: 0.75rem; }
 .slot-empty { display: grid; place-items: center; min-height: 200px; background: var(--surface-2); border-radius: 6px; color: var(--muted); font-size: var(--step-small); text-align: center; padding: 1rem; }
 .slot-card { display: grid; grid-template-columns: minmax(96px, 36%) 1fr; gap: 1rem; align-items: start; }
-.slot-card .img-wrap { overflow: hidden; border-radius: 4px; background: var(--surface-2); }
+.slot-card .img-wrap { overflow: visible; border-radius: 4px; background: transparent; perspective: 1100px; }
 .slot-card img { width: 100%; transition: transform 0.7s var(--ease); }
 .slot-card img.is-rev { transform: rotate(180deg); }
 .slot-card h4 { margin: 0; font-family: var(--font-display); font-size: var(--step-body); }
@@ -232,7 +232,7 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
 .deck { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.75rem; }
 .deck-card {
   position: relative; padding: 0; border: 0; background: transparent; aspect-ratio: 460 / 771; perspective: 800px; border-radius: 6px;
-  transition: transform 0.3s var(--ease);
+  transition: transform 0.38s var(--ease), opacity 0.35s;
 }
 .deck-card:not(:disabled):hover { transform: translateY(-6px) rotate(-1deg); }
 .deck-card:disabled { cursor: default; }
@@ -323,4 +323,67 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
   .btn { width: 100%; }
   .btn-sound { width: auto; }
   .cta-row .btn, .cup-actions .btn, .action-bar .btn { flex: 1 1 100%; }
+}
+
+/* ===== v3.0 Ceremonial Edition ===== */
+
+/* 1909 bookplate corner filigree */
+.intent-btn, .panel, .slot, .rank-card, .oracle {
+  --fil-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 22V7Q2 2 7 2H22M6 22V10Q6 6 10 6H22' fill='none' stroke='%23c9a24b' stroke-width='1.2' opacity='.6'/%3E%3Ccircle cx='4' cy='4' r='1.5' fill='%23c9a24b'/%3E%3C/svg%3E");
+  --fil-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(90 12 12)'%3E%3Cpath d='M2 22V7Q2 2 7 2H22M6 22V10Q6 6 10 6H22' fill='none' stroke='%23c9a24b' stroke-width='1.2' opacity='.6'/%3E%3Ccircle cx='4' cy='4' r='1.5' fill='%23c9a24b'/%3E%3C/g%3E%3C/svg%3E");
+  --fil-c: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(270 12 12)'%3E%3Cpath d='M2 22V7Q2 2 7 2H22M6 22V10Q6 6 10 6H22' fill='none' stroke='%23c9a24b' stroke-width='1.2' opacity='.6'/%3E%3Ccircle cx='4' cy='4' r='1.5' fill='%23c9a24b'/%3E%3C/g%3E%3C/svg%3E");
+  --fil-d: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(180 12 12)'%3E%3Cpath d='M2 22V7Q2 2 7 2H22M6 22V10Q6 6 10 6H22' fill='none' stroke='%23c9a24b' stroke-width='1.2' opacity='.6'/%3E%3Ccircle cx='4' cy='4' r='1.5' fill='%23c9a24b'/%3E%3C/g%3E%3C/svg%3E");
+}
+.intent-btn, .intent-btn:hover, .intent-btn[aria-pressed="true"],
+.panel, .slot, .rank-card, .oracle {
+  background-image: var(--fil-a), var(--fil-b), var(--fil-c), var(--fil-d);
+  background-repeat: no-repeat;
+  background-position: left 6px top 6px, right 6px top 6px, left 6px bottom 6px, right 6px bottom 6px;
+  background-size: 22px 22px;
+}
+.intent-btn { position: relative; overflow: hidden; }
+.intent-btn::after {
+  position: absolute; right: 0.75rem; top: 0.5rem; pointer-events: none;
+  font-family: var(--font-display); font-size: var(--step-head); opacity: 0.12; line-height: 1.2;
+}
+.intent-btn[data-intent="career"]::after { content: "I"; }
+.intent-btn[data-intent="love"]::after { content: "II"; }
+.intent-btn[data-intent="study"]::after { content: "III"; }
+.intent-btn[data-intent="luck"]::after { content: "IV"; }
+
+/* Stage 2 cup tilt and inversion */
+@keyframes revealFade { from { opacity: 0; } to { opacity: 1; } }
+#cup-canvas.reveal { animation-name: revealFade; }
+#cup-canvas { transition: transform 0.18s ease-out; will-change: transform; }
+#cup-canvas.cup-invert { animation: cupInvert 2.4s var(--ease) both; }
+@keyframes cupInvert {
+  0% { transform: perspective(900px) rotateZ(0deg) scale(1); }
+  35% { transform: perspective(900px) rotateZ(14deg) scale(1.03); }
+  55% { transform: perspective(900px) rotateX(180deg) scale(0.92); }
+  75% { transform: perspective(900px) rotateX(180deg) scale(0.92); }
+  100% { transform: perspective(900px) rotateX(0deg) scale(1); }
+}
+
+/* Stage 3 true 3D flip and fan shuffle */
+.card-3d { position: relative; width: 100%; aspect-ratio: 460 / 793; transform-style: preserve-3d; animation: flipReveal 0.88s var(--ease) both; }
+.card-face { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 2px; overflow: hidden; }
+.card-face-back { transform: rotateY(180deg); background: #3a1612; display: grid; place-items: center; }
+.card-face-front { transform: rotateY(0deg); }
+.card-face img { width: 100%; height: 100%; object-fit: cover; }
+@keyframes flipReveal {
+  0% { transform: translateY(24px) translateZ(0) rotateY(180deg) scale(0.92); }
+  50% { transform: translateY(-10px) translateZ(42px) rotateY(90deg) scale(1.05); }
+  100% { transform: translateY(0) translateZ(0) rotateY(0deg) scale(1); }
+}
+.deck.is-fanning .deck-card { transform: translate(var(--tx, 0px), var(--ty, 0px)) rotate(var(--rot, 0deg)); }
+
+/* Stage 4 wax seal */
+.oracle .sign-row { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; }
+.wax-seal { flex: none; transform-origin: center; animation: sealStamp 0.8s var(--ease) 0.5s both; }
+@keyframes sealStamp {
+  from { opacity: 0; transform: scale(1.35) rotate(-12deg); }
+  to { opacity: 1; transform: scale(1) rotate(0deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .card-3d, .wax-seal, #cup-canvas.cup-invert { animation: none; }
 }
