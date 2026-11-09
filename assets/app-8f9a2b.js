@@ -1,1169 +1,1288 @@
-/* 1872 Mary Celeste: six-act interactive state machine. Plain JS, no external deps. */
+/* 摩伊拉咖啡馆：1909古董塔罗与咖啡渣占卜台 */
 (function () {
   'use strict';
 
-  /* ------------------------------------------------------------------ *
-   * Content (mirrors content/toy_creative_spec.json)
-   * ------------------------------------------------------------------ */
-  var SPEC = {
-    acts: {
-      1: {
-        code: 'ABNORMAL_ANCHOR',
-        title: '玛丽·赛勒斯特号案卷',
-        subtitle: '第一幕 · 1872年12月4日北大西洋现场勘查互动卷宗',
-        hook: '你作为大英帝国直布罗陀海事法庭特派勘查官，刚刚踏上这艘在北大西洋独自劈浪漂流的双桅商船「玛丽·赛勒斯特号」。船上没有一具尸体，没有一滴搏斗血迹，1701桶高纯度工业酒精原封未动，但船长本杰明、船长妻女与7名船员（全船共10人），在400海里外的狂风中人间蒸发。',
-        interrupt: '等等不对劲！如果是一场仓促逃命的灾难，为什么船长夫人缝纫机上的童装还差最后一针？为什么厨房炉火刚熄，餐盘上还留着没吃完的早餐？'
-      },
-      2: {
-        code: 'SENSORY_INSPECTION',
-        title: '五件物证，五处反常',
-        subtitle: '切换【黄色荧光标注刷】与【手绘红圈取证笔】，找齐5件核心物证的反常死穴'
-      },
-      3: {
-        code: 'INTUITION_TRAP',
-        title: '直布罗陀海事法庭',
-        subtitle: '先顺应常识建楼，再用反常死穴一锤定向砸碎'
-      },
-      4: {
-        code: 'GHOST_CLUE',
-        title: '红橡木桶与崩断麻绳',
-        subtitle: '连接『9桶红橡木』『掀开的舱盖』与『崩断的主帆缭绳』三条证据链',
-        mechanism: '玩家在勘查台上将【物证 #05 红橡木渗漏】+【物证 #04 崩断的主帆缭绳】通过【掀开的舱盖】串联比对，解锁伦敦大学学院（UCL）以纸板复刻的缩比货舱模型气体燃爆还原实验。'
-      },
-      5: {
-        code: 'PHYSICAL_RECONSTRUCTION',
-        title: '死寂留白与幽蓝冷焰',
-        subtitle: '1872年11月25日 08:12–08:15 · 致命的3分钟'
-      },
-      6: {
-        code: 'FATE_ECHO',
-        title: '最理性的父爱与深海',
-        subtitle: '物理真相 × 人性悲剧的哲学终局',
-        epilogue: '如果本杰明船长是个鲁莽的赌徒，他或许会留在甲板上看一眼货舱：那样他就会发现火已经灭了，全船10人都会平安抵达热那亚。但正因为他是一位极其负责的船长、一位绝不敢拿2岁女儿生命赌万分之一的父亲，他做出了当时最理性的决定：全员登上救生艇，用一根最结实的麻绳系在船尾，等大船不炸再爬回来。几分钟后，北大西洋的阵风鼓满大船风帆，咔嚓一声扯断了那根麻绳。空无一人的玛丽·赛勒斯特号以两倍于划桨的速度绝尘而去，留给那叶孤舟的，只有永远追不上的背影。'
-      }
-    },
-    cards: [
-      {
-        id: 'ev-logbook', angle: -2.8, type: 'yellow_fluo',
-        name: '物证 #01 · 船长航海日志残页',
-        camera: '35mm f/2.8 微距静帧 · 羊皮纸纤维剖面',
-        fact: '最后一条记录停留在11月25日清晨8点，字迹工整平稳：『圣玛丽亚岛位于正东偏南6海里，风力温和。』',
-        target: '11月15日至25日连续10天风平浪静，字迹毫无颤抖',
-        deduction: '直到弃船最后一刻，船上根本没有发生过持续性的暴乱或风暴恐慌！致命异变在几分钟内突然降临。',
-        sound: 'clue_crystal_ding'
-      },
-      {
-        id: 'ev-sword', angle: 4.1, type: 'red_circle',
-        name: '物证 #02 · 床铺下的斑驳意大利长剑',
-        camera: '35mm f/4.0 侧逆光微距 · 金属氧化层断层剖面',
-        fact: '直布罗陀检察官弗拉德声称在船长床下搜出这把带有『暗红色血迹』的长剑，指控船员杀害船长全家。',
-        target: '显微镜化学反应报告：柠檬汁擦拭后的氧化铁红锈与松木油脂，0%人血血红蛋白',
-        deduction: '所谓『血剑』是检察官为了吞没高额海难救助金而强行附会的假证据！全船没有任何暴力流血痕迹。',
-        sound: 'clue_crystal_ding'
-      },
-      {
-        id: 'ev-hull-cuts', angle: -2.5, type: 'red_circle',
-        name: '物证 #03 · 船首两侧对称的V型木屑切口',
-        camera: '35mm f/5.6 广角近摄 · 北美白松木船壳纹理',
-        fact: '检方宣称这是海盗登船前故意凿船制造海难假象的凿痕，长约2米、深约1厘米。',
-        target: '切口严格对称分布在吃水线上方同一水平面，呈自然波浪剥离状',
-        deduction: '木船专家证实：这只是北美新斯科舍白松木在重载劈浪时完全正常的木材开裂剥落，绝非人为斧凿！',
-        sound: 'clue_crystal_ding'
-      },
-      {
-        id: 'ev-Navigation', angle: 3.6, type: 'yellow_fluo',
-        name: '物证 #04 · 被带走的六分仪与断裂的主帆缭绳',
-        camera: '35mm f/2.0 浅景深微距 · 麻绳纤维断裂面',
-        fact: '船长室里价值连城的怀表、珠宝、现金袋分文未动，唯独体积笨重的航海六分仪、航海天文钟与船籍证书消失了；船尾栏杆留有一根崩断的主帆粗麻绳。',
-        target: '六分仪+天文钟带走，金表珠宝留下；栏杆麻绳末端纤维呈极度紧绷拉断状',
-        deduction: '海盗绝不会不要黄金只要六分仪！带走导航仪器的只有船长本人，而且他们登上救生艇后，曾死死用这根缆绳拴住大船，根本不想离开玛丽·赛勒斯特号！',
-        sound: 'clue_crystal_ding'
-      },
-      {
-        id: 'ev-barrels', angle: -2.6, type: 'red_circle',
-        name: '物证 #05 · 货舱深处9桶空置的红橡木桶',
-        camera: '35mm f/2.8 暗光微距 · 红橡木气孔与白橡木对比剖面',
-        fact: '底舱满载1701桶高浓度工业变性酒精（不可饮用），清点后发现有1692桶完好无损，唯独9桶完全空置，且舱盖被掀开。',
-        target: '1692桶为致密白橡木，唯独空掉的9桶是质地疏松多孔的红橡木，且船体刚从寒冷纽约驶入温暖亚速尔海域',
-        deduction: '这就是全案唯一的幽灵线索！多孔红橡木在温差骤升下疯狂渗漏高挥发酒精，使密闭货舱变成了随时引爆的巨型气溶胶炸弹！',
-        sound: 'clue_crystal_ding'
-      }
-    ],
-    hypotheses: [
-      {
-        id: 'hyp-pirates', trap: true, counter: 'ev-Navigation', counterLabel: '物证 #04',
-        title: '假说 A：摩洛哥海盗劫船屠杀',
-        pitch: '1872年亚速尔至直布罗陀航线海盗猖獗，海盗登船绑架全体船员勒索赎金或将其抛入大海。',
-        verdict: '【一锤砸碎 · 铁门闭锁】哪门子海盗放着满船1701桶高价货、船长夫人的黄金首饰和现金袋一分不拿，专门偷走只有专业船长才用得上的六分仪和航海日志？常识假说当场崩塌！'
-      },
-      {
-        id: 'hyp-mutiny', trap: true, counter: 'ev-sword', counterLabel: '物证 #02',
-        title: '假说 B：水手偷喝酒精买醉哗变',
-        pitch: '水手撬开那9桶空酒桶狂饮烂醉，失手杀死严厉的本杰明船长一家，随后乘救生艇畏罪潜逃。',
-        verdict: '【一锤砸碎 · 铁门闭锁】第一，船上装的是掺了甲醇剧毒的工业变性酒精，喝一口就会失明呕吐；第二，『血剑』经化验全是铁锈与柠檬汁；第三，船员连自己的烟斗和油布雨衣都没拿！哗变说彻底破产！'
-      },
-      {
-        id: 'hyp-insurance', trap: true, counter: 'ev-logbook', counterLabel: '物证 #01',
-        title: '假说 C：船长与货主串通骗保',
-        pitch: '本杰明船长因投资亏损，故意在公海伪造弃船假象，勾结打捞船骗取巨额海事保险金。',
-        verdict: '【一锤砸碎 · 铁门闭锁】骗保的前提是人活着去领钱！本杰明船长本人持有该船三分之一股份，还带着自己深爱的妻子和年仅2岁的幼女索菲亚同船，没有任何一个父亲会拿2岁女儿的性命在狂风大西洋里坐无篷小舢板骗保！'
-      },
-      {
-        id: 'hyp-cold-flame', trap: false, counter: 'ev-barrels', counterLabel: '物证 #05',
-        title: '假说 D：多孔红橡木酒精渗漏 + 温差冷焰闪爆诱发『暂时避险』',
-        pitch: '9桶红橡木渗出的酒精在底舱形成高浓度可燃蒸汽，打开舱盖换气瞬间摩擦引燃『低温冷焰闪爆』，船长误以为整船1700桶酒精即将连环殉爆，下令全员坐救生艇借主帆缭绳拖行暂避，不料暴风骤起扯断麻绳。',
-        verdict: '【真相锁定 · 晶体共鸣】伦敦大学学院（UCL）化学系安德烈亚·塞拉教授通过以纸板复刻的缩比货舱模型进行气体燃爆实验证实：乙醇蒸汽在特定浓度下会发生剧烈喷发却温度极低的『冷焰闪爆（Cool Flame）』：火光冲天、气浪震耳，却连一张纸都不会烤焦！'
-      }
-    ],
-    steps: [
-      '08:05 船只驶入亚速尔温暖海域，底舱9桶红橡木渗出的数加仑乙醇迅速气化，膨胀顶松舱盖。',
-      '08:12 船长下令掀开主舱盖排散刺鼻酒气，新鲜氧气涌入，乙醇蒸汽浓度精准落入 3.3%~19% 爆炸极限。',
-      '08:14:59 舱口铁环轻微摩擦产生静电火花：【死寂留白 0.72秒（18帧）：海浪与BGM瞬间归零至 -∞ dBFS，仅剩心脏搏动与麻绳纤维紧绷声】',
-      '08:15:00 轰！数米高的幽蓝色冷焰从底舱喷涌而出，气浪掀翻舱盖，但因为乙醇蒸汽极快燃尽且热容极低，船木连一丝焦黑都没留下！'
-    ],
-    ranks: [
-      {
-        min: 90, letter: 'S+', badge: 'S+ · 皇家海事首席断案官', title: '识破0.1%幽灵线索的福尔摩斯',
-        comment: '【皇家断案官S+】我只用一次勘查就锁定了第9桶红橡木的冷焰死穴！最刀的不是幽灵船，是那根被大船扯断的麻绳……'
-      },
-      {
-        min: 70, letter: 'A', badge: 'A · 苏格兰场资深勘查员', title: '看穿血剑伪证的冷静推理者',
-        comment: '【苏格兰场A级】差点信了水手买醉哗变，直到用荧光刷扫出红橡木气孔！这期互动卷宗太顶了！'
-      },
-      {
-        min: 0, letter: 'B', badge: 'B · 1872直布罗陀陪审团成员', title: '被常识假说诱捕的温柔旁观者',
-        comment: '【陪审团B级】我承认第一眼我也投了海盗劫船，结果被六分仪当场打脸！做完实验汗毛都立起来了！'
-      }
-    ],
-    DEAD_SILENCE_MS: 720
-  };
-
-  /* ------------------------------------------------------------------ *
-   * State
-   * ------------------------------------------------------------------ */
-  var state = {
-    act: 1,
-    maxAct: 1,
-    tool: 'yellow_fluo',
-    found: {},          // card id -> 'manual' | 'auto'
-    foundCount: 0,
-    wrong: {},          // hypothesis id -> true
-    wrongCount: 0,
-    truth: false,
-    picked: null,       // first picked chain node
-    link1: false,
-    link2: false,
-    formula: false,
-    flashing: false,
-    flashed: false,
-    score: 0,
-    rank: null,
-    settled: false,
-    savedCloud: false,
-    savedScore: false,
-    soundOn: true
-  };
-
-  /* ------------------------------------------------------------------ *
-   * DOM helpers
-   * ------------------------------------------------------------------ */
+  var TAU = Math.PI * 2;
+  var SERIF = '"Songti SC", "SimSun", Georgia, serif';
+  var SANS = '"PingFang SC", "Microsoft YaHei", sans-serif';
+  function font(px, weight, fam) {
+    return (weight || 400) + ' ' + Math.max(14, px) + 'px ' + (fam || SERIF);
+  }
   function $(id) { return document.getElementById(id); }
-  function el(tag, cls, text) {
-    var n = document.createElement(tag);
-    if (cls) n.className = cls;
-    if (text != null) n.textContent = text;
-    return n;
-  }
-  function setText(id, text) { var n = $(id); if (n) n.textContent = text; }
-  function cardById(id) {
-    for (var i = 0; i < SPEC.cards.length; i++) if (SPEC.cards[i].id === id) return SPEC.cards[i];
-    return null;
+  function $$(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
   }
 
-  var toastTimer = 0;
+  /* ---------- assets ---------- */
+  var ASSETS = {
+    atlas: './assets/star-atlas-1660-1a2b3c.jpg',
+    cup: './assets/turkish-cup-2b3c4d.jpg',
+    crema: './assets/coffee-crema-3c4d5e.jpg'
+  };
+
+  var CARDS = [
+    { id: 'fool', n: '0', name: '愚者', img: './assets/tarot-00-fool-a1b2c3.jpg', lk: [8, 5],
+      up: '新的起点与轻装上路的勇气', rev: '冲动冒进与准备不足' },
+    { id: 'magician', n: 'I', name: '魔术师', img: './assets/tarot-01-magician-b2c3d4.jpg', lk: [9, 5],
+      up: '手上资源已齐，只差一次动手', rev: '才华分散，话说得比做得多' },
+    { id: 'priestess', n: 'II', name: '女祭司', img: './assets/tarot-02-priestess-c3d4e5.jpg', lk: [7, 6],
+      up: '直觉清醒，答案藏在沉默里', rev: '信息被隐瞒，或你在回避真相' },
+    { id: 'empress', n: 'III', name: '皇后', img: './assets/tarot-03-empress-d4e5f6.jpg', lk: [9, 5],
+      up: '丰盛、滋养与稳定的收成', rev: '过度付出，或停滞的回报' },
+    { id: 'emperor', n: 'IV', name: '皇帝', img: './assets/tarot-04-emperor-e5f6a7.jpg', lk: [7, 5],
+      up: '规则、结构与果断的掌控', rev: '固执僵化，或来自权威的压力' },
+    { id: 'chariot', n: 'VII', name: '战车', img: './assets/tarot-07-chariot-f6a7b8.jpg', lk: [8, 5],
+      up: '意志统一，向着目标加速', rev: '方向分裂，用力过猛反而失控' },
+    { id: 'wheel', n: 'X', name: '命运之轮', img: './assets/tarot-10-wheel-a7b8c9.jpg', lk: [8, 4],
+      up: '转机到来，局势翻面', rev: '周期低谷，暂时的逆风' },
+    { id: 'tower', n: 'XVI', name: '高塔', img: './assets/tarot-16-tower-b8c9d0.jpg', lk: [4, 6],
+      up: '旧结构崩塌，突如其来的真相', rev: '崩塌被拖延，或灾后重建中的余震' },
+    { id: 'star', n: 'XVII', name: '星星', img: './assets/tarot-17-star-c9d0e1.jpg', lk: [10, 6],
+      up: '希望修复，长线的疗愈', rev: '信心失焦，对未来过度悲观' },
+    { id: 'moon', n: 'XVIII', name: '月亮', img: './assets/tarot-18-moon-d0e1f2.jpg', lk: [5, 7],
+      up: '迷雾中的不安与潜意识的暗示', rev: '迷雾渐散，真相即将浮出' },
+    { id: 'sun', n: 'XIX', name: '太阳', img: './assets/tarot-19-sun-e1f2a3.jpg', lk: [10, 6],
+      up: '明朗、成功与被看见', rev: '热情过载，或好消息被延迟' },
+    { id: 'world', n: 'XXI', name: '世界', img: './assets/tarot-21-world-f2a3b4.jpg', lk: [10, 6],
+      up: '圆满收官，一个周期完成', rev: '只差最后一步，收尾被拖住' }
+  ];
+
+  var SLOT_NAMES = ['过去之因', '当下之局', '未来之兆'];
+  var SLOT_SHORT = ['过去', '当下', '未来'];
+
+  var INTENTS = {
+    career: { label: '搞钱与事业破局', short: '事业',
+      lens: ['放在事业上，这是你过去几年在职场与钱路上埋下的底色。',
+             '落到搞钱这件事，它就是眼下卡住你或推着你的那个点。',
+             '对事业破局来说，这是接下来三十天最值得押注的方向。'] },
+    love: { label: '感情与宿命羁绊', short: '感情',
+      lens: ['放在感情上，这是你们关系里最早埋下的那颗种子。',
+             '落到这段羁绊，它说的就是此刻你们之间真正的症结。',
+             '对这段缘分来说，这是接下来最可能发生的转向。'] },
+    study: { label: '学业与上岸渡劫', short: '学业',
+      lens: ['放在学业上，这是你一路复习与备考留下的惯性。',
+             '落到上岸这件事，它指出你眼下最该修正的节奏。',
+             '对渡劫结果来说，这是临门一脚时最需要的状态。'] },
+    luck: { label: '今日赛博水逆退散', short: '运势',
+      lens: ['放在今天的运势上，这是你近日倒霉感的真正来源。',
+             '落到眼前的水逆，它说明麻烦究竟卡在哪一环。',
+             '对退散水逆来说，这是今晚之前最该抓住的转机。'] }
+  };
+
+  var SIGNS = {
+    fire: { label: '火象', trait: '火象的你行动快，热度高，今天要防的是三分钟热度。' },
+    earth: { label: '土象', trait: '土象的你务实稳健，今天要防的是过度保守而错过窗口。' },
+    air: { label: '风象', trait: '风象的你信息多，点子密，今天要防的是想太多而落不了地。' },
+    water: { label: '水象', trait: '水象的你感受细，直觉准，今天要防的是被别人的情绪带跑。' }
+  };
+
+  var TOTEMS = {
+    owl: { name: '夜枭栖枝', el: 'air', luck: 4, item: '黄铜书签',
+      read: '猫头鹰栖在横枝上，双眼朝向杯口。夜枭擅长在暗处看清事物，说明你早已察觉某件事，只是一直没有说破。',
+      intent: {
+        career: '有一个机会出现在非正式场合，夜里想清楚的方案，比白天开会时的更靠谱。',
+        love: '对方的态度你心里早有判断，别再找人求证，第一直觉就是答案。',
+        study: '适合在安静的夜间复盘，薄弱点会在独处时自己浮出来。',
+        luck: '今天先观察再开口，能替你挡掉一次口舌是非。' },
+      zones: {
+        rim: '杯沿的渣粒细碎而分散，近七日会有一条不起眼的消息，值得你多看两眼。',
+        wall: '杯壁左侧有一道向上的纹路，是暗处有人在替你说话；右侧的短横是阻力，多半来自你自己的犹豫。',
+        bottom: '杯底的死穴是想得太多、做得太少。枝再稳，鸟不飞也只是摆设。' } },
+    anchor: { name: '破浪铁锚', el: 'water', luck: 5, item: '深蓝丝巾',
+      read: '铁锚沉在杯底正中，弧形双臂向上托起。锚代表在风浪里把你固定住的东西，你需要的不是更快，而是更稳。',
+      intent: {
+        career: '别被新风口带着跑，守住手上的主业，副业用小成本试水即可。',
+        love: '这段关系需要一个明确的定义，模糊久了，双方都会累。',
+        study: '稳住节奏比冲刺重要，每天固定时段学习，比一次熬夜有效十倍。',
+        luck: '今天适合收拾、整理、做减法，丢掉一件旧物会带来好运。' },
+      zones: {
+        rim: '杯沿有一圈整齐的细渣，近七日行程会被固定下来，反而让人安心。',
+        wall: '杯壁两侧对称，助力与阻力基本持平，关键看你选哪一边使力。',
+        bottom: '杯底的死穴是不敢松手，抓得太紧的东西，正在拖慢你。' } },
+    key: { name: '双生铜钥', el: 'earth', luck: 2, item: '一把旧钥匙',
+      read: '两把铜钥交叉叠在杯底，一把朝左，一把朝右。双钥意味着同一扇门有两种打开方式，你一直只试了其中一种。',
+      intent: {
+        career: '换个角度谈合作，一个看似无关的人脉，会成为第二把钥匙。',
+        love: '你和对方各握着一半真话，先开口的人会拿到主动权。',
+        study: '换一种学习方法，把输入改成输出，卡住的知识点会松动。',
+        luck: '今天遇到的阻碍有备选路线，别在一条路上硬撞。' },
+      zones: {
+        rim: '杯沿渣粒成对出现，近七日会遇到一组二选一的选择。',
+        wall: '杯壁中段有交叉的纹路，是两股力量在拉扯，你夹在中间。',
+        bottom: '杯底的死穴是总想等一个万无一失的答案，而钥匙只有试了才知道合不合。' } },
+    stag: { name: '衔枝白鹿', el: 'fire', luck: 6, item: '白色小饰物',
+      read: '一只白鹿正面望向你，口中衔着一小枝橄榄。鹿是林中的使者，衔枝表示善意与和解，好消息正在靠近。',
+      intent: {
+        career: '有贵人愿意递来橄榄枝，不必急着讨价还价，先接住这份善意。',
+        love: '冷战或误会有机会破冰，先递台阶的人，会赢得整段关系。',
+        study: '导师或同学会给出关键提示，主动请教比独自硬啃更快。',
+        luck: '今天容易遇到顺手的小幸运，保持礼貌，好运会叠加。' },
+      zones: {
+        rim: '杯沿清亮，渣粒稀疏，近七日心情明显轻盈，适合处理积压的消息。',
+        wall: '杯壁上扬的纹路向着杯口，是一股持续的助力，来自一位年长或资深的人。',
+        bottom: '杯底几乎没有死穴，只有一点小提醒：好运来时别疑神疑鬼。' } },
+    crescent: { name: '新月王冠', el: 'water', luck: 5, item: '银色小饰品',
+      read: '一弯新月顶着小小的王冠，悬在杯底中央。新月是从零开始的光，王冠则说明这一次起步，你有资格站在更高的位置。',
+      intent: {
+        career: '适合开启新项目或亮出个人品牌，起点虽小，格局要大。',
+        love: '新的缘分从一个小小的契机开始，不要用旧经验去套新的人。',
+        study: '适合重新制定计划，新的阶段从今天算起，不必追悔过去。',
+        luck: '今天适合许愿与立目标，写下来的事更容易兑现。' },
+      zones: {
+        rim: '杯沿有一道弧形的亮边，近七日会有一次小规模的开端。',
+        wall: '杯壁偏右有月牙状的纹路，是情绪层面的助力，你的感受值得被信任。',
+        bottom: '杯底的死穴是低估自己，把王冠摘下来放进口袋的人，永远等不到加冕。' } },
+    serpent: { name: '衔尾金蛇', el: 'earth', luck: 3, item: '圆形戒指或手环',
+      read: '一条金蛇首尾相衔，围成完整的圆环。衔尾蛇是循环与重生的古老符号，说明你正在重复某个模式，也正站在跳出它的门口。',
+      intent: {
+        career: '同一类问题第三次出现，这次别再打补丁，从根上改流程。',
+        love: '你们在重复同一场争吵，把争吵的开头改掉，结局才会改变。',
+        study: '同一类题型反复出错，是方法而非努力的问题，回到基础概念。',
+        luck: '今天会遇到熟悉的麻烦，换一种与以往不同的做法，它就会自动消失。' },
+      zones: {
+        rim: '杯沿渣粒连成一圈，近七日会有似曾相识的事重演。',
+        wall: '杯壁的纹路首尾相连，助力和阻力其实来自同一件事，换个角度它们就互换了位置。',
+        bottom: '杯底的死穴是习惯，旧习惯舒服，但它把你锁在圆圈里。' } }
+  };
+  var TOTEM_KEYS = ['owl', 'anchor', 'key', 'stag', 'crescent', 'serpent'];
+
+  var ZONES = {
+    rim: { label: '杯沿 · 近七日变局', r0: 158, r1: 190, tag: '杯沿' },
+    wall: { label: '杯壁 · 暗处助力与阻力', r0: 120, r1: 158, tag: '杯壁' },
+    bottom: { label: '杯底 · 潜意识死穴', r0: 0, r1: 120, tag: '杯底' }
+  };
+
+  var CAL = {
+    career: { yi: ['催进一次拖着的报价', '整理作品集并投出三份', '约一位前同事喝咖啡'],
+              ji: ['在群里情绪化发言', '临时答应来路不明的合作', '深夜修改合同条款'] },
+    love: { yi: ['先发一句不带目的的问候', '把心里话写成三行再决定发不发', '独处半小时再回消息'],
+            ji: ['翻对方三个月前的动态', '借酒后的冲动表白', '拿第三个人来试探'] },
+    study: { yi: ['番茄钟四轮，每轮结束写一句总结', '重做上周的错题', '睡前十分钟默背知识框架'],
+             ji: ['通宵刷题', '比较别人的进度', '临时更换复习资料'] },
+    luck: { yi: ['出门前检查钥匙和充电线', '先喝水再回复消息', '把今天最难的事排在上午'],
+            ji: ['冲动下单', '在评论区抬杠', '把重要文件留到最后一刻'] }
+  };
+  var HOURS = ['辰时 07:00 至 09:00', '巳时 09:00 至 11:00', '午时 11:00 至 13:00',
+               '未时 13:00 至 15:00', '申时 15:00 至 17:00', '酉时 17:00 至 19:00', '戌时 19:00 至 21:00'];
+
+  var RANKS = {
+    SSR: { name: 'SSR · 紫微天选', quotes: [
+      '三星归位，杯里有光，牌里有路。今天开口的每一句话，都有人认真听。',
+      '紫微照命，机会不会敲第二次门，所以第一次就请你开门。'] },
+    SR: { name: 'SR · 扶摇破局', quotes: [
+      '风向已转，不必等到万事俱备。先迈出半步，路会替你补上另外半步。',
+      '杯底有裂纹，牌面有出口。顺着裂纹走，别回头。'] },
+    A: { name: 'A · 顺水行舟', quotes: [
+      '水不争先，却能到海。今天做稳一件小事，比做成十件大事更值钱。',
+      '不急，渣已沉底，答案自会澄清。'] },
+    B: { name: 'B · 潜龙勿用', quotes: [
+      '潜龙勿用，不是不用，是等一阵风。今天把力气留给明天。',
+      '牌在提醒你停一停，停下来的人，反而最先看清路。'] }
+  };
+
+  /* ---------- state ---------- */
+  var S = {
+    act: 1, reached: 1, mode: 'daily', intent: 'career', sign: 'fire', sound: true,
+    key: null, totemKey: null, points: null, particles: null, stains: null,
+    settled: false, swirling: false, zone: null,
+    fate: null, drawn: [], drawing: false, result: null, cardURL: null
+  };
+
+  var HISTORY_KEY = 'moirae_cafe_history_v1';
+
+  /* ---------- rng ---------- */
+  function hashStr(s) {
+    var h = 2166136261 >>> 0;
+    for (var i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h = Math.imul(h, 16777619) >>> 0;
+    }
+    return h >>> 0;
+  }
+  function mulberry(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      var t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function dateStr() {
+    var d = new Date(), m = d.getMonth() + 1, day = d.getDate();
+    return d.getFullYear() + '-' + (m < 10 ? '0' + m : m) + '-' + (day < 10 ? '0' + day : day);
+  }
+  function whisperText() { return ($('whisper-input').value || '').trim(); }
+  function seedKey() {
+    return [S.mode, dateStr(), S.intent, S.sign, whisperText()].join('|');
+  }
+  function getRng(salt) {
+    return S.mode === 'daily' ? mulberry(hashStr(seedKey() + '|' + salt)) : Math.random;
+  }
+  function shuffled(arr, rng) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* ---------- ui helpers ---------- */
+  var toastTimer = null;
+  function hideToast() {
+    var t = $('toast');
+    t.classList.remove('is-show');
+    t.style.opacity = '';
+    clearTimeout(toastTimer);
+  }
   function toast(msg) {
     var t = $('toast');
     t.textContent = msg;
-    t.classList.add('is-on');
+    t.classList.add('is-show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(function () { t.classList.remove('is-on'); }, 2200);
+    toastTimer = setTimeout(hideToast, 2200);
   }
-
-  /* ------------------------------------------------------------------ *
-   * Web Audio procedural synthesizer
-   * ------------------------------------------------------------------ */
-  var Audio = (function () {
-    var ctx = null, master = null, sfxBus = null, bgm = null, reverb = null, noiseBuf = null, bgmOn = false;
-
-    function ensure() {
-      if (!state.soundOn) return null;
-      if (!ctx) {
-        var AC = window.AudioContext || window.webkitAudioContext;
-        if (!AC) return null;
-        try { ctx = new AC(); } catch (e) { ctx = null; return null; }
-        var comp = ctx.createDynamicsCompressor();
-        master = ctx.createGain();
-        master.gain.value = 0.8;
-        master.connect(comp);
-        sfxBus = ctx.createGain(); sfxBus.gain.value = 1; sfxBus.connect(master);
-        comp.connect(ctx.destination);
-        // metallic reverb: feedback delay with a darkening filter
-        reverb = ctx.createGain();
-        var dly = ctx.createDelay(0.5), fb = ctx.createGain(), lp = ctx.createBiquadFilter();
-        dly.delayTime.value = 0.093; fb.gain.value = 0.45; lp.type = 'lowpass'; lp.frequency.value = 2600;
-        reverb.connect(dly); dly.connect(lp); lp.connect(fb); fb.connect(dly); lp.connect(master);
-        noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-        var d = noiseBuf.getChannelData(0);
-        for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-      }
-      if (ctx.state === 'suspended' && ctx.resume) { try { ctx.resume(); } catch (e) { /* ignore */ } }
-      return ctx;
-    }
-
-    function noise(t, dur) {
-      var s = ctx.createBufferSource();
-      s.buffer = noiseBuf; s.loop = true;
-      s.start(t); s.stop(t + dur + 0.05);
-      return s;
-    }
-    function env(g, t, peak, attack, dur) {
-      g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(peak, t + attack);
-      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
-    }
-    function osc(type, freq, t, dur) {
-      var o = ctx.createOscillator();
-      o.type = type; o.frequency.setValueAtTime(freq, t);
-      o.start(t); o.stop(t + dur + 0.05);
-      return o;
-    }
-
-    var sounds = {
-      // low-frequency sea breeze: white noise at 180Hz + 480Hz band-pass wind layer (phone speakers)
-      comma_breath: function (t) {
-        var n = noise(t, 1.8), f = ctx.createBiquadFilter(), g = ctx.createGain();
-        f.type = 'lowpass'; f.frequency.value = 180; f.Q.value = 0.8;
-        env(g, t, 1.6, 0.7, 1.8);
-        n.connect(f); f.connect(g); g.connect(sfxBus);
-        var n2 = noise(t, 1.8), bp = ctx.createBiquadFilter(), g2 = ctx.createGain();
-        bp.type = 'bandpass'; bp.frequency.value = 480; bp.Q.value = 1.1;
-        env(g2, t, 0.3, 0.8, 1.8);
-        n2.connect(bp); bp.connect(g2); g2.connect(sfxBus);
-      },
-      // suspense cello harmonics gliding 220Hz -> 196Hz (dur is shortened before the dead-silence window)
-      question_suspense: function (t, dur) {
-        dur = dur || 1.9;
-        var g = ctx.createGain(), f = ctx.createBiquadFilter(), lfo = osc('sine', 5.5, t, dur), lg = ctx.createGain();
-        f.type = 'lowpass'; f.frequency.value = 1400;
-        env(g, t, 0.28, Math.min(0.35, dur * 0.4), dur);
-        lg.gain.value = 3; lfo.connect(lg);
-        [[1, 'sawtooth', 0.6], [2, 'triangle', 0.3], [3, 'sine', 0.15]].forEach(function (h) {
-          var o = osc(h[1], 220 * h[0], t, dur), hg = ctx.createGain();
-          o.frequency.exponentialRampToValueAtTime(196 * h[0], t + dur * 0.74);
-          lg.connect(o.frequency);
-          hg.gain.value = h[2];
-          o.connect(hg); hg.connect(f);
-        });
-        f.connect(g); g.connect(sfxBus);
-      },
-      // crystal ding: 2400Hz + 3600Hz sine overtones with decay
-      clue_crystal_ding: function (t) {
-        [[2400, 0.2, 1.3], [3600, 0.1, 0.9], [4800, 0.03, 0.5]].forEach(function (p) {
-          var o = osc('sine', p[0], t, p[2]), g = ctx.createGain();
-          env(g, t, p[1], 0.005, p[2]);
-          o.connect(g); g.connect(sfxBus);
-        });
-      },
-      // wrong tool: dull low thud
-      tool_mismatch: function (t) {
-        var o = osc('triangle', 130, t, 0.4), g = ctx.createGain();
-        o.frequency.exponentialRampToValueAtTime(78, t + 0.3);
-        env(g, t, 0.55, 0.005, 0.4);
-        o.connect(g); g.connect(sfxBus);
-        var o2 = osc('sine', 260, t, 0.2), g2 = ctx.createGain();
-        env(g2, t, 0.12, 0.005, 0.2);
-        o2.connect(g2); g2.connect(sfxBus);
-      },
-      // iron door slam: 85Hz impact + 170/255Hz metallic overtones + tail through the reverb
-      reversal_iron_lock: function (t) {
-        var o = osc('sine', 85, t, 0.7), g = ctx.createGain();
-        o.frequency.exponentialRampToValueAtTime(48, t + 0.5);
-        env(g, t, 1.0, 0.004, 0.7);
-        o.connect(g); g.connect(sfxBus);
-        [[170, 'triangle', 0.16, 1.0], [255, 'sine', 0.1, 0.8]].forEach(function (p) {
-          var h = osc(p[1], p[0], t, p[3]), hg = ctx.createGain();
-          env(hg, t, p[2], 0.004, p[3]);
-          h.connect(hg); hg.connect(sfxBus); hg.connect(reverb);
-        });
-        var n = noise(t, 0.16), bp = ctx.createBiquadFilter(), ng = ctx.createGain();
-        bp.type = 'bandpass'; bp.frequency.value = 1800; bp.Q.value = 6;
-        env(ng, t, 0.5, 0.003, 0.16);
-        n.connect(bp); bp.connect(ng); ng.connect(sfxBus); ng.connect(reverb);
-        [330, 523, 877].forEach(function (fq) {
-          var m = osc('square', fq, t, 0.9), mg = ctx.createGain();
-          env(mg, t, 0.04, 0.003, 0.9);
-          m.connect(mg); mg.connect(sfxBus); mg.connect(reverb);
-        });
-      },
-      // true dead silence: BGM and the whole sfx bus are hard-cut to 0 amplitude (-inf dBFS);
-      // only a faint straining-rope creak is routed straight to master.
-      dead_silence: function (t) {
-        if (bgm) { bgm.gain.cancelScheduledValues(t); bgm.gain.setValueAtTime(0, t); }
-        sfxBus.gain.cancelScheduledValues(t);
-        sfxBus.gain.setValueAtTime(0, t);
-        var dur = SPEC.DEAD_SILENCE_MS / 1000;
-        var n = noise(t, dur), bp = ctx.createBiquadFilter(), g = ctx.createGain(), lfo = osc('sine', 9, t, dur), lg = ctx.createGain();
-        bp.type = 'bandpass'; bp.frequency.value = 3400; bp.Q.value = 14;
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.linearRampToValueAtTime(0.012, t + dur * 0.8);
-        g.gain.linearRampToValueAtTime(0.0001, t + dur);
-        lg.gain.value = 500; lfo.connect(lg); lg.connect(bp.frequency);
-        n.connect(bp); bp.connect(g); g.connect(master);
-      },
-      // cool flame detonation: restores the sfx bus, whoosh sweep + sub boom + 1200Hz air-burst layer
-      cool_flash: function (t) {
-        sfxBus.gain.cancelScheduledValues(t);
-        sfxBus.gain.setValueAtTime(1, t);
-        var n = noise(t, 1.4), f = ctx.createBiquadFilter(), g = ctx.createGain();
-        f.type = 'lowpass'; f.frequency.setValueAtTime(5000, t);
-        f.frequency.exponentialRampToValueAtTime(200, t + 1.3);
-        env(g, t, 1.3, 0.01, 1.4);
-        n.connect(f); f.connect(g); g.connect(sfxBus); g.connect(reverb);
-        var o = osc('sine', 62, t, 1.2), og = ctx.createGain();
-        o.frequency.exponentialRampToValueAtTime(34, t + 1.0);
-        env(og, t, 1.0, 0.01, 1.2);
-        o.connect(og); og.connect(sfxBus);
-        var s = osc('sine', 2400, t, 0.9), sg = ctx.createGain();
-        env(sg, t, 0.12, 0.005, 0.9);
-        s.connect(sg); sg.connect(sfxBus);
-        var an = noise(t, 0.8), abp = ctx.createBiquadFilter(), ag = ctx.createGain();
-        abp.type = 'bandpass'; abp.frequency.value = 1200; abp.Q.value = 0.9;
-        env(ag, t, 0.55, 0.01, 0.8);
-        an.connect(abp); abp.connect(ag); ag.connect(sfxBus);
-      }
-    };
-
-    function startBgm() {
-      if (bgmOn || !ctx) return;
-      bgmOn = true;
-      bgm = ctx.createGain(); bgm.gain.value = 0.06;
-      var f = ctx.createBiquadFilter(); f.type = 'lowpass'; f.frequency.value = 260;
-      [55, 82.41, 110.3].forEach(function (fq) {
-        var o = ctx.createOscillator(); o.type = 'sawtooth'; o.frequency.value = fq; o.start();
-        o.connect(f);
-      });
-      f.connect(bgm); bgm.connect(master);
-    }
-
-    return {
-      play: function (name, dur) {
-        if (!ensure()) return;
-        startBgm();
-        if (sounds[name]) {
-          try { sounds[name](ctx.currentTime + 0.005, dur); } catch (e) { /* audio is best effort */ }
-        }
-      },
-      restoreBgm: function () {
-        if (bgm && ctx) bgm.gain.setTargetAtTime(state.soundOn ? 0.06 : 0, ctx.currentTime, 0.4);
-      },
-      mute: function (off) {
-        if (!ctx || !master) return;
-        master.gain.setTargetAtTime(off ? 0 : 0.8, ctx.currentTime, 0.02);
-      },
-      enable: function () {
-        if (ctx && master) master.gain.setTargetAtTime(0.8, ctx.currentTime, 0.02);
-      }
-    };
-  })();
-
-  function play(name, dur) { Audio.play(name, dur); }
-
-  /* ------------------------------------------------------------------ *
-   * HUD + navigation
-   * ------------------------------------------------------------------ */
-  function renderHud() {
-    setText('hud-act', '第 ' + state.act + ' 幕 / 6');
-    setText('hud-evidence', '物证 ' + state.foundCount + ' / 5');
-    setText('hud-score', '推理值 ' + currentScore());
-    var ACT_NAMES = ['', '1.反常锚点', '2.物证勘查', '3.庭审博弈', '4.幽灵线索', '5.冷焰还原', '6.宿命终局'];
-    var jumps = document.querySelectorAll('.jump');
-    for (var i = 0; i < jumps.length; i++) {
-      var n = Number(jumps[i].getAttribute('data-jump'));
-      jumps[i].textContent = n > state.maxAct ? '第' + ['', '一', '二', '三', '四', '五', '六'][n] + '幕 · 未解锁' : ACT_NAMES[n];
-      jumps[i].disabled = n > state.maxAct;
-      jumps[i].classList.toggle('is-current', n === state.act);
-      jumps[i].classList.toggle('is-done', n < state.act && n <= state.maxAct);
-      if (n === state.act) jumps[i].setAttribute('aria-current', 'step'); else jumps[i].removeAttribute('aria-current');
-    }
+  function flash() {
+    var f = $('ritual-flash');
+    if (!f) return;
+    f.classList.add('is-on');
+    setTimeout(function () { f.classList.remove('is-on'); }, 700);
   }
-
-  function currentScore() {
-    var s = 0, id;
-    for (id in state.found) {
-      if (Object.prototype.hasOwnProperty.call(state.found, id)) s += state.found[id] === 'manual' ? 8 : 5;
-    }
-    if (state.truth) s += Math.max(0, 30 - state.wrongCount * 8);
-    if (state.formula) s += 15;
-    if (state.flashed) s += 15;
-    return Math.min(100, s);
+  var actx = null;
+  function beep(freq, dur, type, vol) {
+    if (!S.sound) return;
+    try {
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return;
+      actx = actx || new AC();
+      var o = actx.createOscillator();
+      var g = actx.createGain();
+      var now = actx.currentTime;
+      o.type = type || 'sine';
+      o.frequency.value = freq;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(vol || 0.05, now + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, now + dur);
+      o.connect(g); g.connect(actx.destination);
+      o.start(now); o.stop(now + dur + 0.03);
+    } catch (e) { /* audio unavailable */ }
   }
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-  function showAct(n, opts) {
-    if (n < 1 || n > 6 || n > state.maxAct) return;
-    if (state.flashing) return;
-    state.act = n;
-    for (var i = 1; i <= 6; i++) {
-      var s = $('act-' + i);
-      var on = i === n;
-      s.hidden = !on;
-      s.classList.toggle('is-active', on);
-    }
-    renderHud();
-    document.body.setAttribute('data-field', (n === 2 || n === 3 || n === 6) ? 'paper' : 'ink');
+  /* ---------- stage navigation ---------- */
+  var hudAct = $('hud-act');
+  var hudTotem = $('hud-totem');
+  var hudScore = $('hud-score');
+  var jumps = $$('.jump');
+
+  function showAct(n) {
+    S.act = n;
+    hideToast();
+    for (var i = 1; i <= 4; i++) { $('act-' + i).hidden = (i !== n); }
+    jumps.forEach(function (b) {
+      var k = parseInt(b.getAttribute('data-jump'), 10);
+      b.disabled = k > S.reached;
+      var cur = (k === n);
+      b.classList.toggle('is-current', cur);
+      if (cur) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current');
+    });
+    document.body.setAttribute('data-field', (n >= 3) ? 'paper' : 'ink');
+    hudAct.textContent = '第 ' + n + ' 仪 / 4';
+    flash();
     window.scrollTo(0, 0);
-    if (!opts || !opts.silent) play(n === 3 ? 'question_suspense' : 'comma_breath');
-    if (n === 6) enterAct6();
+    var h = $('act' + n + '-title');
+    if (h) { try { h.focus({ preventScroll: true }); } catch (e) { h.focus(); } }
+    if (n === 2) drawCup(cupOpts());
+    if (n === 4 && !S.result) buildResult();
+  }
+  function openStage(n) {
+    if (n > S.reached) S.reached = n;
+    jumps.forEach(function (b) {
+      var k = parseInt(b.getAttribute('data-jump'), 10);
+      b.disabled = k > S.reached;
+    });
   }
 
-  function advance(n) {
-    if (n > state.maxAct) state.maxAct = n;
-    showAct(n);
+  /* ---------- stage 1 ---------- */
+  var MODE_NOTES = {
+    daily: '每日灵签：同一天、同一问题会得到同一份神谕，明天再来会变。',
+    free: '自由重占：每次都会重新洗牌与摇杯，适合想换个角度再问一次。'
+  };
+  function selectInGroup(sel, attr, val) {
+    $$(sel).forEach(function (b) {
+      var on = b.getAttribute(attr) === val;
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+      b.classList.toggle('is-on', on);
+    });
   }
-
-  /* ------------------------------------------------------------------ *
-   * Act 1
-   * ------------------------------------------------------------------ */
-  function initAct1() {
-    var a = SPEC.acts[1];
-    setText('act1-code', a.code);
-    setText('act1-title', a.title);
-    setText('act1-sub', a.subtitle);
-    setText('act1-hook', a.hook);
-    setText('act1-interrupt', a.interrupt);
-    // no timers: the first user gesture (clue button / boarding button) wakes Web Audio
-    $('btn-first-clue').addEventListener('click', revealFirstClue);
-    $('btn-to-act2').addEventListener('click', function () { advance(2); });
+  function updateStartHint() {
+    $('start-hint').textContent = '已锚定：' + INTENTS[S.intent].label + ' · ' + SIGNS[S.sign].label +
+      (whisperText() ? ' · 杯底留言已写下' : '');
   }
+  $$('.mode-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.mode = b.getAttribute('data-mode');
+      $$('.mode-btn').forEach(function (x) {
+        var on = x === b;
+        x.classList.toggle('is-on', on);
+        x.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      $('mode-note').textContent = MODE_NOTES[S.mode];
+      beep(520, 0.12);
+    });
+  });
+  $$('.intent-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.intent = b.getAttribute('data-intent');
+      selectInGroup('.intent-btn', 'data-intent', S.intent);
+      updateStartHint();
+      beep(440, 0.1);
+    });
+  });
+  $$('.sign-btn').forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.sign = b.getAttribute('data-sign');
+      selectInGroup('.sign-btn', 'data-sign', S.sign);
+      updateStartHint();
+      beep(494, 0.1);
+    });
+  });
+  $('whisper-input').addEventListener('input', updateStartHint);
 
-  function revealFirstClue() {
-    play('clue_crystal_ding');
-    if (state.firstClue) return;
-    state.firstClue = true;
-    var b = $('btn-first-clue');
-    $('first-clue-panel').hidden = false;
-    b.textContent = '已速查首件疑证 · 船长室微距批注已展开';
-    b.setAttribute('aria-expanded', 'true');
-    toast('首件疑证已记录');
-  }
+  $('btn-to-act2').addEventListener('click', function () {
+    var k = seedKey();
+    if (k !== S.key) { resetReading(); S.key = k; S.fate = makeFate(); }
+    openStage(2);
+    beep(392, 0.25, 'triangle');
+    showAct(2);
+  });
 
-  /* ------------------------------------------------------------------ *
-   * Act 2: Polaroid evidence table (35mm inline SVG macro photos)
-   * ------------------------------------------------------------------ */
-  var MASK_TEXT = '【待用对应工具勘查解锁反常死穴】';
-
-  function filmFrame(uid, label, defs, inner) {
-    var holes = '', x;
-    for (x = 6; x < 240; x += 14) {
-      holes += '<rect x="' + x + '" y="2.5" width="7" height="5" rx="1.2"/><rect x="' + x + '" y="127.5" width="7" height="5" rx="1.2"/>';
-    }
-    return '<svg class="photo-svg" viewBox="0 0 240 135" preserveAspectRatio="xMidYMid slice" role="img" aria-label="' + label + '">' +
-      '<defs><clipPath id="' + uid + '-c"><rect y="10" width="240" height="115"/></clipPath>' +
-      '<radialGradient id="' + uid + '-vg" cx="50%" cy="50%" r="72%"><stop offset="52%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#000" stop-opacity=".8"/></radialGradient>' +
-      defs + '</defs>' +
-      '<rect width="240" height="135" fill="#0b0f14"/>' +
-      '<g clip-path="url(#' + uid + '-c)">' + inner + '</g>' +
-      '<rect width="240" height="135" fill="url(#' + uid + '-vg)"/>' +
-      '<rect width="240" height="10" fill="#07090c"/><rect y="125" width="240" height="10" fill="#07090c"/>' +
-      '<g fill="#d9cfb4" opacity=".82">' + holes + '</g>' +
-      '</svg>';
-  }
-
-  var ART = {
-    // (1) logbook: steady ink lines + compass
-    'ev-logbook': function () {
-      var lines = '', i, k, seg;
-      for (i = 0; i < 7; i++) {
-        seg = '';
-        for (k = 0; k < 9 + (i * 7) % 5; k++) seg += ' t10 0';
-        lines += '<path d="M18 ' + (40 + i * 11) + ' q5 -2.6 10 0' + seg + '"/>';
+  /* ---------- totem silhouettes ---------- */
+  var SHAPES = {
+    owl: function (g) {
+      g.strokeStyle = '#000'; g.fillStyle = '#000'; g.lineCap = 'round';
+      g.lineWidth = 9; g.beginPath(); g.moveTo(20, 172); g.quadraticCurveTo(100, 184, 182, 166); g.stroke();
+      g.lineWidth = 5; g.beginPath(); g.moveTo(150, 170); g.lineTo(178, 140); g.stroke();
+      g.beginPath(); g.ellipse(100, 114, 44, 58, 0, 0, TAU); g.fill();
+      g.beginPath(); g.ellipse(60, 120, 15, 44, 0.22, 0, TAU); g.fill();
+      g.beginPath(); g.ellipse(140, 120, 15, 44, -0.22, 0, TAU); g.fill();
+      g.beginPath(); g.ellipse(100, 62, 36, 30, 0, 0, TAU); g.fill();
+      g.beginPath(); g.moveTo(68, 48); g.lineTo(70, 12); g.lineTo(92, 36); g.closePath(); g.fill();
+      g.beginPath(); g.moveTo(132, 48); g.lineTo(130, 12); g.lineTo(108, 36); g.closePath(); g.fill();
+      g.fillRect(82, 164, 8, 10); g.fillRect(110, 164, 8, 10);
+      g.globalCompositeOperation = 'destination-out';
+      g.beginPath(); g.arc(85, 62, 11, 0, TAU); g.fill();
+      g.beginPath(); g.arc(115, 62, 11, 0, TAU); g.fill();
+      g.lineWidth = 2;
+      for (var row = 0; row < 3; row++) {
+        for (var col = -1; col <= 1; col++) {
+          var cx = 100 + col * 16, cy = 108 + row * 18;
+          g.beginPath(); g.moveTo(cx - 6, cy - 4); g.lineTo(cx, cy + 3); g.lineTo(cx + 6, cy - 4); g.stroke();
+        }
       }
-      var ticks = '<circle cx="192" cy="72" r="26" fill="none" stroke="#5a3d1a" stroke-width="4" stroke-dasharray="1.2 5.4" opacity=".8"/>';
-      return filmFrame('a1', '35mm微距：船长航海日志残页与罗盘',
-        '<linearGradient id="a1-p" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dcc79a"/><stop offset="1" stop-color="#9c7a45"/></linearGradient>',
-        '<rect x="8" y="12" width="224" height="111" fill="url(#a1-p)"/>' +
-        '' +
-        '<g fill="none" stroke="#2b1a0e" stroke-width="1.1" stroke-linecap="round" opacity=".85">' + lines + '</g>' +
-        '<line x1="18" y1="34" x2="150" y2="34" stroke="#7a2b12" stroke-width=".7" opacity=".7"/>' +
-        '<circle cx="192" cy="72" r="28" fill="rgba(30,20,10,.14)" stroke="#5a3d1a" stroke-width="1.4"/>' + ticks +
-        '<circle cx="192" cy="72" r="19" fill="none" stroke="#5a3d1a" stroke-width=".8"/>' +
-        '<path d="M192 46v52M166 72h52" stroke="#5a3d1a" stroke-width=".7"/>' +
-        '<polygon points="192,50 196,72 188,72" fill="#a8261c"/><polygon points="192,94 196,72 188,72" fill="#2b1a0e"/>' +
-        '<circle cx="192" cy="72" r="2.2" fill="#c9a24b"/>' +
-        '');
+      g.globalCompositeOperation = 'source-over';
+      g.beginPath(); g.arc(85, 62, 5, 0, TAU); g.fill();
+      g.beginPath(); g.arc(115, 62, 5, 0, TAU); g.fill();
+      g.beginPath(); g.moveTo(94, 68); g.lineTo(106, 68); g.lineTo(100, 84); g.closePath(); g.fill();
     },
-    // (2) sword blade with red rust crystals under a magnifier
-    'ev-sword': function () {
-      return filmFrame('a2', '35mm微距：意大利长剑剑刃与红锈结晶放大镜',
-        '<linearGradient id="a2-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#27323d"/><stop offset="1" stop-color="#0d131a"/></linearGradient>' +
-        '<linearGradient id="a2-bl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c3ccd4"/><stop offset=".5" stop-color="#7a8691"/><stop offset="1" stop-color="#47525c"/></linearGradient>' +
-        '<clipPath id="a2-lens"><circle cx="172" cy="48" r="27"/></clipPath>',
-        '<rect width="240" height="135" fill="url(#a2-bg)"/>' +
-        '<g transform="rotate(-16 120 78)">' +
-        '<circle cx="22" cy="75" r="6" fill="#8a6a2a" stroke="#3a2a10"/><rect x="28" y="70" width="30" height="10" rx="3" fill="#2a1a12"/>' +
-        '<rect x="58" y="60" width="7" height="30" rx="2" fill="#a07a2e" stroke="#3a2a10" stroke-width=".8"/>' +
-        '<polygon points="65,70 200,70 224,75 200,80 65,80" fill="url(#a2-bl)"/>' +
-        '<line x1="68" y1="75" x2="206" y2="75" stroke="#2d363e" stroke-width="1.3"/>' +
-        '<g fill="#a8431f" opacity=".75"><ellipse cx="92" cy="73" rx="6" ry="2.3"/><ellipse cx="125" cy="77" rx="9" ry="2.8"/><ellipse cx="156" cy="72.6" rx="5" ry="1.8"/><ellipse cx="180" cy="77" rx="7" ry="2.2"/></g></g>' +
-        '<circle cx="172" cy="48" r="29" fill="#0a0f14" stroke="#c9a24b" stroke-width="3"/>' +
-        '<g clip-path="url(#a2-lens)"><rect x="140" y="18" width="62" height="62" fill="#5c6770"/>' +
-        '<polygon points="148,40 160,34 166,46 154,52" fill="#b5471f"/><polygon points="166,44 178,36 188,48 176,56" fill="#d9703a"/>' +
-        '<polygon points="154,56 166,52 172,64 160,70" fill="#7a2b12"/><polygon points="176,58 190,54 192,68 180,72" fill="#a8431f"/>' +
-        '<polygon points="146,28 158,24 160,32 150,34" fill="#c4562a"/><polygon points="180,24 192,28 188,38 178,34" fill="#8a3418"/>' +
-        '<path d="M140 62l62-10M140 30l62 14" stroke="rgba(255,255,255,.2)" stroke-width=".8"/></g>' +
-        '<line x1="194" y1="70" x2="224" y2="102" stroke="#5a3d1a" stroke-width="6" stroke-linecap="round"/>' +
-        '');
-    },
-    // (3) bow with symmetric V cuts above the waterline
-    'ev-hull-cuts': function () {
-      var plank = '', i;
-      for (i = 0; i < 9; i++) plank += '<path d="M20 ' + (24 + i * 10) + ' q50 -2.5 100 0 t100 0" />';
-      return filmFrame('a3', '35mm近摄：船首两侧对称的V型木屑切口剖面',
-        '<linearGradient id="a3-w" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c79c62"/><stop offset="1" stop-color="#6e4d29"/></linearGradient>' +
-        '<linearGradient id="a3-s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1c4a66"/><stop offset="1" stop-color="#0b2233"/></linearGradient>' +
-        '<clipPath id="a3-b"><polygon points="120,16 214,112 26,112"/></clipPath>',
-        '<rect width="240" height="135" fill="#2a3a46"/>' +
-        '<rect x="0" y="12" width="240" height="40" fill="#31475a" opacity=".6"/>' +
-        '<g clip-path="url(#a3-b)"><rect x="20" y="12" width="200" height="105" fill="url(#a3-w)"/>' +
-        '<g fill="none" stroke="rgba(30,15,5,.4)" stroke-width="1">' + plank + '</g></g>' +
-        '<path d="M26 112L120 16L214 112" fill="none" stroke="#e6d2a8" stroke-width="1.4" opacity=".6"/>' +
-        '<rect x="0" y="97" width="240" height="28" fill="url(#a3-s)"/>' +
-        '<path d="M0 97q15 -4 30 0t30 0t30 0t30 0t30 0t30 0t30 0t30 0" fill="none" stroke="#8fd0ee" stroke-width="1.2" opacity=".8"/>' +
-        '<polygon points="66,72 84,72 75,92" fill="#1b1008"/><polygon points="156,72 174,72 165,92" fill="#1b1008"/>' +
-        '<path d="M66 72l-6 -4M84 72l6 -5M75 92l0 5M156 72l-6 -5M174 72l6 -4M165 92l0 5" stroke="#f0dcaa" stroke-width="1" opacity=".85"/>' +
-        '<line x1="120" y1="12" x2="120" y2="122" stroke="#e8d9b0" stroke-width=".9" stroke-dasharray="3 3" opacity=".7"/>' +
-        '' +
-        '');
-    },
-    // (4) sextant arc + snapped, frayed main-sheet rope
-    'ev-Navigation': function () {
-      var ticks = '', fibers = '', a, r, x1, y1, x2, y2, k, ang, len;
-      for (a = 0; a <= 90; a += 5) {
-        r = a % 10 === 0 ? 8 : 4;
-        x1 = 40 + 74 * Math.sin(a * Math.PI / 180); y1 = 108 - 74 * Math.cos(a * Math.PI / 180);
-        x2 = 40 + (74 - r) * Math.sin(a * Math.PI / 180); y2 = 108 - (74 - r) * Math.cos(a * Math.PI / 180);
-        ticks += '<line x1="' + x1.toFixed(1) + '" y1="' + y1.toFixed(1) + '" x2="' + x2.toFixed(1) + '" y2="' + y2.toFixed(1) + '"/>';
+    anchor: function (g) {
+      g.strokeStyle = '#000'; g.fillStyle = '#000'; g.lineCap = 'round'; g.lineJoin = 'round';
+      g.lineWidth = 7; g.beginPath(); g.arc(100, 32, 14, 0, TAU); g.stroke();
+      g.lineWidth = 10; g.beginPath(); g.moveTo(100, 46); g.lineTo(100, 168); g.stroke();
+      g.lineWidth = 9; g.beginPath(); g.moveTo(68, 68); g.lineTo(132, 68); g.stroke();
+      g.beginPath(); g.arc(68, 68, 6, 0, TAU); g.fill();
+      g.beginPath(); g.arc(132, 68, 6, 0, TAU); g.fill();
+      g.lineWidth = 11; g.beginPath(); g.arc(100, 112, 58, 0.05, Math.PI - 0.05); g.stroke();
+      g.beginPath(); g.moveTo(26, 102); g.lineTo(54, 116); g.lineTo(38, 130); g.closePath(); g.fill();
+      g.beginPath(); g.moveTo(174, 102); g.lineTo(146, 116); g.lineTo(162, 130); g.closePath(); g.fill();
+      g.lineWidth = 3;
+      g.globalCompositeOperation = 'destination-out';
+      g.beginPath();
+      for (var y = 80; y < 150; y += 2) {
+        var x = 100 + Math.sin(y * 0.35) * 3;
+        if (y === 80) g.moveTo(x, y); else g.lineTo(x, y);
       }
-      for (k = 0; k < 11; k++) {
-        ang = (165 + k * 8) * Math.PI / 180; len = 9 + (k * 5) % 11;
-        x2 = 168 + Math.cos(ang) * len; y2 = 96 - Math.sin(ang) * len;
-        fibers += '<path d="M168 96 Q' + (168 + Math.cos(ang) * len * 0.5).toFixed(1) + ' ' + (96 - Math.sin(ang) * len * 0.5 - 3).toFixed(1) + ' ' + x2.toFixed(1) + ' ' + y2.toFixed(1) + '"/>';
-      }
-      var ix = 40 + 72 * Math.sin(52 * Math.PI / 180), iy = 108 - 72 * Math.cos(52 * Math.PI / 180);
-      return filmFrame('a4', '35mm微距：六分仪弧形刻度与崩断麻绳炸毛纤维',
-        '<linearGradient id="a4-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1b2a3a"/><stop offset="1" stop-color="#090e14"/></linearGradient>' +
-        '<linearGradient id="a4-br" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e2bd62"/><stop offset="1" stop-color="#7a5a1f"/></linearGradient>',
-        '<rect width="240" height="135" fill="url(#a4-bg)"/>' +
-        '<path d="M40 108L40 34A74 74 0 0 1 114 108Z" fill="url(#a4-br)" stroke="#f0d58a" stroke-width="1.2"/>' +
-        '<path d="M40 108L40 60A48 48 0 0 1 88 108Z" fill="rgba(0,0,0,.5)"/>' +
-        '<g stroke="#2a1d08" stroke-width=".9">' + ticks + '</g>' +
-        '<line x1="40" y1="108" x2="' + ix.toFixed(1) + '" y2="' + iy.toFixed(1) + '" stroke="#f4efe6" stroke-width="1.6"/>' +
-        '<rect x="88" y="98" width="36" height="9" rx="2" fill="#7a5a1f" stroke="#e2bd62" stroke-width=".8"/>' +
-        '<circle cx="40" cy="108" r="3.5" fill="#e2bd62"/>' +
-        '<path d="M238 36C214 42 206 80 168 96" fill="none" stroke="#b8996a" stroke-width="9"/>' +
-        '<path d="M238 36C214 42 206 80 168 96" fill="none" stroke="#5a4220" stroke-width="9" stroke-dasharray="2 5"/>' +
-        '<g fill="none" stroke="#e1c88f" stroke-width=".9" stroke-linecap="round">' + fibers + '</g>' +
-        '');
+      g.stroke();
+      g.globalCompositeOperation = 'source-over';
     },
-    // (5) dense white oak vs porous red oak under the microscope
-    'ev-barrels': function () {
-      return filmFrame('a5', '35mm显微对比：致密白橡木与多孔蜂窝状红橡木剖面',
-        '<pattern id="a5-p" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.1" fill="#b9a77f"/></pattern>' +
-        '<pattern id="a5-q" width="18" height="16" patternUnits="userSpaceOnUse"><ellipse cx="5" cy="4" rx="4.6" ry="3.4" fill="#2a0e06" stroke="#e07a4b" stroke-width=".8"/><ellipse cx="14" cy="12" rx="4.6" ry="3.4" fill="#2a0e06" stroke="#e07a4b" stroke-width=".8"/></pattern>',
-        '<rect x="10" y="12" width="108" height="111" fill="#e8dcc0"/><rect x="10" y="12" width="108" height="111" fill="url(#a5-p)"/>' +
-        '<rect x="122" y="12" width="108" height="111" fill="#8a3a22"/><rect x="122" y="12" width="108" height="111" fill="url(#a5-q)"/>' +
-        '<line x1="120" y1="10" x2="120" y2="125" stroke="#c9a24b" stroke-width="2"/>' +
-        '<rect x="10" y="12" width="108" height="14" fill="rgba(0,0,0,.55)"/><rect x="122" y="12" width="108" height="14" fill="rgba(0,0,0,.55)"/>' +
-        '<text x="15" y="23" font-family="sans-serif" font-size="14" fill="#f4efe6">白橡木</text>' +
-        '<text x="127" y="23" font-family="sans-serif" font-size="14" fill="#ffd9c4">红橡木</text>' +
-        '<line x1="14" y1="114" x2="44" y2="114" stroke="#2b2118" stroke-width="1.6"/>');
+    key: function (g) {
+      function oneKey(angle, mirror) {
+        g.save();
+        g.translate(100, 100); g.rotate(angle);
+        if (mirror) g.scale(-1, 1);
+        g.lineWidth = 9; g.strokeStyle = '#000'; g.fillStyle = '#000';
+        g.beginPath(); g.arc(0, -62, 20, 0, TAU); g.stroke();
+        g.beginPath(); g.arc(0, -62, 6, 0, TAU); g.fill();
+        g.fillRect(-4.5, -42, 9, 118);
+        g.fillRect(4.5, 50, 18, 9);
+        g.fillRect(4.5, 66, 12, 9);
+        g.restore();
+      }
+      oneKey(Math.PI / 4, false);
+      oneKey(-Math.PI / 4, true);
+    },
+    stag: function (g) {
+      g.strokeStyle = '#000'; g.fillStyle = '#000'; g.lineCap = 'round'; g.lineJoin = 'round';
+      var tines = [
+        [[84, 92], [70, 70], [58, 50], [50, 28], [46, 10]],
+        [[70, 70], [50, 66], [36, 56]],
+        [[58, 50], [40, 44], [30, 30]],
+        [[52, 34], [64, 22]]
+      ];
+      g.lineWidth = 6;
+      tines.forEach(function (pl) {
+        [false, true].forEach(function (m) {
+          g.beginPath();
+          pl.forEach(function (p, i) {
+            var x = m ? 200 - p[0] : p[0];
+            if (i === 0) g.moveTo(x, p[1]); else g.lineTo(x, p[1]);
+          });
+          g.stroke();
+        });
+      });
+      g.beginPath(); g.ellipse(66, 104, 16, 7, -0.5, 0, TAU); g.fill();
+      g.beginPath(); g.ellipse(134, 104, 16, 7, 0.5, 0, TAU); g.fill();
+      g.beginPath(); g.moveTo(76, 130); g.lineTo(124, 130); g.lineTo(144, 198); g.lineTo(56, 198); g.closePath(); g.fill();
+      g.beginPath(); g.ellipse(100, 116, 27, 30, 0, 0, TAU); g.fill();
+      g.beginPath(); g.ellipse(100, 146, 15, 23, 0, 0, TAU); g.fill();
+      g.globalCompositeOperation = 'destination-out';
+      g.beginPath(); g.arc(87, 112, 4, 0, TAU); g.fill();
+      g.beginPath(); g.arc(113, 112, 4, 0, TAU); g.fill();
+      g.lineWidth = 3;
+      g.beginPath(); g.moveTo(66, 172); g.quadraticCurveTo(100, 160, 134, 168); g.stroke();
+      [[76, 168, -0.6], [90, 165, 0.5], [112, 164, -0.5], [126, 167, 0.6]].forEach(function (l) {
+        g.beginPath(); g.ellipse(l[0], l[1], 7, 3.5, l[2], 0, TAU); g.fill();
+      });
+      g.globalCompositeOperation = 'source-over';
+    },
+    crescent: function (g) {
+      g.fillStyle = '#000';
+      g.beginPath(); g.arc(100, 118, 56, 0, TAU); g.fill();
+      g.globalCompositeOperation = 'destination-out';
+      g.beginPath(); g.arc(128, 108, 48, 0, TAU); g.fill();
+      g.globalCompositeOperation = 'source-over';
+      g.beginPath();
+      g.moveTo(68, 66); g.lineTo(64, 34); g.lineTo(84, 50); g.lineTo(100, 26);
+      g.lineTo(116, 50); g.lineTo(136, 34); g.lineTo(132, 66); g.closePath(); g.fill();
+      g.globalCompositeOperation = 'destination-out';
+      [[84, 56], [100, 56], [116, 56]].forEach(function (p) {
+        g.beginPath(); g.arc(p[0], p[1], 3, 0, TAU); g.fill();
+      });
+      g.globalCompositeOperation = 'source-over';
+      g.beginPath();
+      for (var i = 0; i < 10; i++) {
+        var rr = (i % 2 === 0) ? 11 : 4.5;
+        var a = -Math.PI / 2 + i * Math.PI / 5;
+        var px = 130 + Math.cos(a) * rr, py = 108 + Math.sin(a) * rr;
+        if (i === 0) g.moveTo(px, py); else g.lineTo(px, py);
+      }
+      g.closePath(); g.fill();
+    },
+    serpent: function (g) {
+      g.fillStyle = '#000';
+      var R = 58, N = 140;
+      for (var i = 0; i <= N; i++) {
+        var s = i / N;
+        var a = 0.55 + s * (TAU - 0.45);
+        var w = 5 + 15 * Math.pow(s, 0.8);
+        g.beginPath(); g.arc(100 + Math.cos(a) * R, 100 + Math.sin(a) * R, w / 2, 0, TAU); g.fill();
+      }
+      var ha = 0.3;
+      g.save();
+      g.translate(100 + Math.cos(ha) * R, 100 + Math.sin(ha) * R);
+      g.rotate(ha + Math.PI / 2);
+      g.beginPath(); g.ellipse(0, 4, 13, 17, 0, 0, TAU); g.fill();
+      g.globalCompositeOperation = 'destination-out';
+      g.beginPath(); g.arc(-5, 2, 2.8, 0, TAU); g.fill();
+      g.beginPath(); g.arc(5, 2, 2.8, 0, TAU); g.fill();
+      g.restore();
+      g.globalCompositeOperation = 'destination-out';
+      for (var j = 12; j < N - 6; j += 6) {
+        var sj = j / N;
+        var aj = 0.55 + sj * (TAU - 0.45);
+        g.beginPath(); g.arc(100 + Math.cos(aj) * R, 100 + Math.sin(aj) * R, 1.6, 0, TAU); g.fill();
+      }
+      g.globalCompositeOperation = 'source-over';
     }
   };
 
-  function buildCard(c) {
-    var b = el('button', 'polaroid');
-    b.type = 'button';
-    b.setAttribute('data-id', c.id);
-    b.style.setProperty('--tilt', c.angle + 'deg');
-    b.setAttribute('aria-label', c.name + '，点击勘查');
-
-    var photo = el('span', 'photo');
-    var art = el('span', 'photo-art');
-    art.innerHTML = ART[c.id] ? ART[c.id]() : '';
-    photo.appendChild(art);
-    photo.appendChild(el('span', 'photo-spec', c.camera));
-    var cap = el('span', 'cap');
-    cap.appendChild(el('span', 'cap-name', c.name));
-    cap.appendChild(el('span', 'cap-fact', c.fact));
-    // the fatal flaw stays masked until the matching tool is used
-    var tgt = el('span', 'target is-masked', MASK_TEXT);
-    tgt.id = 'target-' + c.id;
-    cap.appendChild(tgt);
-    var ded = el('span', 'deduction', c.deduction);
-    ded.id = 'ded-' + c.id;
-    ded.hidden = true;
-    cap.appendChild(ded);
-    b.appendChild(photo);
-    b.appendChild(cap);
-    b.addEventListener('click', function () { inspect(c.id, 'manual'); });
-    return b;
-  }
-
-  function circleSvg() {
-    var ns = 'http://www.w3.org/2000/svg';
-    var svg = document.createElementNS(ns, 'svg');
-    svg.setAttribute('class', 'circle-svg');
-    svg.setAttribute('viewBox', '0 0 100 100');
-    svg.setAttribute('preserveAspectRatio', 'none');
-    svg.setAttribute('aria-hidden', 'true');
-    var e = document.createElementNS(ns, 'ellipse');
-    e.setAttribute('cx', '50'); e.setAttribute('cy', '50');
-    e.setAttribute('rx', '48'); e.setAttribute('ry', '46');
-    e.setAttribute('pathLength', '1');
-    e.setAttribute('transform', 'rotate(-4 50 50)');
-    svg.appendChild(e);
-    return svg;
-  }
-
-  function setTool(type) {
-    state.tool = type;
-    var fluo = type === 'yellow_fluo';
-    $('tool-fluo').classList.toggle('is-selected', fluo);
-    $('tool-fluo').setAttribute('aria-pressed', String(fluo));
-    $('tool-circle').classList.toggle('is-selected', !fluo);
-    $('tool-circle').setAttribute('aria-pressed', String(!fluo));
-    setText('tool-hint', fluo ? '当前工具：黄色荧光标注刷，扫过反常文字。' : '当前工具：手绘红圈取证笔，圈出致命破绽。');
-  }
-
-  function inspect(id, mode) {
-    var c = cardById(id);
-    if (!c || state.found[id]) return;
-    var card = document.querySelector('.polaroid[data-id="' + id + '"]');
-    if (mode === 'manual' && state.tool !== c.type) {
-      // wrong tool: no evidence registered, no score change
-      if (card) {
-        card.classList.remove('is-shake');
-        void card.offsetWidth;
-        card.classList.add('is-shake');
-        setTimeout(function () { card.classList.remove('is-shake'); }, 400);
+  function genPoints(key, n) {
+    var off = document.createElement('canvas');
+    off.width = 200; off.height = 200;
+    var g = off.getContext('2d');
+    SHAPES[key](g);
+    var data = g.getImageData(0, 0, 200, 200).data;
+    var pool = [];
+    for (var y = 0; y < 200; y++) {
+      for (var x = 0; x < 200; x++) {
+        if (data[(y * 200 + x) * 4 + 3] > 128) pool.push(x, y);
       }
-      play('tool_mismatch');
-      var need = c.type === 'yellow_fluo' ? '【黄色荧光标注刷】（用于文字卷宗）' : '【手绘红圈取证笔】（用于实物痕迹）';
-      setText('tool-hint', '工具不匹配！此物证需切换' + need + '后再点击勘查。');
-      toast('请切换' + need);
-      return;
     }
-    state.found[id] = mode;
-    state.foundCount++;
-    setTool(c.type);
-
-    var tgt = $('target-' + id);
-    tgt.classList.remove('is-masked');
-    var wrap = el('span', c.type === 'yellow_fluo' ? 'hl-fluo' : 'hl-circle', c.target);
-    if (c.type === 'red_circle') wrap.appendChild(circleSvg());
-    tgt.textContent = '';
-    tgt.appendChild(wrap);
-    $('ded-' + id).hidden = false;
-    card.classList.add('is-done');
-    card.setAttribute('aria-label', c.name + '，已取证');
-
-    play(c.sound);
-    updateEvidenceUi();
-    if (mode === 'manual') toast(c.name.split(' · ')[0] + ' 已取证');
-  }
-
-  function updateEvidenceUi() {
-    setText('evidence-counter', state.foundCount + ' / 5');
-    var done = state.foundCount >= 5;
-    $('btn-to-act3').disabled = !done;
-    $('btn-inspect-all').disabled = done;
-    if (done) setText('tool-hint', '5 件物证全部取证，法庭已开庭。');
-    renderHud();
-  }
-
-  function inspectAll() {
-    var pending = SPEC.cards.filter(function (c) { return !state.found[c.id]; });
-    $('btn-inspect-all').disabled = true;
-    pending.forEach(function (c, i) {
-      setTimeout(function () { inspect(c.id, 'auto'); }, i * 280);
-    });
-  }
-
-  function initAct2() {
-    var a = SPEC.acts[2];
-    setText('act2-code', a.code);
-    setText('act2-title', a.title);
-    setText('act2-sub', a.subtitle);
-    var grid = $('evidence-grid');
-    SPEC.cards.forEach(function (c) { grid.appendChild(buildCard(c)); });
-    $('tool-fluo').addEventListener('click', function () { setTool('yellow_fluo'); });
-    $('tool-circle').addEventListener('click', function () { setTool('red_circle'); });
-    $('btn-inspect-all').addEventListener('click', inspectAll);
-    $('btn-to-act3').addEventListener('click', function () { advance(3); });
-    updateEvidenceUi();
-  }
-
-  /* ------------------------------------------------------------------ *
-   * Act 3: Intuition Trap courtroom
-   * ------------------------------------------------------------------ */
-  function buildHyp(h) {
-    var b = el('button', 'hyp');
-    b.type = 'button';
-    b.setAttribute('data-id', h.id);
-    b.appendChild(el('span', 'hyp-title', h.title));
-    b.appendChild(el('span', 'hyp-pitch', h.pitch));
-    b.addEventListener('click', function () { pickHypothesis(h, b); });
-    b.firstChild.style.display = 'block';
-    b.lastChild.style.display = 'block';
-    return b;
-  }
-
-  function pickHypothesis(h, node) {
-    if (node.classList.contains('is-locked')) return;
-    var ev = cardById(h.counter);
-    var v = el('span', 'verdict', h.verdict + '　（反证：' + h.counterLabel + ' · ' + ev.name.split(' · ')[1] + '）');
-    v.style.display = 'block';
-    node.appendChild(v);
-    node.classList.add('is-locked');
-    node.setAttribute('aria-disabled', 'true');
-    if (h.trap && state.truth) {
-      // review mode after the truth is locked: show the refutation, no penalty
-      node.classList.add('is-broken');
-      play('reversal_iron_lock');
-      toast('卷宗复盘模式：已查看常识陷阱反证（不扣分）');
-    } else if (h.trap) {
-      node.classList.add('is-broken', 'slam');
-      state.wrong[h.id] = true;
-      state.wrongCount++;
-      play('reversal_iron_lock');
-      toast('假说被一锤砸碎 · 推理值 -8');
-    } else {
-      node.classList.add('is-truth');
-      state.truth = true;
-      play('reversal_iron_lock');
-      setTimeout(function () { play('clue_crystal_ding'); }, 380);
-      $('btn-to-act4').disabled = false;
-      toast('真相锁定');
+    var pts = [];
+    var len = pool.length / 2;
+    if (!len) return pts;
+    for (var i = 0; i < n; i++) {
+      var k = Math.floor(Math.random() * len) * 2;
+      var r = Math.random();
+      pts.push({ x: pool[k] + Math.random() - 0.5, y: pool[k + 1] + Math.random() - 0.5,
+                 c: r < 0.5 ? 0 : (r < 0.88 ? 1 : 2), s: 0.9 + Math.random() * 1.1 });
     }
-    renderHud();
+    return pts;
   }
+  var PAL_DARK = ['#23150e', '#3d281c', '#c9a24b'];
+  var PAL_LIGHT = ['#f1e2c0', '#c9a24b', '#e8c97a'];
 
-  function initAct3() {
-    var a = SPEC.acts[3];
-    setText('act3-code', a.code);
-    setText('act3-title', a.title);
-    setText('act3-sub', a.subtitle);
-    var list = $('hyp-list');
-    SPEC.hypotheses.forEach(function (h) { list.appendChild(buildHyp(h)); });
-    $('btn-to-act4').addEventListener('click', function () { advance(4); });
-  }
-
-  /* ------------------------------------------------------------------ *
-   * Act 4: evidence chain linker + UCL formula
-   * ------------------------------------------------------------------ */
-  var NODES = ['barrels', 'hatch', 'rope'];
-
-  function renderChain() {
-    $('link-1').classList.toggle('is-on', state.link1);
-    $('link-2').classList.toggle('is-on', state.link2);
-    NODES.forEach(function (n, i) {
-      var node = $('node-' + n);
-      var linked = (i === 0 && state.link1) || (i === 1 && (state.link1 || state.link2)) || (i === 2 && state.link2);
-      node.classList.toggle('is-linked', linked);
-      node.classList.toggle('is-picked', state.picked === n);
-    });
-  }
-
-  function pickNode(n) {
-    if (state.formula) return;
-    if (state.picked === n) { state.picked = null; renderChain(); return; }
-    if (!state.picked) {
-      state.picked = n;
-      play('question_suspense');
-      setText('chain-hint', '已选中「' + $('node-' + n).querySelector('b').textContent + '」，再选一个证据节点进行交叉比对。');
-      renderChain();
-      return;
+  function drawPoints(g, pts, ox, oy, sc, sizeMul, pal) {
+    for (var i = 0; i < pts.length; i++) {
+      var p = pts[i];
+      g.fillStyle = pal[p.c];
+      g.beginPath();
+      g.arc(ox + p.x * sc, oy + p.y * sc, p.s * sizeMul, 0, TAU);
+      g.fill();
     }
-    var pair = [state.picked, n].sort().join('+');
-    state.picked = null;
-    if (pair === 'barrels+hatch') state.link1 = true;
-    else if (pair === 'hatch+rope') state.link2 = true;
-    else if (pair === 'barrels+rope') { state.link1 = true; state.link2 = true; }
-    play('clue_crystal_ding');
-    if (state.link1 && state.link2) {
-      state.formula = true;
-      setTimeout(function () { play('reversal_iron_lock'); }, 300);
-      $('formula').hidden = false;
-      $('btn-to-act5').disabled = false;
-      setText('chain-hint', '证据链闭合：UCL 热力学冷焰公式已解锁。');
-    } else {
-      setText('chain-hint', '一条链已接通，再把剩下的节点连起来。');
+  }
+
+  /* ---------- cup canvas ---------- */
+  var cupCanvas = $('cup-canvas');
+  var cg = cupCanvas.getContext('2d');
+  var CW = 520, C = 260;
+  var CUP_SC = 0.95, CUP_OX = C - 100 * CUP_SC, CUP_OY = C - 100 * CUP_SC;
+
+  function drawCupBase(g) {
+    g.clearRect(0, 0, CW, CW);
+    g.save();
+    g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 28; g.shadowOffsetY = 10;
+    var sg = g.createRadialGradient(C - 40, C - 50, 40, C, C, 250);
+    sg.addColorStop(0, '#fffaf0'); sg.addColorStop(1, '#dcd0b6');
+    g.fillStyle = sg; g.beginPath(); g.arc(C, C, 250, 0, TAU); g.fill();
+    g.restore();
+    g.strokeStyle = 'rgba(201,162,75,0.7)'; g.lineWidth = 2;
+    g.beginPath(); g.arc(C, C, 238, 0, TAU); g.stroke();
+    g.strokeStyle = 'rgba(150,130,90,0.35)'; g.lineWidth = 1.5;
+    g.beginPath(); g.arc(C, C, 222, 0, TAU); g.stroke();
+    // handle
+    g.save();
+    g.shadowColor = 'rgba(0,0,0,0.3)'; g.shadowBlur = 8; g.shadowOffsetY = 4;
+    g.strokeStyle = '#f7f1e2'; g.lineWidth = 20;
+    g.beginPath(); g.ellipse(466, C, 34, 28, 0, 0, TAU); g.stroke();
+    g.restore();
+    g.strokeStyle = 'rgba(201,162,75,0.8)'; g.lineWidth = 2;
+    g.beginPath(); g.ellipse(466, C, 34, 28, 0, 0, TAU); g.stroke();
+    // cup body
+    g.save();
+    g.shadowColor = 'rgba(0,0,0,0.35)'; g.shadowBlur = 16; g.shadowOffsetY = 6;
+    g.fillStyle = '#fbf6ea'; g.beginPath(); g.arc(C, C, 205, 0, TAU); g.fill();
+    g.restore();
+    g.strokeStyle = '#c9a24b'; g.lineWidth = 3;
+    g.beginPath(); g.arc(C, C, 197, 0, TAU); g.stroke();
+    for (var i = 0; i < 48; i++) {
+      var a = i / 48 * TAU;
+      g.fillStyle = (i % 2) ? '#c9a24b' : '#2f5d8a';
+      g.beginPath(); g.arc(C + Math.cos(a) * 200, C + Math.sin(a) * 200, 1.8, 0, TAU); g.fill();
     }
-    renderChain();
-    renderHud();
+    // inner wall
+    var wg = g.createRadialGradient(C, C, 118, C, C, 192);
+    wg.addColorStop(0, '#e6d8b8'); wg.addColorStop(0.5, '#f3ead3'); wg.addColorStop(1, '#fffaf0');
+    g.fillStyle = wg; g.beginPath(); g.arc(C, C, 190, 0, TAU); g.fill();
+    g.strokeStyle = '#d9ccaf'; g.lineWidth = 2; g.beginPath(); g.arc(C, C, 190, 0, TAU); g.stroke();
+    g.strokeStyle = 'rgba(120,90,50,0.15)'; g.lineWidth = 1.5; g.beginPath(); g.arc(C, C, 158, 0, TAU); g.stroke();
+    // floor
+    var fg = g.createRadialGradient(C - 20, C - 20, 10, C, C, 120);
+    fg.addColorStop(0, '#f3ead6'); fg.addColorStop(1, '#e0d0aa');
+    g.fillStyle = fg; g.beginPath(); g.arc(C, C, 119, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(120,90,50,0.3)'; g.lineWidth = 3; g.beginPath(); g.arc(C, C, 119, 0, TAU); g.stroke();
   }
 
-  function initAct4() {
-    var a = SPEC.acts[4];
-    setText('act4-code', a.code);
-    setText('act4-title', a.title);
-    setText('act4-sub', a.subtitle);
-    setText('act4-mechanism', a.mechanism);
-    NODES.forEach(function (n) {
-      $('node-' + n).addEventListener('click', function () { pickNode(n); });
-    });
-    $('btn-to-act5').addEventListener('click', function () { advance(5); });
-  }
-
-  /* ------------------------------------------------------------------ *
-   * Act 5: 0.72s Dead Silence + Cool Flame
-   * ------------------------------------------------------------------ */
-  function setStep(i) {
-    var li = $('timeline').children[i];
-    if (li) li.classList.add('is-on');
-  }
-
-  function triggerFlash() {
-    if (state.flashing || state.flashed) return;
-    state.flashing = true;
-    var btn = $('btn-trigger-flash');
-    btn.disabled = true;
-    var stage = $('flame-stage');
-    stage.classList.add('is-armed');
-    setStep(0);
-    setText('flame-readout', '乙醇蒸汽持续渗出，舱盖被顶松……');
-    setTimeout(function () {
-      setStep(1);
-      setText('flame-readout', '舱盖掀开，蒸汽浓度落入爆炸极限……');
-      play('question_suspense', 0.72);
-    }, 700);
-
-    setTimeout(function () {
-      // 0.72s of pitch black. BGM cut to 0 dB.
-      setStep(2);
-      var ds = $('dead-silence');
-      ds.classList.add('is-on');
-      play('dead_silence');
-      setTimeout(function () {
-        ds.classList.remove('is-on');
-        var fl = $('cool-flash');
-        fl.classList.remove('is-on');
-        void fl.offsetWidth;
-        fl.classList.add('is-on');
-        setTimeout(function () { fl.classList.remove('is-on'); }, 800);
-        setStep(3);
-        $('timeline').children[3].classList.add('is-flame');
-        stage.classList.add('is-blast');
-        setText('flame-readout', '轰！幽蓝冷焰喷涌而出，船木无一丝焦黑');
-        $('paper-test').hidden = false;
-        play('cool_flash');
-        Audio.restoreBgm();
-        state.flashing = false;
-        state.flashed = true;
-        btn.hidden = true;
-        var next = $('btn-to-act6');
-        next.hidden = false;
-        next.disabled = false;
-        renderHud();
-      }, SPEC.DEAD_SILENCE_MS);
-    }, 1500);
-  }
-
-  function initAct5() {
-    var a = SPEC.acts[5];
-    setText('act5-code', a.code);
-    setText('act5-title', a.title);
-    setText('act5-sub', a.subtitle);
-    var tl = $('timeline');
-    SPEC.steps.forEach(function (s, i) {
-      var li = el('li', i === 2 ? 'is-silence' : '', s);
-      tl.appendChild(li);
-    });
-    $('btn-trigger-flash').addEventListener('click', triggerFlash);
-    $('btn-to-act6').addEventListener('click', function () { advance(6); });
-  }
-
-  /* ------------------------------------------------------------------ *
-   * Act 6: epilogue, rank card, single settlement
-   * ------------------------------------------------------------------ */
-  function pickRank(score) {
-    for (var i = 0; i < SPEC.ranks.length; i++) if (score >= SPEC.ranks[i].min) return SPEC.ranks[i];
-    return SPEC.ranks[SPEC.ranks.length - 1];
-  }
-
-  function enterAct6() {
-    if (state.rank) return;
-    state.score = currentScore();
-    state.rank = pickRank(state.score);
-    var r = state.rank;
-    var a = SPEC.acts[6];
-    setText('act6-code', a.code);
-    setText('act6-title', a.title);
-    setText('act6-sub', a.subtitle);
-    setText('epilogue', a.epilogue);
-    setText('rank-letter', r.letter);
-    setText('rank-badge', r.badge);
-    setText('rank-title', r.title);
-    setText('final-score', String(state.score));
-    setText('comment-text', r.comment);
-    $('rank-card').setAttribute('data-rank', r.letter);
-    play('reversal_iron_lock');
-    settle(0);
-  }
-
-  function getToy() { return window.toy || null; }
-
-  function settleStatus(msg) { setText('save-status', msg); }
-
-  // One settlement: one setCloudStorage + one submitScore. Only a 307044 rejection is retried, with exponential backoff.
-  async function settle(attempt) {
-    var toy = getToy();
-    if (!toy) {
-      settleStatus('皇家海事法庭档案室已签收卷宗 · 预览模式下记录仅保存在本机');
-      renderLeaderboard();
-      return;
+  function makeStains() {
+    var st = [];
+    for (var i = 0; i < 30; i++) {
+      st.push({ a: Math.random() * TAU, r0: 186 - Math.random() * 6, len: 14 + Math.random() * 58,
+                bend: (Math.random() - 0.5) * 0.14, w: 1.5 + Math.random() * 3.5, al: 0.1 + Math.random() * 0.2 });
     }
-    if (state.settled && attempt === 0) return;
-    state.settled = true;
-    if (attempt === 0) { probeToy(toy); renderLeaderboard(); }
-    settleStatus('正在保存战绩…');
-    try {
-      if (!state.savedCloud) {
-        await toy.setCloudStorage({
-          mary_celeste_rank: state.rank.letter,
-          mary_celeste_score: String(state.score)
-        });
-        state.savedCloud = true;
+    return st;
+  }
+  function drawStains(g, st) {
+    g.save();
+    g.beginPath(); g.arc(C, C, 188, 0, TAU); g.clip();
+    st.forEach(function (s) {
+      g.strokeStyle = 'rgba(61,40,28,' + s.al + ')'; g.lineWidth = s.w; g.lineCap = 'round';
+      g.beginPath();
+      for (var t = 0; t <= 1.001; t += 0.1) {
+        var r = s.r0 - s.len * t, a = s.a + s.bend * t;
+        var x = C + Math.cos(a) * r, y = C + Math.sin(a) * r;
+        if (t === 0) g.moveTo(x, y); else g.lineTo(x, y);
       }
-      if (!state.savedScore) {
-        await toy.submitScore(state.score);
-        state.savedScore = true;
-      }
-      settleStatus('战绩已封存进卷宗。');
-    } catch (error) {
-      if (error && error.code === 307044) {
-        if (attempt < 3) {
-          var wait = 1500 * Math.pow(2, attempt);
-          settleStatus('请求过于频繁，将在 ' + Math.round(wait / 1000) + ' 秒后自动重试…');
-          setTimeout(function () { settle(attempt + 1); }, wait);
-        } else {
-          settleStatus('请求过于频繁，稍后再来重新勘查即可保存。');
-        }
+      g.stroke();
+    });
+    g.restore();
+    g.fillStyle = 'rgba(61,40,28,0.14)'; g.beginPath(); g.arc(C, C, 112, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(61,40,28,0.28)'; g.lineWidth = 2;
+    g.beginPath(); g.arc(C, C, 116, 0, TAU); g.stroke();
+  }
+  function drawLiquid(g, amt) {
+    if (amt <= 0) return;
+    g.save();
+    g.globalAlpha = Math.min(1, amt);
+    var lg = g.createRadialGradient(C - 30, C - 30, 10, C, C, 180);
+    lg.addColorStop(0, '#4a2c19'); lg.addColorStop(1, '#1d0f08');
+    g.fillStyle = lg; g.beginPath(); g.arc(C, C, 178, 0, TAU); g.fill();
+    g.strokeStyle = 'rgba(201,162,75,0.28)'; g.lineWidth = 6;
+    g.beginPath(); g.arc(C, C, 150, 0.3, 2.2); g.stroke();
+    g.strokeStyle = 'rgba(255,230,180,0.16)'; g.lineWidth = 3;
+    g.beginPath(); g.arc(C, C, 120, 3.4, 4.8); g.stroke();
+    g.restore();
+  }
+  function drawZone(g, zone) {
+    var z = ZONES[zone];
+    if (!z) return;
+    g.save();
+    g.beginPath();
+    g.arc(C, C, z.r1, 0, TAU);
+    if (z.r0 > 0) g.arc(C, C, z.r0, 0, TAU, true);
+    g.fillStyle = 'rgba(201,162,75,0.24)';
+    g.fill('evenodd');
+    g.strokeStyle = '#c9a24b'; g.lineWidth = 3; g.setLineDash([8, 6]);
+    g.beginPath(); g.arc(C, C, z.r1 - 1, 0, TAU); g.stroke();
+    if (z.r0 > 0) { g.beginPath(); g.arc(C, C, z.r0 + 1, 0, TAU); g.stroke(); }
+    g.setLineDash([]);
+    g.fillStyle = '#5a3b12'; g.font = font(16, 700, SANS); g.textAlign = 'center'; g.textBaseline = 'middle';
+    var ly = (zone === 'bottom') ? C + 104 : C - (z.r0 + z.r1) / 2;
+    g.fillText(z.tag, C, ly);
+    g.restore();
+  }
+  function drawParticleSet(g, parts, p) {
+    var q = Math.min(p / 0.75, 1);
+    var ease = 1 - Math.pow(1 - q, 2);
+    var sp = Math.max(0, Math.min(1, (p - 0.6) / 0.4));
+    var s = sp * sp * (3 - 2 * sp);
+    for (var i = 0; i < parts.length; i++) {
+      var o = parts[i];
+      var ang = o.a0 + o.w * 7 * ease;
+      var rr = o.r0 * (1 + 0.08 * Math.sin(ang * 3 + i));
+      var ox = C + Math.cos(ang) * rr, oy = C + Math.sin(ang) * rr;
+      var x = ox + (o.tx - ox) * s, y = oy + (o.ty - oy) * s;
+      g.fillStyle = o.col;
+      g.beginPath(); g.arc(x, y, o.sz, 0, TAU); g.fill();
+    }
+  }
+  function cupOpts() {
+    return { liquid: S.settled ? 0 : 1, stains: S.settled ? S.stains : null,
+             points: S.settled ? S.points : null, particles: S.settled ? S.particles : null, zone: S.zone };
+  }
+  function drawCup(o) {
+    var g = cg;
+    drawCupBase(g);
+    if (o.stains) drawStains(g, o.stains);
+    drawLiquid(g, o.liquid);
+    if (o.points) drawPoints(g, o.points, CUP_OX, CUP_OY, CUP_SC, 0.75, PAL_DARK);
+    if (o.particles) drawParticleSet(g, o.particles, 1);
+    if (o.zone) drawZone(g, o.zone);
+  }
+
+  /* ---------- swirl ---------- */
+  var btnSwirl = $('btn-swirl-cup');
+  var btnReswirl = $('btn-reswirl');
+  var btnAct3 = $('btn-to-act3');
+  var zoneBtns = $$('.zone-btn');
+
+  function resetZoneUI() {
+    S.zone = null;
+    zoneBtns.forEach(function (b) { b.setAttribute('aria-pressed', 'false'); b.classList.remove('is-on'); });
+  }
+  function pickTotem() {
+    if (S.mode === 'daily') {
+      var r = getRng('totem');
+      return TOTEM_KEYS[Math.floor(r() * TOTEM_KEYS.length)];
+    }
+    var k;
+    do { k = TOTEM_KEYS[Math.floor(Math.random() * TOTEM_KEYS.length)]; }
+    while (k === S.totemKey && TOTEM_KEYS.length > 1);
+    return k;
+  }
+  function buildParticles() {
+    var arr = [];
+    for (var i = 0; i < 400; i++) {
+      var tx, ty;
+      if (i < 300) {
+        var pt = S.points[Math.floor(Math.random() * S.points.length)];
+        tx = CUP_OX + pt.x * CUP_SC; ty = CUP_OY + pt.y * CUP_SC;
       } else {
-        settleStatus('战绩暂未保存（未登录或网络异常），不影响体验。');
+        var a = Math.random() * TAU, r = 126 + Math.random() * 36;
+        tx = C + Math.cos(a) * r; ty = C + Math.sin(a) * r;
+      }
+      var rnd = Math.random();
+      var r0 = 20 + Math.random() * 150;
+      arr.push({ a0: Math.random() * TAU, r0: r0, w: (0.7 + Math.random() * 1.0) * (1.2 - r0 / 300),
+                 tx: tx, ty: ty, sz: 1.6 + Math.random() * 2,
+                 col: rnd < 0.5 ? '#23150e' : (rnd < 0.88 ? '#3d281c' : '#c9a24b') });
+    }
+    return arr;
+  }
+  function startSwirl() {
+    if (S.swirling) return;
+    S.swirling = true; S.settled = false;
+    resetZoneUI();
+    btnSwirl.disabled = true; btnReswirl.disabled = true; btnAct3.disabled = true;
+    zoneBtns.forEach(function (b) { b.disabled = true; });
+    S.result = null;
+    S.totemKey = pickTotem();
+    S.points = genPoints(S.totemKey, 1500);
+    S.particles = buildParticles();
+    $('totem-name').textContent = '咖啡渣正在沉淀';
+    $('totem-read').textContent = '杯中的渣粒正在旋转，请屏住呼吸，等它们落定。';
+    $('totem-intent').textContent = '';
+    $('totem-luck').textContent = '';
+    beep(220, 0.5, 'sine', 0.04);
+    var dur = reduced ? 600 : 2200;
+    var t0 = performance.now();
+    function frame(now) {
+      var p = Math.min(1, (now - t0) / dur);
+      drawCupBase(cg);
+      drawLiquid(cg, 1 - Math.min(1, p / 0.7));
+      drawParticleSet(cg, S.particles, p);
+      if (p < 1) requestAnimationFrame(frame); else finishSwirl();
+    }
+    requestAnimationFrame(frame);
+  }
+  function finishSwirl() {
+    S.swirling = false; S.settled = true;
+    S.stains = makeStains();
+    drawCup(cupOpts());
+    var t = TOTEMS[S.totemKey];
+    var aff = (t.el === S.sign);
+    $('totem-name').textContent = t.name;
+    $('totem-read').textContent = t.read;
+    $('totem-intent').textContent = '你问的是「' + INTENTS[S.intent].label + '」：' + t.intent[S.intent];
+    $('totem-luck').textContent = '杯底气运加成 +' + t.luck + ' · 幸运器物：' + t.item +
+      (aff ? ' · 与你的' + SIGNS[S.sign].label + '同频，额外 +2' : '');
+    $('zone-reading').innerHTML = '<h3>杯底图腾已显影：' + esc(t.name) + '</h3><p>点选杯沿、杯壁、杯底三个分区，咖啡渣会在对应的圆环上亮起，并给出分区读数。</p>';
+    hudTotem.textContent = '杯底图腾 · ' + t.name;
+    cupCanvas.setAttribute('aria-label', '杯底咖啡渣沉淀成「' + t.name + '」图腾');
+    btnSwirl.disabled = false; btnReswirl.disabled = false; btnAct3.disabled = false;
+    zoneBtns.forEach(function (b) { b.disabled = false; });
+    openStage(3);
+    beep(660, 0.3, 'triangle', 0.05);
+    setTimeout(function () { beep(880, 0.35, 'triangle', 0.04); }, 140);
+  }
+  btnSwirl.addEventListener('click', startSwirl);
+  btnReswirl.addEventListener('click', startSwirl);
+
+  var drag = { on: false, x: 0, y: 0, acc: 0 };
+  cupCanvas.style.touchAction = 'none';
+  cupCanvas.addEventListener('pointerdown', function (e) {
+    drag.on = true; drag.x = e.clientX; drag.y = e.clientY; drag.acc = 0;
+    try { cupCanvas.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+  });
+  cupCanvas.addEventListener('pointermove', function (e) {
+    if (!drag.on) return;
+    drag.acc += Math.hypot(e.clientX - drag.x, e.clientY - drag.y);
+    drag.x = e.clientX; drag.y = e.clientY;
+    if (drag.acc > 240 && !S.swirling) { drag.on = false; startSwirl(); }
+  });
+  function endDrag() { drag.on = false; }
+  cupCanvas.addEventListener('pointerup', endDrag);
+  cupCanvas.addEventListener('pointercancel', endDrag);
+
+  zoneBtns.forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!S.settled) return;
+      var z = b.getAttribute('data-zone');
+      S.zone = z;
+      zoneBtns.forEach(function (x) {
+        var on = x === b;
+        x.setAttribute('aria-pressed', on ? 'true' : 'false');
+        x.classList.toggle('is-on', on);
+      });
+      drawCup(cupOpts());
+      var t = TOTEMS[S.totemKey];
+      $('zone-reading').innerHTML = '<h3>' + esc(ZONES[z].label) + '</h3><p>' + esc(t.zones[z]) + '</p>';
+      beep(560, 0.15);
+    });
+  });
+  btnAct3.addEventListener('click', function () {
+    if (!S.settled) return;
+    openStage(3);
+    showAct(3);
+    beep(330, 0.25, 'triangle');
+  });
+
+  /* ---------- stage 3 ---------- */
+  var deckEl = $('tarot-deck');
+  var BACK_SVG =
+    '<svg viewBox="0 0 120 200" width="100%" height="100%" aria-hidden="true" focusable="false">' +
+    '<rect x="3" y="3" width="114" height="194" rx="8" fill="#1b1109" stroke="#c9a24b" stroke-width="2"/>' +
+    '<rect x="11" y="11" width="98" height="178" rx="5" fill="none" stroke="#c9a24b" stroke-width="1" opacity="0.7"/>' +
+    '<circle cx="60" cy="100" r="40" fill="none" stroke="#c9a24b" stroke-width="1.5"/>' +
+    '<circle cx="60" cy="100" r="30" fill="none" stroke="#c9a24b" stroke-width="0.8" stroke-dasharray="2 3"/>' +
+    '<path d="M60 50 L66 94 L110 100 L66 106 L60 150 L54 106 L10 100 L54 94 Z" fill="#c9a24b" opacity="0.88"/>' +
+    '<circle cx="60" cy="100" r="7" fill="#1b1109" stroke="#c9a24b" stroke-width="1.5"/>' +
+    '<path d="M24 24 Q60 40 96 24" fill="none" stroke="#c9a24b" stroke-width="1.2"/>' +
+    '<path d="M24 176 Q60 160 96 176" fill="none" stroke="#c9a24b" stroke-width="1.2"/>' +
+    '<circle cx="20" cy="20" r="3" fill="#c9a24b"/><circle cx="100" cy="20" r="3" fill="#c9a24b"/>' +
+    '<circle cx="20" cy="180" r="3" fill="#c9a24b"/><circle cx="100" cy="180" r="3" fill="#c9a24b"/>' +
+    '</svg>';
+
+  function makeFate() {
+    var rng = getRng('fate');
+    var order = shuffled(CARDS, rng);
+    return [0, 1, 2].map(function (i) { return { card: order[i], rev: rng() < 0.38 }; });
+  }
+  function buildDeck() {
+    deckEl.innerHTML = '';
+    var order = shuffled(CARDS.map(function (c, i) { return i; }), Math.random);
+    order.forEach(function (idx, pos) {
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'deck-card';
+      b.setAttribute('aria-label', '第 ' + (pos + 1) + ' 张牌背，点击翻牌');
+      b.innerHTML = '<span class="back">' + BACK_SVG + '</span>';
+      deckEl.appendChild(b);
+    });
+  }
+  function resetSlots() {
+    [0, 1, 2].forEach(function (i) {
+      $('slot-' + i).querySelector('.slot-inner').innerHTML = '<div class="slot-empty">待翻牌</div>';
+    });
+    $('drawn-counter').textContent = '0 / 3';
+    $('btn-to-act4').disabled = true;
+    $('btn-draw-all').disabled = false;
+  }
+  function slotReading(slot, card, rev) {
+    return card.name + (rev ? '逆位' : '正位') + '：' + (rev ? card.rev : card.up) + '。' +
+      INTENTS[S.intent].lens[slot];
+  }
+  function drawNext(btn) {
+    var slot = S.drawn.length;
+    if (slot >= 3) return;
+    if (!S.fate) S.fate = makeFate();
+    var f = S.fate[slot];
+    S.drawn.push({ card: f.card, rev: f.rev });
+    S.result = null;
+    if (btn) {
+      btn.disabled = true; btn.classList.add('is-drawn');
+      btn.style.opacity = '0.2'; btn.style.pointerEvents = 'none';
+    } else {
+      var avail = $$('.deck-card:not(.is-drawn)', deckEl);
+      if (avail.length) {
+        var v = avail[Math.floor(Math.random() * avail.length)];
+        v.disabled = true; v.classList.add('is-drawn'); v.style.opacity = '0.2'; v.style.pointerEvents = 'none';
       }
     }
+    var inner = $('slot-' + slot).querySelector('.slot-inner');
+    inner.innerHTML =
+      '<div class="slot-card slot-in"><div class="img-wrap"><img src="' + f.card.img + '" width="460" height="793" alt="1909莱德·伟特塔罗 ' +
+      esc(f.card.name) + (f.rev ? '（逆位）' : '（正位）') + '"' + (f.rev ? ' class="is-rev"' : '') + '></div>' +
+      '<h4>' + esc(f.card.n + ' ' + f.card.name) + '</h4>' +
+      '<span class="orient">' + (f.rev ? '逆位' : '正位') + '</span>' +
+      '<p>' + esc(slotReading(slot, f.card, f.rev)) + '</p></div>';
+    $('drawn-counter').textContent = S.drawn.length + ' / 3';
+    beep(300 + slot * 120, 0.22, 'triangle', 0.05);
+    if (S.drawn.length === 3) {
+      $('btn-to-act4').disabled = false;
+      $('btn-draw-all').disabled = true;
+      openStage(4);
+      toast('三张牌已全部翻开，可以合成最终神谕');
+    }
+  }
+  deckEl.addEventListener('click', function (e) {
+    var b = e.target.closest ? e.target.closest('.deck-card') : null;
+    if (!b || b.disabled || S.drawn.length >= 3) return;
+    drawNext(b);
+  });
+  $('btn-shuffle').addEventListener('click', function () {
+    var cards = $$('.deck-card', deckEl);
+    cards.forEach(function (c) { c.classList.add('is-shuffle'); });
+    beep(180, 0.3, 'sawtooth', 0.025);
+    setTimeout(function () {
+      var live = $$('.deck-card', deckEl);
+      shuffled(live, Math.random).forEach(function (c) { deckEl.appendChild(c); });
+      live.forEach(function (c) { c.classList.remove('is-shuffle'); });
+    }, reduced ? 50 : 700);
+    if (S.mode === 'free' && S.drawn.length < 3) {
+      var used = S.drawn.map(function (d) { return d.card.id; });
+      var pool = shuffled(CARDS.filter(function (c) { return used.indexOf(c.id) < 0; }), Math.random);
+      for (var i = S.drawn.length; i < 3; i++) {
+        S.fate[i] = { card: pool[i - S.drawn.length], rev: Math.random() < 0.38 };
+      }
+    }
+    toast(S.mode === 'daily' ? '牌已洗过，每日灵签的牌运不会改变' : '牌已重新洗切');
+  });
+  $('btn-draw-all').addEventListener('click', function () {
+    var left = 3 - S.drawn.length;
+    if (left <= 0) return;
+    for (var i = 0; i < left; i++) {
+      (function (d) { setTimeout(function () { drawNext(null); }, d); })(reduced ? 0 : i * 320);
+    }
+  });
+  $('btn-to-act4').addEventListener('click', function () {
+    if (S.drawn.length < 3) return;
+    openStage(4);
+    showAct(4);
+    beep(440, 0.3, 'triangle');
+  });
+
+  /* ---------- stage 4 ---------- */
+  function scoreAndRank() {
+    var t = TOTEMS[S.totemKey];
+    var sum = 0;
+    S.drawn.forEach(function (d) { sum += d.card.lk[d.rev ? 1 : 0]; });
+    var rng = getRng('score');
+    var score = 62 + Math.round((sum - 12) * 1.2) + t.luck + (t.el === S.sign ? 2 : 0) + Math.floor(rng() * 4);
+    score = Math.max(62, Math.min(98, score));
+    var code = score >= 92 ? 'SSR' : (score >= 84 ? 'SR' : (score >= 75 ? 'A' : 'B'));
+    return { score: score, code: code };
+  }
+  function buildResult() {
+    if (!S.totemKey || S.drawn.length < 3) return;
+    var t = TOTEMS[S.totemKey];
+    var sr = scoreAndRank();
+    var rank = RANKS[sr.code];
+    var rng = getRng('oracle');
+    var cal = CAL[S.intent];
+    var res = {
+      score: sr.score, code: sr.code, rankName: rank.name,
+      cards: S.drawn.map(function (d) { return { card: d.card, rev: d.rev }; }),
+      totem: S.totemKey,
+      yi: cal.yi[Math.floor(rng() * cal.yi.length)],
+      ji: cal.ji[Math.floor(rng() * cal.ji.length)],
+      hour: HOURS[Math.floor(rng() * HOURS.length)],
+      quote: rank.quotes[Math.floor(rng() * rank.quotes.length)],
+      whisper: whisperText(), intent: S.intent, sign: S.sign
+    };
+    var cipherCode = 'MR' + hashStr(seedKey() + res.score).toString(36).toUpperCase().slice(0, 5);
+    res.cipher = '摩伊拉接好运【' + sr.code + '】' + t.name + ' + ' +
+      res.cards.map(function (c) { return c.card.name + (c.rev ? '逆' : '正'); }).join(' / ') +
+      '，我的今日气运值 ' + sr.score + '，评论区一起接好运，水逆退散！暗号 ' + cipherCode;
+    S.result = res;
+
+    $('rank-card').setAttribute('data-rank', sr.code);
+    $('rank-name').textContent = rank.name;
+    countUp($('final-score'), sr.score);
+    countUp(hudScore, sr.score, '气运值 ');
+
+    var mini = $('totem-mini');
+    var mg = mini.getContext('2d');
+    mg.clearRect(0, 0, 240, 240);
+    var bg = mg.createRadialGradient(120, 120, 10, 120, 120, 120);
+    bg.addColorStop(0, '#2c1a10'); bg.addColorStop(1, '#150b06');
+    mg.fillStyle = bg; mg.beginPath(); mg.arc(120, 120, 118, 0, TAU); mg.fill();
+    mg.strokeStyle = '#c9a24b'; mg.lineWidth = 3; mg.beginPath(); mg.arc(120, 120, 116, 0, TAU); mg.stroke();
+    mg.strokeStyle = 'rgba(201,162,75,0.4)'; mg.lineWidth = 1; mg.beginPath(); mg.arc(120, 120, 108, 0, TAU); mg.stroke();
+    drawPoints(mg, S.points, 120 - 100 * 0.95, 120 - 100 * 0.95, 0.95, 0.8, PAL_LIGHT);
+    mg.fillStyle = '#e8c97a'; mg.font = font(16, 700, SERIF); mg.textAlign = 'center'; mg.textBaseline = 'alphabetic';
+    mg.fillText(t.name, 120, 226);
+
+    $('strip-cards').innerHTML = res.cards.map(function (c, i) {
+      return '<figure class="strip-card"><img src="' + c.card.img + '" width="460" height="793" alt="' +
+        esc(SLOT_SHORT[i] + '：' + c.card.name + (c.rev ? '逆位' : '正位')) + '"' + (c.rev ? ' class="is-rev"' : '') + '>' +
+        '<figcaption>' + SLOT_SHORT[i] + ' · ' + esc(c.card.name) + (c.rev ? ' 逆' : ' 正') + '</figcaption></figure>';
+    }).join('');
+
+    $('oracle-dossier').innerHTML = oracleHTML(res);
+    saveHistory(res);
+    renderHistory();
+    beep(523, 0.3, 'triangle', 0.05);
+    setTimeout(function () { beep(659, 0.3, 'triangle', 0.05); }, 150);
+    setTimeout(function () { beep(784, 0.45, 'triangle', 0.05); }, 300);
+  }
+  function countUp(el, target, prefix) {
+    prefix = prefix || '';
+    if (reduced) { el.textContent = prefix + target; return; }
+    var t0 = performance.now(), dur = 900;
+    function step(now) {
+      var p = Math.min(1, (now - t0) / dur);
+      el.textContent = prefix + Math.round(target * (1 - Math.pow(1 - p, 3)));
+      if (p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  function synthLine(cards) {
+    var revs = cards.filter(function (c) { return c.rev; });
+    if (revs.length === 0) return '三张牌皆为正位，杯底与牌阵同声相应，整体走势顺畅，放手去做即可。';
+    if (revs.length === 1) return '唯一的逆位落在「' + revs[0].card.name + '」，杯底图腾指出的那个盲点，多半就藏在这张牌里，先处理它。';
+    if (revs.length === 2) return '两张逆位说明阻力不小，但杯底图腾仍然给出了出口，把力气花在「' +
+      cards.filter(function (c) { return !c.rev; })[0].card.name + '」所指的方向上。';
+    return '三张牌皆为逆位，这是一次让你放慢的提醒，不是判决。杯底图腾给的建议，正是在逆风里最稳的那一步。';
+  }
+  function oracleHTML(r) {
+    var t = TOTEMS[r.totem];
+    var I = INTENTS[r.intent];
+    var aff = (t.el === r.sign);
+    var s1 = '<p>你带着「' + esc(I.label) + '」的执念而来，属' + esc(SIGNS[r.sign].label) + '之人。' +
+      esc(SIGNS[r.sign].trait) +
+      (r.whisper ? '你写在杯底的那句「' + esc(r.whisper) + '」，已经被咖啡渣记下。' : '你没有在杯底留言，咖啡渣便按你此刻的心念自行成形。') + '</p>' +
+      '<p>杯底沉淀出「' + esc(t.name) + '」：' + esc(t.read) + esc(t.intent[r.intent]) +
+      (aff ? '图腾的元素与你的' + esc(SIGNS[r.sign].label) + '同频，今日气运额外加成。' : '图腾的元素与你的星象并不同频，反而是在补你缺的那一块。') + '</p>' +
+      '<p>' + r.cards.map(function (c, i) {
+        return SLOT_SHORT[i] + '是' + esc(c.card.name) + (c.rev ? '逆位' : '正位') + '，指向' + esc(c.rev ? c.card.rev : c.card.up);
+      }).join('；') + '。' + esc(synthLine(r.cards)) + '</p>';
+    return '<section><h3>杯底图腾与圣三角合参</h3>' + s1 + '</section>' +
+      '<section><h3>今日行事历与气运锚点</h3><dl>' +
+      '<dt>今日宜</dt><dd>' + esc(r.yi) + '</dd>' +
+      '<dt>今日忌</dt><dd>' + esc(r.ji) + '</dd>' +
+      '<dt>吉时</dt><dd>' + esc(r.hour) + '</dd>' +
+      '<dt>幸运器物</dt><dd>' + esc(t.item) + '</dd></dl></section>' +
+      '<section><h3>摩伊拉破局箴言</h3><p class="quote">' + esc(r.quote) + '</p></section>';
   }
 
-  function copyComment() {
-    var text = state.rank ? state.rank.comment : $('comment-text').textContent;
-    function done() { toast('评论区暗号已复制'); }
+  /* ---------- history ---------- */
+  function loadHistory() {
+    try {
+      var raw = localStorage.getItem(HISTORY_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) { return []; }
+  }
+  function saveHistory(res) {
+    var key = seedKey();
+    var list = loadHistory();
+    if (S.mode === 'daily') list = list.filter(function (x) { return x.key !== key; });
+    list.unshift({
+      key: key, ts: Date.now(), date: dateStr(), score: res.score, code: res.code,
+      totem: TOTEMS[res.totem].name, intent: INTENTS[res.intent].short,
+      cards: res.cards.map(function (c) { return c.card.name + (c.rev ? '逆' : '正'); })
+    });
+    list = list.slice(0, 5);
+    try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch (e) { /* storage full or blocked */ }
+  }
+  function renderHistory() {
+    var list = loadHistory();
+    var ol = $('lb-list');
+    if (!list.length) { ol.innerHTML = '<li class="lb-empty">暂无记录，完成一次占卜后会出现在这里。</li>'; return; }
+    ol.innerHTML = list.map(function (x) {
+      return '<li><b class="lb-score">' + esc(x.score) + '</b> <span class="lb-rank">' + esc(x.code) +
+        '</span> <span class="lb-meta">' + esc(x.totem) + ' · ' + esc(x.intent) + ' · ' + esc(x.cards.join(' ')) + ' · ' + esc(x.date) + '</span></li>';
+    }).join('');
+  }
+
+  /* ---------- poster ---------- */
+  var imgCache = {};
+  function loadImg(src) {
+    if (imgCache[src]) return imgCache[src];
+    imgCache[src] = new Promise(function (resolve) {
+      var im = new Image();
+      im.onload = function () { resolve(im); };
+      im.onerror = function () { resolve(null); };
+      im.src = src;
+    });
+    return imgCache[src];
+  }
+  function rrect(g, x, y, w, h, r) {
+    g.beginPath();
+    g.moveTo(x + r, y); g.lineTo(x + w - r, y); g.quadraticCurveTo(x + w, y, x + w, y + r);
+    g.lineTo(x + w, y + h - r); g.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    g.lineTo(x + r, y + h); g.quadraticCurveTo(x, y + h, x, y + h - r);
+    g.lineTo(x, y + r); g.quadraticCurveTo(x, y, x + r, y); g.closePath();
+  }
+  function renderPoster() {
+    var r = S.result;
+    if (!r) return Promise.resolve();
+    var t = TOTEMS[r.totem];
+    var loads = [loadImg(ASSETS.atlas), loadImg(ASSETS.crema)].concat(r.cards.map(function (c) { return loadImg(c.card.img); }));
+    return Promise.all(loads).then(function (im) {
+      var c = $('card-canvas'), g = c.getContext('2d');
+      var W = 720, H = 1040;
+      g.clearRect(0, 0, W, H);
+      // paper
+      var pg = g.createLinearGradient(0, 0, 0, H);
+      pg.addColorStop(0, '#f4ead3'); pg.addColorStop(1, '#e8d9b8');
+      g.fillStyle = pg; g.fillRect(0, 0, W, H);
+      for (var i = 0; i < 1800; i++) {
+        g.fillStyle = 'rgba(90,60,30,' + (0.02 + Math.random() * 0.05) + ')';
+        g.fillRect(Math.random() * W, Math.random() * H, 1.5, 1.5);
+      }
+      g.strokeStyle = '#9a7a2e'; g.lineWidth = 3; rrect(g, 14, 14, W - 28, H - 28, 10); g.stroke();
+      g.strokeStyle = 'rgba(154,122,46,0.55)'; g.lineWidth = 1; rrect(g, 24, 24, W - 48, H - 48, 6); g.stroke();
+      // photo window
+      var px = 50, py = 50, pw = 620, ph = 540;
+      g.save();
+      rrect(g, px, py, pw, ph, 4); g.clip();
+      g.fillStyle = '#1b1109'; g.fillRect(px, py, pw, ph);
+      if (im[0]) {
+        var sc = Math.max(pw / im[0].width, ph / im[0].height);
+        g.globalAlpha = 0.4;
+        g.drawImage(im[0], px + (pw - im[0].width * sc) / 2, py + (ph - im[0].height * sc) / 2, im[0].width * sc, im[0].height * sc);
+      }
+      if (im[1]) {
+        var sc2 = Math.max(pw / im[1].width, ph / im[1].height);
+        g.globalAlpha = 0.16;
+        g.drawImage(im[1], px + (pw - im[1].width * sc2) / 2, py + (ph - im[1].height * sc2) / 2, im[1].width * sc2, im[1].height * sc2);
+      }
+      g.globalAlpha = 1;
+      var vg = g.createRadialGradient(W / 2, 330, 80, W / 2, 330, 340);
+      vg.addColorStop(0, 'rgba(27,17,9,0.2)'); vg.addColorStop(1, 'rgba(10,5,2,0.8)');
+      g.fillStyle = vg; g.fillRect(px, py, pw, ph);
+      g.strokeStyle = 'rgba(201,162,75,0.7)'; g.lineWidth = 2;
+      g.beginPath(); g.arc(W / 2, 335, 200, 0, TAU); g.stroke();
+      g.strokeStyle = 'rgba(201,162,75,0.35)'; g.lineWidth = 1;
+      g.beginPath(); g.arc(W / 2, 335, 214, 0, TAU); g.stroke();
+      drawPoints(g, S.points, W / 2 - 100 * 1.7, 335 - 100 * 1.7, 1.7, 1.5, PAL_LIGHT);
+      g.fillStyle = '#e8c97a'; g.textAlign = 'center'; g.textBaseline = 'alphabetic';
+      g.font = font(40, 700, SERIF); g.fillText(r.rankName, W / 2, 112);
+      g.font = font(18, 400, SERIF); g.fillStyle = '#d9c9a0';
+      g.fillText('摩伊拉咖啡馆 · 1909占卜卷宗', W / 2, 142);
+      g.font = font(24, 700, SERIF); g.fillStyle = '#f1e2c0';
+      g.fillText('杯底图腾：' + t.name, W / 2, 556);
+      g.font = font(18, 400, SERIF); g.fillStyle = '#c9a24b';
+      g.textAlign = 'right'; g.fillText('气运值 ' + r.score + ' / 100', px + pw - 18, py + 28);
+      g.restore();
+      // cards
+      var cw = 141, ch = 244, gap = 30, sx = (W - (cw * 3 + gap * 2)) / 2, cy = 614;
+      r.cards.forEach(function (cd, k) {
+        var x = sx + k * (cw + gap);
+        g.save();
+        g.shadowColor = 'rgba(0,0,0,0.3)'; g.shadowBlur = 8; g.shadowOffsetY = 3;
+        g.fillStyle = '#fffaf0'; g.fillRect(x - 4, cy - 4, cw + 8, ch + 8);
+        g.restore();
+        var img = im[2 + k];
+        if (img) {
+          g.save();
+          g.translate(x + cw / 2, cy + ch / 2);
+          if (cd.rev) g.rotate(Math.PI);
+          g.drawImage(img, -cw / 2, -ch / 2, cw, ch);
+          g.restore();
+        } else {
+          g.fillStyle = '#2a1a10'; g.fillRect(x, cy, cw, ch);
+        }
+        g.fillStyle = '#2a1a10'; g.font = font(16, 700, SERIF); g.textAlign = 'center';
+        g.fillText(SLOT_SHORT[k] + ' · ' + cd.card.name + (cd.rev ? '逆' : '正'), x + cw / 2, cy + ch + 28);
+      });
+      // caption
+      g.fillStyle = '#2a1a10'; g.textAlign = 'center';
+      g.font = font(24, 700, SERIF);
+      g.fillText('「' + INTENTS[r.intent].label + '」 · ' + SIGNS[r.sign].label, W / 2, 928, 620);
+      g.font = font(20, 400, SERIF); g.fillStyle = '#5a3b12';
+      var line = r.whisper ? '杯底留言：' + r.whisper : r.quote;
+      g.fillText(line, W / 2, 966, 620);
+      g.font = font(16, 400, SANS); g.fillStyle = '#7a6a4a';
+      g.fillText('摩伊拉咖啡馆 · ' + dateStr() + ' · 仅供娱乐', W / 2, 1002);
+      try { S.cardURL = c.toDataURL('image/png'); } catch (e) { S.cardURL = null; }
+    });
+  }
+
+  var modal = $('card-modal');
+  var lastFocus = null;
+  function openModal() {
+    lastFocus = document.activeElement;
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+    $('btn-close-modal').focus();
+  }
+  function closeModal() {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+    if (lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+  $('btn-save-card').addEventListener('click', function () {
+    if (!S.result) return;
+    $('modal-note').textContent = '正在绘制灵签……';
+    openModal();
+    renderPoster().then(function () {
+      $('modal-note').textContent = S.cardURL ? '灵签已生成，可以下载保存。' : '灵签已生成，当前浏览器限制了直接下载，请截图保存。';
+      beep(700, 0.3, 'triangle', 0.05);
+    });
+  });
+  $('btn-download-card').addEventListener('click', function () {
+    if (!S.cardURL) { toast('请截图保存这张灵签'); return; }
+    var a = document.createElement('a');
+    a.href = S.cardURL;
+    a.download = 'moirae-oracle-card-' + dateStr() + '.png';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    toast('灵签图片已开始下载');
+  });
+  $('btn-close-modal').addEventListener('click', closeModal);
+  modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal();
+  });
+
+  /* ---------- copy ---------- */
+  $('btn-copy-comment').addEventListener('click', function () {
+    if (!S.result) return;
+    var text = S.result.cipher;
     function fallback() {
       var ta = document.createElement('textarea');
       ta.value = text; ta.setAttribute('readonly', '');
-      ta.style.position = 'fixed'; ta.style.opacity = '0'; ta.style.top = '0';
-      document.body.appendChild(ta);
-      ta.select();
+      ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
       var ok = false;
       try { ok = document.execCommand('copy'); } catch (e) { ok = false; }
       document.body.removeChild(ta);
-      toast(ok ? '评论区暗号已复制' : '复制失败，请长按文字手动复制');
+      toast(ok ? '暗号已复制，去评论区接好运吧' : '复制失败，请手动复制：' + text);
     }
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(text).then(done, fallback);
-    } else {
-      fallback();
-    }
-  }
+      navigator.clipboard.writeText(text).then(function () {
+        toast('暗号已复制，去评论区接好运吧');
+      }, fallback);
+    } else { fallback(); }
+  });
 
-  // Gentle probing of optional toy APIs: never throws, never blocks the settlement.
-  function probeToy(toy) {
-    ['getUserInfo', 'getUserVideoAction', 'getRankList'].forEach(function (name) {
-      try {
-        if (typeof toy[name] !== 'function') return;
-        var r = toy[name]();
-        if (r && typeof r.then === 'function') r.then(function (v) { state['toy_' + name] = v; }, function () { /* ignore */ });
-      } catch (e) { /* ignore */ }
+  /* ---------- reset / restart ---------- */
+  function resetReading() {
+    S.totemKey = null; S.points = null; S.particles = null; S.stains = null;
+    S.settled = false; S.swirling = false; S.zone = null;
+    S.fate = null; S.drawn = []; S.result = null; S.cardURL = null;
+    S.reached = 1;
+    resetZoneUI();
+    zoneBtns.forEach(function (b) { b.disabled = true; });
+    btnReswirl.disabled = true; btnSwirl.disabled = false; btnAct3.disabled = true;
+    $('totem-name').textContent = '图腾待显影';
+    $('totem-read').textContent = '倾倒咖啡并凝视杯底，或在杯面上按住拖动，等待咖啡渣沉淀成形。';
+    $('totem-intent').textContent = '';
+    $('totem-luck').textContent = '';
+    $('zone-reading').innerHTML = '<h3>分区读数</h3><p>杯底显影之后，点选上方三个分区，咖啡渣会在对应的圆环上亮起。</p>';
+    cupCanvas.setAttribute('aria-label', '俯视的土耳其骨瓷咖啡杯，杯底有咖啡渣');
+    hudTotem.textContent = '杯底图腾 · 待显影';
+    hudScore.textContent = '气运值 0';
+    buildDeck();
+    resetSlots();
+    $('final-score').textContent = '0';
+    $('oracle-dossier').innerHTML = '';
+    $('strip-cards').innerHTML = '';
+    drawCup(cupOpts());
+  }
+  $('btn-restart').addEventListener('click', function () {
+    resetReading();
+    S.key = null;
+    $('whisper-input').value = '';
+    updateStartHint();
+    if (modal.classList.contains('is-open')) closeModal();
+    showAct(1);
+    toast('已重置，换个问题再占一次');
+  });
+
+  /* ---------- jump bar & sound ---------- */
+  jumps.forEach(function (b) {
+    b.addEventListener('click', function () {
+      var n = parseInt(b.getAttribute('data-jump'), 10);
+      if (n > S.reached) return;
+      if (n === 2 && !S.key) { S.key = seedKey(); S.fate = makeFate(); }
+      showAct(n);
     });
-  }
+  });
+  $('btn-sound').addEventListener('click', function () {
+    S.sound = !S.sound;
+    this.textContent = S.sound ? '声音：开' : '声音：关';
+    this.setAttribute('aria-pressed', S.sound ? 'true' : 'false');
+    if (S.sound) beep(600, 0.15);
+  });
 
-  var LB_NPC = [
-    { name: '直布罗陀首席大法官', score: 100 },
-    { name: '苏格兰场·雷斯垂德', score: 92 },
-    { name: '红橡木显微镜爱好者', score: 81 },
-    { name: '六分仪守护人', score: 68 }
-  ];
+  /* ---------- init ---------- */
+  selectInGroup('.intent-btn', 'data-intent', S.intent);
+  selectInGroup('.sign-btn', 'data-sign', S.sign);
+  updateStartHint();
+  buildDeck();
+  resetSlots();
+  renderHistory();
+  drawCup({ liquid: 1 });
+  showAct(1);
+  window.scrollTo(0, 0);
 
-  function renderLeaderboard() {
-    var list = $('lb-list');
-    if (!list || !state.rank) return;
-    var rows = [], placed = false, i, me = { me: true, score: state.score };
-    for (i = 0; i < LB_NPC.length; i++) {
-      if (!placed && me.score >= LB_NPC[i].score) { rows.push(me); placed = true; }
-      rows.push(LB_NPC[i]);
-    }
-    if (!placed) rows.push(me);
-    rows = rows.slice(0, 5);
-    list.textContent = '';
-    rows.forEach(function (r, idx) {
-      var rk = pickRank(r.score).letter;
-      var text = r.me ? '你（特派勘查官） · 推理值 ' + r.score + ' · 段位 ' + rk : r.name + ' · 推理值 ' + r.score + ' · 段位 ' + rk;
-      var li = el('li', r.me ? 'lb-item is-me' : 'lb-item');
-      li.appendChild(el('span', 'lb-no', String(idx + 1)));
-      li.appendChild(el('span', 'lb-text', text));
-      list.appendChild(li);
-    });
-  }
-
-  function wrapText(c, text, x, y, maxW, lh, maxLines) {
-    var line = '', n = 0, i, ch;
-    for (i = 0; i < text.length; i++) {
-      ch = text.charAt(i);
-      if (c.measureText(line + ch).width > maxW && line) {
-        n++;
-        if (maxLines && n >= maxLines) { c.fillText(line.slice(0, -1) + '…', x, y); return y + lh; }
-        c.fillText(line, x, y); y += lh; line = ch;
-      } else line += ch;
-    }
-    if (line) { c.fillText(line, x, y); y += lh; }
-    return y;
-  }
-
-  function generatePolaroidCard() {
-    if (!state.rank) return;
-    var r = state.rank;
-    var cv = document.createElement('canvas');
-    cv.width = 720; cv.height = 960;
-    var c = cv.getContext('2d');
-    if (!c) { toast('当前设备不支持生成图片'); return; }
-    var serif = '"Songti SC","Noto Serif SC",SimSun,Georgia,serif';
-    var mono = serif;
-    // polaroid paper
-    c.fillStyle = '#d8d0bd'; c.fillRect(0, 0, 720, 960);
-    c.fillStyle = '#f4efe6'; c.fillRect(24, 24, 672, 912);
-    c.strokeStyle = 'rgba(0,0,0,.12)'; c.lineWidth = 2; c.strokeRect(24, 24, 672, 912);
-    // deep-sea banner
-    c.fillStyle = '#0a121b';
-    
-    c.fillRect(56, 56, 608, 380);
-    c.strokeStyle = '#c9a24b'; c.lineWidth = 4; c.strokeRect(56, 56, 608, 380);
-    c.strokeStyle = 'rgba(201,162,75,.45)'; c.lineWidth = 1.5; c.strokeRect(66, 66, 588, 360);
-    // waves + silhouette
-    c.strokeStyle = 'rgba(143,208,238,.4)'; c.lineWidth = 2;
-    var y, x;
-    for (y = 360; y < 430; y += 20) {
-      c.beginPath(); c.moveTo(60, y);
-      for (x = 60; x < 660; x += 40) c.quadraticCurveTo(x + 10, y - 9, x + 20, y), c.quadraticCurveTo(x + 30, y + 9, x + 40, y);
-      c.stroke();
-    }
-    c.fillStyle = '#04070b';
-    c.beginPath(); c.moveTo(250, 360); c.lineTo(268, 388); c.lineTo(500, 388); c.lineTo(520, 352); c.closePath(); c.fill();
-    c.fillRect(340, 220, 4, 140); c.fillRect(430, 240, 4, 120);
-    c.beginPath(); c.moveTo(345, 228); c.quadraticCurveTo(396, 290, 346, 350); c.closePath(); c.fill();
-    c.beginPath(); c.moveTo(435, 248); c.quadraticCurveTo(480, 300, 436, 350); c.closePath(); c.fill();
-    c.textAlign = 'left'; c.fillStyle = '#c9a24b'; c.font = '700 22px ' + mono;
-    c.fillText('MARITIME COURT OF GIBRALTAR', 86, 100);
-    c.fillStyle = '#e8e2d4'; c.font = '700 40px ' + serif;
-    c.fillText('结案鉴定卡', 86, 156);
-    c.fillStyle = 'rgba(232,226,212,.7)'; c.font = '20px ' + mono;
-    c.fillText('38\u00b020\'N \u00b7 17\u00b015\'W', 86, 192);
-    // wax seal
-    c.save(); c.translate(588, 134); c.rotate(0.14);
-    c.fillStyle = '#8e1f17'; c.beginPath(); c.arc(0, 0, 52, 0, Math.PI * 2); c.fill();
-    c.strokeStyle = '#d9574a'; c.lineWidth = 3; c.beginPath(); c.arc(0, 0, 41, 0, Math.PI * 2); c.stroke();
-    c.fillStyle = '#f3b6ad'; c.textAlign = 'center'; c.font = '700 20px ' + serif; c.fillText('1872', 0, -6);
-    c.font = '700 14px ' + mono; c.fillText('MARY', 0, 12); c.fillText('CELESTE', 0, 29);
-    c.restore();
-    // rank letter
-    c.textAlign = 'center';
-    c.fillStyle = r.letter === 'S+' ? '#e6c15c' : (r.letter === 'A' ? '#8fc6ee' : '#d9c6a8');
-    c.font = '900 150px ' + serif;
-    c.fillText(r.letter, 360, 596);
-    // badge + score
-    c.fillStyle = '#2b2118'; c.font = '700 30px ' + serif;
-    c.fillText(r.badge.length > 22 ? r.badge.slice(0, 22) : r.badge, 360, 650);
-    c.fillStyle = '#5a4a38'; c.font = '22px ' + serif;
-    c.fillText(r.title, 360, 686);
-    c.fillStyle = '#8a3a12'; c.font = '900 56px ' + serif;
-    c.fillText(state.score + ' / 100', 360, 750);
-    c.fillStyle = '#5a4a38'; c.font = '20px ' + serif;
-    c.fillText('最终推理值', 360, 776);
-    // stats
-    var manual = 0, auto = 0, id;
-    for (id in state.found) if (Object.prototype.hasOwnProperty.call(state.found, id)) { if (state.found[id] === 'manual') manual++; else auto++; }
-    c.fillStyle = '#2b2118'; c.font = '20px ' + serif;
-    c.fillText('取证 ' + state.foundCount + '/5（手动 ' + manual + ' · 辅助 ' + auto + '） · 常识陷阱 ' + state.wrongCount + ' 次 · 冷焰已' + (state.flashed ? '还原' : '未还原'), 360, 812);
-    // comment cipher
-    c.fillStyle = '#e6dfcf'; c.fillRect(56, 830, 608, 80);
-    c.textAlign = 'left'; c.fillStyle = '#4a3c2c'; c.font = '17px ' + serif;
-    wrapText(c, '评论区暗号：' + r.comment, 70, 858, 580, 24, 3);
-    // corner mark
-    c.textAlign = 'right'; c.fillStyle = 'rgba(90,74,56,.7)'; c.font = '14px ' + mono;
-    c.fillText('1872 MARY CELESTE \u00b7 CASE CLOSED', 690, 926);
-
-    var url = '';
-    try { url = cv.toDataURL('image/png'); } catch (e) { url = ''; }
-    if (!url) { toast('图片生成失败，请截屏保存'); return; }
-    $('card-modal-img').src = url;
-    var link = $('card-download-link');
-    link.href = url;
-    $('card-modal').hidden = false;
-    play('clue_crystal_ding');
-    try { link.click(); } catch (e2) { /* manual download button remains */ }
-  }
-
-  function closeCardModal() { $('card-modal').hidden = true; }
-
-  function initAct6() {
-    $('btn-copy-comment').addEventListener('click', function () { play('clue_crystal_ding'); copyComment(); });
-    $('btn-save-card').addEventListener('click', generatePolaroidCard);
-    $('btn-close-modal').addEventListener('click', closeCardModal);
-    $('card-modal').addEventListener('click', function (e) { if (e.target === this) closeCardModal(); });
-    $('btn-restart').addEventListener('click', function () { window.location.reload(); });
-  }
-
-  /* ------------------------------------------------------------------ *
-   * Boot
-   * ------------------------------------------------------------------ */
-  function initHud() {
-    var bar = document.querySelectorAll('.jump');
-    for (var i = 0; i < bar.length; i++) {
-      (function (b) {
-        b.addEventListener('click', function () { showAct(Number(b.getAttribute('data-jump'))); });
-      })(bar[i]);
-    }
-    $('btn-sound').addEventListener('click', function () {
-      state.soundOn = !state.soundOn;
-      this.setAttribute('aria-pressed', String(state.soundOn));
-      this.textContent = state.soundOn ? '声音：开' : '声音：关';
-      if (state.soundOn) Audio.enable(); else Audio.mute(true);
-      if (state.soundOn) play('comma_breath');
-    });
-  }
-
-  function boot() {
-    initHud();
-    initAct1();
-    initAct2();
-    initAct3();
-    initAct4();
-    initAct5();
-    initAct6();
-    setTool('yellow_fluo');
-    setText('tool-hint', '点击任意拍立得，用当前工具标出它的反常死穴。');
-    renderChain();
-    renderHud();
-  }
-
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
-  else boot();
+  // preload every bundled plate so the oracle card and strip render instantly
+  var preload = [ASSETS.atlas, ASSETS.cup, ASSETS.crema].concat(CARDS.map(function (c) { return c.img; }));
+  var idle = window.requestIdleCallback || function (fn) { return setTimeout(fn, 600); };
+  idle(function () { preload.forEach(loadImg); });
 })();
