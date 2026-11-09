@@ -25,162 +25,216 @@
 
   var CARDS = [
     { id: 'fool', n: '0', name: '愚者', img: './assets/tarot-00-fool-a1b2c3.jpg', lk: [8, 5],
-      up: '新的起点与轻装上路的勇气', rev: '冲动冒进与准备不足' },
+      scene: '崖边白犬追着衣角低吠，少年肩头只挂一只小小行囊',
+      up: '轻装出门的人，连云也肯为他让出一条窄路，脚下无路之处，便是新的路',
+      rev: '莫把一时的莽撞错认作勇气，崖边的风并不认得你是谁，先看清落脚处',
+      pos: ['你年少时也曾这样不管不顾地出门，那一步至今仍在脚底微微发烫。',
+            '此刻你正站在崖边，行囊很轻，心也很轻，只差一个迈步的理由。',
+            '前方没有地图，却有一整片尚未命名的晴空，等你去取名字。'] },
     { id: 'magician', n: 'I', name: '魔术师', img: './assets/tarot-01-magician-b2c3d4.jpg', lk: [9, 5],
-      up: '手上资源已齐，只差一次动手', rev: '才华分散，话说得比做得多' },
+      scene: '案上杯、剑、币、杖四器齐陈，他一手指天一手指地，头顶悬着无尽的灯',
+      up: '你手里早已握着所需的一切，只差一声清脆的响指，便能把它们点成真的',
+      rev: '戏法若是无心，终成一场空响，舞台再亮，也照不暖台下那双冰凉的手',
+      pos: ['早年你便悄悄备下了这四件器物，只是那时还不知它们能做什么。',
+            '你案头的东西已经齐了，该做的不是再添一件，而是动手。',
+            '不久之后，你会亲手把一个念头变成看得见摸得着的东西。'] },
     { id: 'priestess', n: 'II', name: '女祭司', img: './assets/tarot-02-priestess-c3d4e5.jpg', lk: [7, 6],
-      up: '直觉清醒，答案藏在沉默里', rev: '信息被隐瞒，或你在回避真相' },
+      scene: '帘后石榴暗红，新月卧在她脚边，经卷半掩于袖中',
+      up: '答案不会喧哗，它在静默里慢慢浮起，像杯底渐渐澄清的那一圈琥珀',
+      rev: '别再假装听不见心底那个声音，帘子拉得越紧，帘后的影子便越是清楚',
+      pos: ['有些话你很早就听见了，却一直没有讲给任何人。',
+            '眼下最要紧的不是追问，而是安静坐一会儿，等浮渣自己沉下去。',
+            '往后你会发现，那份直觉比所有旁人的劝告都更靠得住。'] },
     { id: 'empress', n: 'III', name: '皇后', img: './assets/tarot-03-empress-d4e5f6.jpg', lk: [9, 5],
-      up: '丰盛、滋养与稳定的收成', rev: '过度付出，或停滞的回报' },
+      scene: '麦穗环绕她的金冠，身后林叶沙沙，溪水从裙边缓缓绕过',
+      up: '丰饶如期而至，耐心浇灌过的东西，自会在属于它的那个季节里挂满枝头',
+      rev: '照顾旁人之前，请先替自己续上一盏灯，因为空了的杯子，斟不出一点温热',
+      pos: ['你曾被人温柔地养育过，那份底气一直藏在你的脊背里。',
+            '此刻不必急着收成，让土再暖一暖，根自会往深处伸。',
+            '往后会有一段饱满的日子，像刚出炉的面包，值得慢慢掰开。'] },
     { id: 'emperor', n: 'IV', name: '皇帝', img: './assets/tarot-04-emperor-e5f6a7.jpg', lk: [7, 5],
-      up: '规则、结构与果断的掌控', rev: '固执僵化，或来自权威的压力' },
+      scene: '石座扶手刻着四只羊首，他披红袍端坐，身后群山寸草不生',
+      up: '立好规矩便是立好屋梁，风雨来时再大，也吹不动一座早已想得周全的房子',
+      rev: '过硬的墙会把自己也关在里面，权威若是始终不肯弯腰，便只剩孤零零的冷',
+      pos: ['早年有一位严肃的人替你立过规矩，你至今仍在遵守或反抗它。',
+            '眼下需要一点果断，把摇摆不定的事用一条线划分清楚。',
+            '往后你会成为替别人遮风的人，请记得在屋里留一扇窗。'] },
     { id: 'chariot', n: 'VII', name: '战车', img: './assets/tarot-07-chariot-f6a7b8.jpg', lk: [8, 5],
-      up: '意志统一，向着目标加速', rev: '方向分裂，用力过猛反而失控' },
+      scene: '黑白双狮并驾，星幔覆在车顶，城门在他身后缓缓退去',
+      up: '握紧缰绳，让两股相反的力朝同一个方向奔去，远处的城门已在眼前亮起灯',
+      rev: '方向未定的奔驰，只是徒然扬起一路尘土，不妨先勒住缰绳，在路边歇上片刻',
+      pos: ['你曾为了证明什么而远走，那场出发至今仍在耳边隆隆作响。',
+            '此刻两股心念各拉一头，先把它们捏成一股，车才走得稳。',
+            '不远处有一座城门为你敞开，只是扬鞭的手要你自己来握。'] },
     { id: 'wheel', n: 'X', name: '命运之轮', img: './assets/tarot-10-wheel-a7b8c9.jpg', lk: [8, 4],
-      up: '转机到来，局势翻面', rev: '周期低谷，暂时的逆风' },
+      scene: '云间巨轮缓缓转动，四角圣兽各捧一卷书，斯芬克斯静坐轮顶',
+      up: '命运的轮子终于缓缓转到了你这一边，只需顺着它的力气，不必再费一分蛮力',
+      rev: '低处不过是轮回里小小的一格，别急着中途下车，等这一圈转完便见分晓',
+      pos: ['你的过往里有一次转折，当时看似坏事，如今回头已是伏笔。',
+            '眼下局势正在翻面，所有悬着的东西都要重新落位。',
+            '接下来的风向会变，请把窗户开着，让新的机缘走进来。'] },
     { id: 'tower', n: 'XVI', name: '高塔', img: './assets/tarot-16-tower-b8c9d0.jpg', lk: [4, 6],
-      up: '旧结构崩塌，突如其来的真相', rev: '崩塌被拖延，或灾后重建中的余震' },
+      scene: '闪电劈开塔顶的王冠，火舌从窗口舔出，两个人影坠入暗夜',
+      up: '旧的城墙自己裂开了口，塌下来的是谎言，留下来的才是真正的地基',
+      rev: '崩塌被一再拖延，裂缝只在暗处悄悄长大，倒不如自己动手，拆下第一块砖',
+      pos: ['你曾亲历一次猝不及防的坍塌，至今仍记得那声巨响。',
+            '眼下有一处看似坚固的东西已经松动，别再用力去扶它。',
+            '废墟之后会有一片亮得出奇的空地，足够你重新盖一座屋子。'] },
     { id: 'star', n: 'XVII', name: '星星', img: './assets/tarot-17-star-c9d0e1.jpg', lk: [10, 6],
-      up: '希望修复，长线的疗愈', rev: '信心失焦，对未来过度悲观' },
+      scene: '少女跪在池边，双壶倾泻清水，头顶八芒星静静亮着',
+      up: '伤口之上，星光正在一针一线地替你缝合，长夜再长，也终究会有它的尽头',
+      rev: '别因为一夜的阴云便不信天会亮，星从未离开过，只是你低着头太久太久了',
+      pos: ['你曾在漫长的黑夜里独自坐过，那时没有人知道你有多疼。',
+            '此刻有一线微光落在你肩上，不必伸手去抓，只管抬头。',
+            '往后你会慢慢被治愈，温柔得像清晨第一口热咖啡。'] },
     { id: 'moon', n: 'XVIII', name: '月亮', img: './assets/tarot-18-moon-d0e1f2.jpg', lk: [5, 7],
-      up: '迷雾中的不安与潜意识的暗示', rev: '迷雾渐散，真相即将浮出' },
+      scene: '犬与狼对着满月长嚎，小径通向远山，池底的龙虾缓缓爬上岸',
+      up: '朦胧之处藏着最真的直觉，雾再浓，月亮也会悄悄替你照出前面的半条小路',
+      rev: '迷雾正在慢慢散开，莫被自己的影子吓得退后，你所怕的，多半只是一场回声',
+      pos: ['你心里有一件从未说清的事，像潮水，夜夜来拍你的窗。',
+            '眼下看不真切并不可怕，慢些走，把脚步放轻就好。',
+            '不久雾便要散了，你会发现那些吓人的影子原来是树。'] },
     { id: 'sun', n: 'XIX', name: '太阳', img: './assets/tarot-19-sun-e1f2a3.jpg', lk: [10, 6],
-      up: '明朗、成功与被看见', rev: '热情过载，或好消息被延迟' },
+      scene: '向日葵探出矮墙，赤足的孩童骑着白马，红旗在日光里舒展',
+      up: '阳光从不过问来处，只管把你照得通亮，你唇边的笑意，会替你说完所有的话',
+      rev: '热情过盛也会灼伤窗台，好消息只是迟了几步，请你再耐心多等一个温暖的晌午',
+      pos: ['你有过一段被人毫无保留地爱着的日子，它仍在骨头里发热。',
+            '此刻的明朗来得朴素，不必声张，也值得好好晒一晒。',
+            '前方有一场坦荡的欢喜，等你推开门便能撞个满怀。'] },
     { id: 'world', n: 'XXI', name: '世界', img: './assets/tarot-21-world-f2a3b4.jpg', lk: [10, 6],
-      up: '圆满收官，一个周期完成', rev: '只差最后一步，收尾被拖住' }
+      scene: '桂冠环中的舞者轻盈回身，四角圣兽守在云端，红绸缠过她的腰',
+      up: '一段漫长的旅程圆满落成，你终于可以放下行囊，听一听自己的脚步声',
+      rev: '差半圈便圆，别急着提前离席，因为最后那一小段路，往往才最见真章与心意',
+      pos: ['你曾走完一段很长的路，那份完成感至今还留在掌心。',
+            '眼下只差最后一笔，不要因为累了便草草收尾。',
+            '之后你会站在新的起点上，回头望去，整条路都亮着灯。'] }
   ];
 
-  var SLOT_NAMES = ['过去之因', '当下之局', '未来之兆'];
-  var SLOT_SHORT = ['过去', '当下', '未来'];
+  var SLOT_NAMES = ['往昔之因', '眼下之局', '将至之兆'];
+  var SLOT_SHORT = ['往昔', '眼下', '将至'];
 
   var INTENTS = {
-    career: { label: '搞钱与事业破局', short: '事业',
-      lens: ['放在事业上，这是你过去几年在职场与钱路上埋下的底色。',
-             '落到搞钱这件事，它就是眼下卡住你或推着你的那个点。',
-             '对事业破局来说，这是接下来三十天最值得押注的方向。'] },
-    love: { label: '感情与宿命羁绊', short: '感情',
-      lens: ['放在感情上，这是你们关系里最早埋下的那颗种子。',
-             '落到这段羁绊，它说的就是此刻你们之间真正的症结。',
-             '对这段缘分来说，这是接下来最可能发生的转向。'] },
-    study: { label: '学业与上岸渡劫', short: '学业',
-      lens: ['放在学业上，这是你一路复习与备考留下的惯性。',
-             '落到上岸这件事，它指出你眼下最该修正的节奏。',
-             '对渡劫结果来说，这是临门一脚时最需要的状态。'] },
-    luck: { label: '今日赛博水逆退散', short: '运势',
-      lens: ['放在今天的运势上，这是你近日倒霉感的真正来源。',
-             '落到眼前的水逆，它说明麻烦究竟卡在哪一环。',
-             '对退散水逆来说，这是今晚之前最该抓住的转机。'] }
+    career: { label: '前程与器业', short: '前程', whisperAsk: '你想亲手建成什么？', motif: '案上那张迟迟未落印的图纸' },
+    love: { label: '故人与羁绊', short: '故人', whisperAsk: '那个名字，还在你舌尖吗？', motif: '旧信里那朵未肯褪尽颜色的花' },
+    study: { label: '灯火与登科', short: '灯火', whisperAsk: '哪一页，你迟迟不肯翻过？', motif: '灯下那页翻不过去的书' },
+    luck: { label: '流年与晴雨', short: '流年', whisperAsk: '你在等哪一场雨停？', motif: '窗外低垂不动的云脚' }
   };
 
   var SIGNS = {
-    fire: { label: '火象', trait: '火象的你行动快，热度高，今天要防的是三分钟热度。' },
-    earth: { label: '土象', trait: '土象的你务实稳健，今天要防的是过度保守而错过窗口。' },
-    air: { label: '风象', trait: '风象的你信息多，点子密，今天要防的是想太多而落不了地。' },
-    water: { label: '水象', trait: '水象的你感受细，直觉准，今天要防的是被别人的情绪带跑。' }
+    fire: { label: '火象', trait: '火象的人生来带着壁炉的脾气，一句话便能点燃整座沙龙，也最怕炉火空烧。' },
+    earth: { label: '土象', trait: '土象的人像橡木吧台般沉稳，慢慢焙熟每一颗豆子，从不辜负时间的重量。' },
+    air: { label: '风象', trait: '风象的人总在长桌两端传递新闻与诗句，心比门上的风铃还要轻快。' },
+    water: { label: '水象', trait: '水象的人能从别人杯中的涟漪读出心事，温柔得像博斯普鲁斯的夜雾。' }
   };
 
   var TOTEMS = {
     owl: { name: '夜枭栖枝', el: 'air', luck: 4, item: '黄铜书签',
-      read: '猫头鹰栖在横枝上，双眼朝向杯口。夜枭擅长在暗处看清事物，说明你早已察觉某件事，只是一直没有说破。',
+      gist: '一只夜枭在瓷壁上收拢了双翼',
+      read: '残渣沿着温热的瓷壁慢慢收拢，成了一只栖在横枝上的夜枭，双眼静静朝着杯口。夜里的念头比白昼清醒，你早已看清某件事，只是一直没有说破。',
       intent: {
-        career: '有一个机会出现在非正式场合，夜里想清楚的方案，比白天开会时的更靠谱。',
-        love: '对方的态度你心里早有判断，别再找人求证，第一直觉就是答案。',
-        study: '适合在安静的夜间复盘，薄弱点会在独处时自己浮出来。',
-        luck: '今天先观察再开口，能替你挡掉一次口舌是非。' },
+        career: '有一个机会会出现在不那么正式的场合，夜里想清楚的方案，比白天会议上的更靠得住。',
+        love: '对方的心意你早有判断，不必再托人求证，第一眼的直觉便是答案。',
+        study: '适合在安静的夜里复盘，薄弱之处会在独处时自己浮上来，像茶面上的一粒金屑。',
+        luck: '今日先看后说，一句收住的话，能替你挡下一场无谓的口舌。' },
       zones: {
-        rim: '杯沿的渣粒细碎而分散，近七日会有一条不起眼的消息，值得你多看两眼。',
-        wall: '杯壁左侧有一道向上的纹路，是暗处有人在替你说话；右侧的短横是阻力，多半来自你自己的犹豫。',
-        bottom: '杯底的死穴是想得太多、做得太少。枝再稳，鸟不飞也只是摆设。' } },
+        rim: '杯沿的渣粒细碎而疏落，像檐角将停未停的雨。近七日会有一条不起眼的消息，值得你多看两眼，夜里的念头比白昼清醒。',
+        wall: '杯壁左侧有一道向上的细纹，像一位沉默的长者在暗处看你，也替你说话；右侧那一小横，多半是你自己的犹豫。',
+        bottom: '杯底沉着一枚小小的结：你怕说出口便不灵验。可枝再稳，鸟不飞，也只是一幅静物。' } },
     anchor: { name: '破浪铁锚', el: 'water', luck: 5, item: '深蓝丝巾',
-      read: '铁锚沉在杯底正中，弧形双臂向上托起。锚代表在风浪里把你固定住的东西，你需要的不是更快，而是更稳。',
+      gist: '咖啡渣沉成一枚铁锚',
+      read: '咖啡渣在杯底沉成一枚铁锚，弧形双臂向上托起，锚链没入深褐色的暗潮。远行的船票正在路上，而你真正需要的，不是更快，是更稳。',
       intent: {
-        career: '别被新风口带着跑，守住手上的主业，副业用小成本试水即可。',
-        love: '这段关系需要一个明确的定义，模糊久了，双方都会累。',
-        study: '稳住节奏比冲刺重要，每天固定时段学习，比一次熬夜有效十倍。',
-        luck: '今天适合收拾、整理、做减法，丢掉一件旧物会带来好运。' },
+        career: '别被新风口带着跑，守住手上的正业，旁的营生只拿小小的本钱去试水。',
+        love: '这段牵连需要一个体面的名分，含糊得太久，两个人都会疲惫。',
+        study: '稳住节奏比冲刺要紧，每日固定一段灯下的时辰，胜过一夜熬红的双眼。',
+        luck: '今日宜收拾、宜做减法，送走一件旧物，会换回一小份清爽。' },
       zones: {
-        rim: '杯沿有一圈整齐的细渣，近七日行程会被固定下来，反而让人安心。',
-        wall: '杯壁两侧对称，助力与阻力基本持平，关键看你选哪一边使力。',
-        bottom: '杯底的死穴是不敢松手，抓得太紧的东西，正在拖慢你。' } },
+        rim: '杯沿一圈整齐的细渣，像码头边排好的缆绳。远行的船票正在路上，近七日的行程会被一一钉牢，反叫人安心。',
+        wall: '杯壁两侧对称如天平，家中有人替你压住风浪，助力与阻力几乎持平，只看你选哪一边使力。',
+        bottom: '杯底的结，是你舍不得那片旧港湾。抓得太紧的东西，正悄悄拖慢你的船。' } },
     key: { name: '双生铜钥', el: 'earth', luck: 2, item: '一把旧钥匙',
-      read: '两把铜钥交叉叠在杯底，一把朝左，一把朝右。双钥意味着同一扇门有两种打开方式，你一直只试了其中一种。',
+      gist: '两柄小小的铜钥交叠在金边之上',
+      read: '两柄铜钥交叠在杯底的金边上，一柄朝左，一柄朝右，像一句未说完的誓言。同一扇门原有两种开法，你一直只试过其中一种。',
       intent: {
-        career: '换个角度谈合作，一个看似无关的人脉，会成为第二把钥匙。',
-        love: '你和对方各握着一半真话，先开口的人会拿到主动权。',
-        study: '换一种学习方法，把输入改成输出，卡住的知识点会松动。',
-        luck: '今天遇到的阻碍有备选路线，别在一条路上硬撞。' },
+        career: '换个角度去谈合作，一位看似无关的旧识，会成为你的第二把钥匙。',
+        love: '你与对方各握着一半真话，先开口的人，会拿到那一点温柔的主动。',
+        study: '换一种读书的法子，把输入改成输出，卡住的那一处自会松动。',
+        luck: '今日遇到的阻碍另有小路可走，不必在一条巷子里硬撞。' },
       zones: {
-        rim: '杯沿渣粒成对出现，近七日会遇到一组二选一的选择。',
-        wall: '杯壁中段有交叉的纹路，是两股力量在拉扯，你夹在中间。',
-        bottom: '杯底的死穴是总想等一个万无一失的答案，而钥匙只有试了才知道合不合。' } },
+        rim: '杯沿的渣粒两两成对，像并排挂着的两把钥匙。近七日里，两扇门将同时向你敞开。',
+        wall: '杯壁中段有交叉的细纹，有人握着另一半答案，两股力量正在你身上拉扯。',
+        bottom: '杯底的结，是你怕选了一扇便失去另一扇。钥匙合不合锁，只有试了才知道。' } },
     stag: { name: '衔枝白鹿', el: 'fire', luck: 6, item: '白色小饰物',
-      read: '一只白鹿正面望向你，口中衔着一小枝橄榄。鹿是林中的使者，衔枝表示善意与和解，好消息正在靠近。',
+      gist: '一头白鹿衔着橄榄枝走过瓷上的雪原',
+      read: '细细的纹路勾出一头白鹿，衔着橄榄枝，踏过瓷壁上一片薄薄的雪原。鹿是林中的使者，衔枝是和解，好消息随晨光一同靠近。',
       intent: {
-        career: '有贵人愿意递来橄榄枝，不必急着讨价还价，先接住这份善意。',
-        love: '冷战或误会有机会破冰，先递台阶的人，会赢得整段关系。',
-        study: '导师或同学会给出关键提示，主动请教比独自硬啃更快。',
-        luck: '今天容易遇到顺手的小幸运，保持礼貌，好运会叠加。' },
+        career: '有贵人愿意递来橄榄枝，不必急着议价，先接住这份善意。',
+        love: '冷下来的误会有机会破冰，肯先递台阶的人，会赢得整段情谊。',
+        study: '师长或同窗会点拨一句关键的话，开口求教，比独自硬啃更快。',
+        luck: '今日容易遇到顺手的小小好运，保持礼貌，好运会一件叠着一件。' },
       zones: {
-        rim: '杯沿清亮，渣粒稀疏，近七日心情明显轻盈，适合处理积压的消息。',
-        wall: '杯壁上扬的纹路向着杯口，是一股持续的助力，来自一位年长或资深的人。',
-        bottom: '杯底几乎没有死穴，只有一点小提醒：好运来时别疑神疑鬼。' } },
+        rim: '杯沿清亮，渣粒疏朗，像雪后第一缕晨光。和解的消息会随早晨而来，近七日心情明显轻盈。',
+        wall: '杯壁有一道向着杯口扬起的纹路，是旧友在暗中替你说情，也是一位年长者持续不断的助力。',
+        bottom: '杯底几乎没有死结，只留一句小小的提醒：你仍记着一句未曾道出的歉意，好运来时，别疑神疑鬼。' } },
     crescent: { name: '新月王冠', el: 'water', luck: 5, item: '银色小饰品',
-      read: '一弯新月顶着小小的王冠，悬在杯底中央。新月是从零开始的光，王冠则说明这一次起步，你有资格站在更高的位置。',
+      gist: '一弯新月托着小小的王冠浮在杯口',
+      read: '杯口浮起一弯新月，月尖托着小小的王冠，细渣沿着瓷壁贴成一道银亮的弧。新月是从零开始的光，这一回起步，你有资格站在更高处。',
       intent: {
-        career: '适合开启新项目或亮出个人品牌，起点虽小，格局要大。',
-        love: '新的缘分从一个小小的契机开始，不要用旧经验去套新的人。',
-        study: '适合重新制定计划，新的阶段从今天算起，不必追悔过去。',
-        luck: '今天适合许愿与立目标，写下来的事更容易兑现。' },
+        career: '宜开新局、亮出自己的名号，起点虽小，格局要大。',
+        love: '新的缘分始于一个小小的契机，莫拿旧日的经验去量新来的人。',
+        study: '宜重新立下章程，新的阶段从今夜算起，不必追悔从前。',
+        luck: '今夜适合许愿，写下来的心事，更容易落地成真。' },
       zones: {
-        rim: '杯沿有一道弧形的亮边，近七日会有一次小规模的开端。',
-        wall: '杯壁偏右有月牙状的纹路，是情绪层面的助力，你的感受值得被信任。',
-        bottom: '杯底的死穴是低估自己，把王冠摘下来放进口袋的人，永远等不到加冕。' } },
+        rim: '杯沿有一道弧形的亮边，像刚升起的月牙。新的名分正悄悄靠近，近七日会有一次小小的开端。',
+        wall: '杯壁偏右一弯月牙状的细纹，是一位女性贵人在照看着你，情绪里的助力，值得你信任。',
+        bottom: '杯底的结，是你怀疑自己配不上光亮。把王冠摘下来揣进口袋的人，永远等不到加冕。' } },
     serpent: { name: '衔尾金蛇', el: 'earth', luck: 3, item: '圆形戒指或手环',
-      read: '一条金蛇首尾相衔，围成完整的圆环。衔尾蛇是循环与重生的古老符号，说明你正在重复某个模式，也正站在跳出它的门口。',
+      gist: '一圈金色的残渍首尾相衔，绕着杯壁如一枚古老的环',
+      read: '一圈金色残渍首尾相衔，绕着杯壁，像一枚古老的环。衔尾蛇是循环，也是重生，说明你正重复着某种旧模样，也恰好站在跳出它的门口。',
       intent: {
-        career: '同一类问题第三次出现，这次别再打补丁，从根上改流程。',
-        love: '你们在重复同一场争吵，把争吵的开头改掉，结局才会改变。',
-        study: '同一类题型反复出错，是方法而非努力的问题，回到基础概念。',
-        luck: '今天会遇到熟悉的麻烦，换一种与以往不同的做法，它就会自动消失。' },
+        career: '同一类难题第三次出现，这回别再打补丁，从根上改一改章法。',
+        love: '你们在重演同一场争执，把开头改掉，结局才会跟着改。',
+        study: '同一类题目屡屡出错，是方法的事，不是勤奋的事，回到最初的概念。',
+        luck: '今日会撞见熟悉的小麻烦，换一种与往常不同的做法，它便自行散去。' },
       zones: {
-        rim: '杯沿渣粒连成一圈，近七日会有似曾相识的事重演。',
-        wall: '杯壁的纹路首尾相连，助力和阻力其实来自同一件事，换个角度它们就互换了位置。',
-        bottom: '杯底的死穴是习惯，旧习惯舒服，但它把你锁在圆圈里。' } }
+        rim: '杯沿的渣粒连成一圈，旧事将以新面目归来，近七日会有似曾相识的一幕重演。',
+        wall: '杯壁的纹路首尾相接，循环本身在推着你，助力与阻力原是同一件事，换个角度便互换了位置。',
+        bottom: '杯底的结，是你一直绕着同一个旧伤口走。旧习惯很舒服，却把你锁在圆圈里。' } }
   };
   var TOTEM_KEYS = ['owl', 'anchor', 'key', 'stag', 'crescent', 'serpent'];
 
   var ZONES = {
-    rim: { label: '杯沿 · 近七日变局', r0: 158, r1: 190, tag: '杯沿' },
-    wall: { label: '杯壁 · 暗处助力与阻力', r0: 120, r1: 158, tag: '杯壁' },
-    bottom: { label: '杯底 · 潜意识死穴', r0: 0, r1: 120, tag: '杯底' }
+    rim: { label: '杯沿 · 近七日风向', r0: 158, r1: 190, tag: '杯沿' },
+    wall: { label: '杯壁 · 暗处推手', r0: 120, r1: 158, tag: '杯壁' },
+    bottom: { label: '杯底 · 潜藏心结', r0: 0, r1: 120, tag: '杯底' }
   };
 
   var CAL = {
-    career: { yi: ['催进一次拖着的报价', '整理作品集并投出三份', '约一位前同事喝咖啡'],
-              ji: ['在群里情绪化发言', '临时答应来路不明的合作', '深夜修改合同条款'] },
-    love: { yi: ['先发一句不带目的的问候', '把心里话写成三行再决定发不发', '独处半小时再回消息'],
-            ji: ['翻对方三个月前的动态', '借酒后的冲动表白', '拿第三个人来试探'] },
-    study: { yi: ['番茄钟四轮，每轮结束写一句总结', '重做上周的错题', '睡前十分钟默背知识框架'],
-             ji: ['通宵刷题', '比较别人的进度', '临时更换复习资料'] },
-    luck: { yi: ['出门前检查钥匙和充电线', '先喝水再回复消息', '把今天最难的事排在上午'],
-            ji: ['冲动下单', '在评论区抬杠', '把重要文件留到最后一刻'] }
+    career: { yi: ['把拖着的那份报价轻轻寄出去', '整理作品集，选三处值得的门敲一敲', '约一位旧同事喝杯咖啡，不谈事'],
+              ji: ['在群里说带着火气的话', '临时应下来路不明的合作', '深夜改动合同的任何一个字'] },
+    love: { yi: ['先发一句不带目的的问候', '把心里话写成三行，再决定寄不寄', '独自坐半个钟头，再回那条消息'],
+            ji: ['翻对方三个月前的旧动态', '借着酒意说出口', '拿第三个人来试探'] },
+    study: { yi: ['番茄钟四轮，每轮末写一句小结', '把上周的错题重做一遍', '睡前十分钟，在心里默画一遍知识的骨架'],
+             ji: ['通宵刷题', '拿自己去比别人的进度', '临阵更换复习的书目'] },
+    luck: { yi: ['出门前摸一摸钥匙和充电线', '先喝一口水，再回消息', '把今日最难的事排在上午'],
+            ji: ['一时冲动下单', '在评论区同人争辩', '把要紧的文件拖到最后一刻'] }
   };
   var HOURS = ['辰时 07:00 至 09:00', '巳时 09:00 至 11:00', '午时 11:00 至 13:00',
                '未时 13:00 至 15:00', '申时 15:00 至 17:00', '酉时 17:00 至 19:00', '戌时 19:00 至 21:00'];
 
   var RANKS = {
-    SSR: { name: 'SSR · 紫微天选', quotes: [
-      '三星归位，杯里有光，牌里有路。今天开口的每一句话，都有人认真听。',
-      '紫微照命，机会不会敲第二次门，所以第一次就请你开门。'] },
-    SR: { name: 'SR · 扶摇破局', quotes: [
-      '风向已转，不必等到万事俱备。先迈出半步，路会替你补上另外半步。',
-      '杯底有裂纹，牌面有出口。顺着裂纹走，别回头。'] },
+    SSR: { name: 'SSR · 群星归位', quotes: [
+      '今夜所有的星都为你点灯，去吧，门是开着的。',
+      '星轨已为你铺好，机会不会敲第二次门，所以第一次就请你推开它。'] },
+    SR: { name: 'SR · 长风破浪', quotes: [
+      '风已鼓满你的帆，只需把舵握得再稳一些。',
+      '杯底有裂纹，牌面有出口，顺着光走，不必回头。'] },
     A: { name: 'A · 顺水行舟', quotes: [
-      '水不争先，却能到海。今天做稳一件小事，比做成十件大事更值钱。',
-      '不急，渣已沉底，答案自会澄清。'] },
+      '不必用力划桨，河流认得回家的路。',
+      '水不争先，却能到海，今夜做稳一件小事，胜过匆匆做成十件大事。'] },
     B: { name: 'B · 潜龙勿用', quotes: [
-      '潜龙勿用，不是不用，是等一阵风。今天把力气留给明天。',
-      '牌在提醒你停一停，停下来的人，反而最先看清路。'] }
+      '且在深水里多睡一季，鳞片正悄悄长成。',
+      '牌在叫你停一停，停下来的人，反而最先看清路。'] }
   };
 
   /* ---------- state ---------- */
@@ -308,8 +362,8 @@
 
   /* ---------- stage 1 ---------- */
   var MODE_NOTES = {
-    daily: '每日灵签：同一天、同一问题会得到同一份神谕，明天再来会变。',
-    free: '自由重占：每次都会重新洗牌与摇杯，适合想换个角度再问一次。'
+    daily: '每日一签：同一天、同一桩心事，三姊妹会写下同一封回信；明夜再来，雨声便不同了。',
+    free: '夜夜重占：每一次都重新洗牌、重新轻旋杯碟，适合想换个角度再问一回的人。'
   };
   function selectInGroup(sel, attr, val) {
     $$(sel).forEach(function (b) {
@@ -319,8 +373,8 @@
     });
   }
   function updateStartHint() {
-    $('start-hint').textContent = '已锚定：' + INTENTS[S.intent].label + ' · ' + SIGNS[S.sign].label +
-      (whisperText() ? ' · 杯底留言已写下' : '');
+    $('start-hint').textContent = '已推开：' + INTENTS[S.intent].label + ' · ' + SIGNS[S.sign].label +
+      (whisperText() ? ' · 杯底低语已留下' : '');
   }
   $$('.mode-btn').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -338,6 +392,8 @@
     b.addEventListener('click', function () {
       S.intent = b.getAttribute('data-intent');
       selectInGroup('.intent-btn', 'data-intent', S.intent);
+      $('whisper-label').textContent = INTENTS[S.intent].whisperAsk + '（可在杯底留一句低语）';
+      $('whisper-input').placeholder = INTENTS[S.intent].whisperAsk + '轻声写一句，也可以留白';
       updateStartHint();
       beep(440, 0.1);
     });
@@ -755,10 +811,10 @@
     var aff = (t.el === S.sign);
     $('totem-name').textContent = t.name;
     $('totem-read').textContent = t.read;
-    $('totem-intent').textContent = '你问的是「' + INTENTS[S.intent].label + '」：' + t.intent[S.intent];
-    $('totem-luck').textContent = '杯底气运加成 +' + t.luck + ' · 幸运器物：' + t.item +
-      (aff ? ' · 与你的' + SIGNS[S.sign].label + '同频，额外 +2' : '');
-    $('zone-reading').innerHTML = '<h3>杯底图腾已显影：' + esc(t.name) + '</h3><p>点选杯沿、杯壁、杯底三个分区，咖啡渣会在对应的圆环上亮起，并给出分区读数。</p>';
+    $('totem-intent').textContent = '你叩的是「' + INTENTS[S.intent].label + '」之门：' + t.intent[S.intent];
+    $('totem-luck').textContent = '杯底星轨加成 +' + t.luck + ' · 随身信物：' + t.item +
+      (aff ? ' · 与你的' + SIGNS[S.sign].label + '同频，另添 +2' : '');
+    $('zone-reading').innerHTML = '<h3>杯底已显影：' + esc(t.name) + '</h3><p>' + esc(t.gist) + '。轻点杯沿、杯壁、杯底，咖啡渣便在对应的圆环上亮起，一处一处说与你听。</p>';
     hudTotem.textContent = '杯底图腾 · ' + t.name;
     cupCanvas.setAttribute('aria-label', '杯底咖啡渣沉淀成「' + t.name + '」图腾');
     btnSwirl.disabled = false; btnReswirl.disabled = false; btnAct3.disabled = false;
@@ -813,16 +869,16 @@
   var deckEl = $('tarot-deck');
   var BACK_SVG =
     '<svg viewBox="0 0 120 200" width="100%" height="100%" aria-hidden="true" focusable="false">' +
-    '<rect x="3" y="3" width="114" height="194" rx="8" fill="#1b1109" stroke="#c9a24b" stroke-width="2"/>' +
-    '<rect x="11" y="11" width="98" height="178" rx="5" fill="none" stroke="#c9a24b" stroke-width="1" opacity="0.7"/>' +
-    '<circle cx="60" cy="100" r="40" fill="none" stroke="#c9a24b" stroke-width="1.5"/>' +
-    '<circle cx="60" cy="100" r="30" fill="none" stroke="#c9a24b" stroke-width="0.8" stroke-dasharray="2 3"/>' +
-    '<path d="M60 50 L66 94 L110 100 L66 106 L60 150 L54 106 L10 100 L54 94 Z" fill="#c9a24b" opacity="0.88"/>' +
-    '<circle cx="60" cy="100" r="7" fill="#1b1109" stroke="#c9a24b" stroke-width="1.5"/>' +
-    '<path d="M24 24 Q60 40 96 24" fill="none" stroke="#c9a24b" stroke-width="1.2"/>' +
-    '<path d="M24 176 Q60 160 96 176" fill="none" stroke="#c9a24b" stroke-width="1.2"/>' +
-    '<circle cx="20" cy="20" r="3" fill="#c9a24b"/><circle cx="100" cy="20" r="3" fill="#c9a24b"/>' +
-    '<circle cx="20" cy="180" r="3" fill="#c9a24b"/><circle cx="100" cy="180" r="3" fill="#c9a24b"/>' +
+    '<rect x="3" y="3" width="114" height="194" rx="2" fill="#1b1109" stroke="#b08a3e" stroke-width="2"/>' +
+    '<rect x="11" y="11" width="98" height="178" rx="1" fill="none" stroke="#b08a3e" stroke-width="1" opacity="0.7"/>' +
+    '<circle cx="60" cy="100" r="40" fill="none" stroke="#b08a3e" stroke-width="1.5"/>' +
+    '<circle cx="60" cy="100" r="30" fill="none" stroke="#b08a3e" stroke-width="0.8" stroke-dasharray="2 3"/>' +
+    '<path d="M60 50 L66 94 L110 100 L66 106 L60 150 L54 106 L10 100 L54 94 Z" fill="#b08a3e" opacity="0.88"/>' +
+    '<circle cx="60" cy="100" r="7" fill="#1b1109" stroke="#b08a3e" stroke-width="1.5"/>' +
+    '<path d="M24 24 Q60 40 96 24" fill="none" stroke="#b08a3e" stroke-width="1.2"/>' +
+    '<path d="M24 176 Q60 160 96 176" fill="none" stroke="#b08a3e" stroke-width="1.2"/>' +
+    '<circle cx="20" cy="20" r="3" fill="#b08a3e"/><circle cx="100" cy="20" r="3" fill="#b08a3e"/>' +
+    '<circle cx="20" cy="180" r="3" fill="#b08a3e"/><circle cx="100" cy="180" r="3" fill="#b08a3e"/>' +
     '</svg>';
 
   function makeFate() {
@@ -837,22 +893,21 @@
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'deck-card';
-      b.setAttribute('aria-label', '第 ' + (pos + 1) + ' 张牌背，点击翻牌');
+      b.setAttribute('aria-label', '第 ' + (pos + 1) + ' 幅石版画牌背，点击翻开');
       b.innerHTML = '<span class="back">' + BACK_SVG + '</span>';
       deckEl.appendChild(b);
     });
   }
   function resetSlots() {
     [0, 1, 2].forEach(function (i) {
-      $('slot-' + i).querySelector('.slot-inner').innerHTML = '<div class="slot-empty">待翻牌</div>';
+      $('slot-' + i).querySelector('.slot-inner').innerHTML = '<div class="slot-empty">此处静候一幅石版画</div>';
     });
     $('drawn-counter').textContent = '0 / 3';
     $('btn-to-act4').disabled = true;
     $('btn-draw-all').disabled = false;
   }
   function slotReading(slot, card, rev) {
-    return card.name + (rev ? '逆位' : '正位') + '：' + (rev ? card.rev : card.up) + '。' +
-      INTENTS[S.intent].lens[slot];
+    return card.scene + '。' + (rev ? card.rev : card.up) + '。' + card.pos[slot];
   }
   function drawNext(btn) {
     var slot = S.drawn.length;
@@ -884,7 +939,7 @@
       $('btn-to-act4').disabled = false;
       $('btn-draw-all').disabled = true;
       openStage(4);
-      toast('三张牌已全部翻开，可以合成最终神谕');
+      toast('三幅石版画都已翻开，可请三姊妹提笔了');
     }
   }
   deckEl.addEventListener('click', function (e) {
@@ -908,7 +963,7 @@
         S.fate[i] = { card: pool[i - S.drawn.length], rev: Math.random() < 0.38 };
       }
     }
-    toast(S.mode === 'daily' ? '牌已洗过，每日灵签的牌运不会改变' : '牌已重新洗切');
+    toast(S.mode === 'daily' ? '牌已轻洗，每日一签的牌运不会更改' : '牌已重新洗切，换一副心境再翻');
   });
   $('btn-draw-all').addEventListener('click', function () {
     var left = 3 - S.drawn.length;
@@ -953,15 +1008,15 @@
       whisper: whisperText(), intent: S.intent, sign: S.sign
     };
     var cipherCode = 'MR' + hashStr(seedKey() + res.score).toString(36).toUpperCase().slice(0, 5);
-    res.cipher = '摩伊拉接好运【' + sr.code + '】' + t.name + ' + ' +
+    res.cipher = '摩伊拉夜话笺【' + sr.code + '】' + t.name + ' + ' +
       res.cards.map(function (c) { return c.card.name + (c.rev ? '逆' : '正'); }).join(' / ') +
-      '，我的今日气运值 ' + sr.score + '，评论区一起接好运，水逆退散！暗号 ' + cipherCode;
+      '，今夜星轨契合度 ' + sr.score + '，来摩伊拉咖啡馆借一盏灯。暗号 ' + cipherCode;
     S.result = res;
 
     $('rank-card').setAttribute('data-rank', sr.code);
     $('rank-name').textContent = rank.name;
     countUp($('final-score'), sr.score);
-    countUp(hudScore, sr.score, '气运值 ');
+    countUp(hudScore, sr.score, '星轨契合 ');
 
     var mini = $('totem-mini');
     var mg = mini.getContext('2d');
@@ -1001,31 +1056,37 @@
   }
   function synthLine(cards) {
     var revs = cards.filter(function (c) { return c.rev; });
-    if (revs.length === 0) return '三张牌皆为正位，杯底与牌阵同声相应，整体走势顺畅，放手去做即可。';
-    if (revs.length === 1) return '唯一的逆位落在「' + revs[0].card.name + '」，杯底图腾指出的那个盲点，多半就藏在这张牌里，先处理它。';
-    if (revs.length === 2) return '两张逆位说明阻力不小，但杯底图腾仍然给出了出口，把力气花在「' +
+    if (revs.length === 0) return '三幅画皆正位朝着你，杯底与桌布像两盏相对的灯，彼此照亮，今夜只管放手去做。';
+    if (revs.length === 1) return '只有「' + revs[0].card.name + '」是倒悬着的，杯底图腾提起的那处盲点，多半就藏在这幅画里，先轻轻把它扶正。';
+    if (revs.length === 2) return '两幅画倒悬着，逆风是有的，可杯底图腾仍替你留了一道缝隙，请把力气花在「' +
       cards.filter(function (c) { return !c.rev; })[0].card.name + '」所指的方向上。';
-    return '三张牌皆为逆位，这是一次让你放慢的提醒，不是判决。杯底图腾给的建议，正是在逆风里最稳的那一步。';
+    return '三幅画都倒悬着，这不是判词，只是长夜替你按下的一枚慢板记号，杯底图腾给的那句话，正是逆风里最稳的一步。';
   }
   function oracleHTML(r) {
     var t = TOTEMS[r.totem];
     var I = INTENTS[r.intent];
+    var S_ = SIGNS[r.sign];
     var aff = (t.el === r.sign);
-    var s1 = '<p>你带着「' + esc(I.label) + '」的执念而来，属' + esc(SIGNS[r.sign].label) + '之人。' +
-      esc(SIGNS[r.sign].trait) +
-      (r.whisper ? '你写在杯底的那句「' + esc(r.whisper) + '」，已经被咖啡渣记下。' : '你没有在杯底留言，咖啡渣便按你此刻的心念自行成形。') + '</p>' +
-      '<p>杯底沉淀出「' + esc(t.name) + '」：' + esc(t.read) + esc(t.intent[r.intent]) +
-      (aff ? '图腾的元素与你的' + esc(SIGNS[r.sign].label) + '同频，今日气运额外加成。' : '图腾的元素与你的星象并不同频，反而是在补你缺的那一块。') + '</p>' +
-      '<p>' + r.cards.map(function (c, i) {
-        return SLOT_SHORT[i] + '是' + esc(c.card.name) + (c.rev ? '逆位' : '正位') + '，指向' + esc(c.rev ? c.card.rev : c.card.up);
-      }).join('；') + '。' + esc(synthLine(r.cards)) + '</p>';
-    return '<section><h3>杯底图腾与圣三角合参</h3>' + s1 + '</section>' +
-      '<section><h3>今日行事历与气运锚点</h3><dl>' +
+    var c = r.cards;
+    function cardLine(i) {
+      return SLOT_SHORT[i] + '落下的是「' + c[i].card.name + '」' + (c[i].rev ? '倒悬' : '正立') + '，' + c[i].card.scene + '，' +
+        c[i].card.pos[i];
+    }
+    var p1 = '致推门而入的夜航人：佩拉区的雨落了一整夜，我们在烛下把咖啡温了又温，才等到你。你推门时带进一阵潮湿的海风，也带进「' +
+      I.label + '」这一桩心事，像' + I.motif + '。' + S_.trait +
+      (r.whisper ? '你在杯底留的那句「' + r.whisper + '」，我们读过了，没有告诉任何人。' : '你没有在杯底留话，咖啡渣便照着你此刻的心念，自己静静成了形。');
+    var p2 = '烛光里翻开骨瓷杯，' + t.read + t.intent[r.intent] +
+      (aff ? '这图腾与你的' + S_.label + '同声相应，今夜的星轨，便向你又靠近了一些。' : '这图腾与你的' + S_.label + '并不同频，倒像是特意来补你缺着的那一角。');
+    var p3 = '烛芯轻轻爆了一声，我们翻开亚麻桌布上的三幅石版画。' + cardLine(0) + cardLine(1) + cardLine(2) +
+      synthLine(c) + r.quote;
+    return '<section><h3>《摩伊拉夜话笺》</h3>' +
+      '<p>' + esc(p1) + '</p><p>' + esc(p2) + '</p><p>' + esc(p3) + '</p>' +
+      '<p class="sign-off">摩伊拉三姊妹 · 书于佩拉区雨夜</p></section>' +
+      '<section><h3>今夜行事笺</h3><dl>' +
       '<dt>今日宜</dt><dd>' + esc(r.yi) + '</dd>' +
       '<dt>今日忌</dt><dd>' + esc(r.ji) + '</dd>' +
       '<dt>吉时</dt><dd>' + esc(r.hour) + '</dd>' +
-      '<dt>幸运器物</dt><dd>' + esc(t.item) + '</dd></dl></section>' +
-      '<section><h3>摩伊拉破局箴言</h3><p class="quote">' + esc(r.quote) + '</p></section>';
+      '<dt>随身信物</dt><dd>' + esc(t.item) + '</dd></dl></section>';
   }
 
   /* ---------- history ---------- */
@@ -1127,7 +1188,7 @@
       g.font = font(24, 700, SERIF); g.fillStyle = '#f1e2c0';
       g.fillText('杯底图腾：' + t.name, W / 2, 556);
       g.font = font(18, 400, SERIF); g.fillStyle = '#c9a24b';
-      g.textAlign = 'right'; g.fillText('气运值 ' + r.score + ' / 100', px + pw - 18, py + 28);
+      g.textAlign = 'right'; g.fillText('星轨契合 ' + r.score + ' / 100', px + pw - 18, py + 28);
       g.restore();
       // cards
       var cw = 141, ch = 244, gap = 30, sx = (W - (cw * 3 + gap * 2)) / 2, cy = 614;
@@ -1178,20 +1239,20 @@
   }
   $('btn-save-card').addEventListener('click', function () {
     if (!S.result) return;
-    $('modal-note').textContent = '正在绘制灵签……';
+    $('modal-note').textContent = '正在为你洗印拍立得笺……';
     openModal();
     renderPoster().then(function () {
-      $('modal-note').textContent = S.cardURL ? '灵签已生成，可以下载保存。' : '灵签已生成，当前浏览器限制了直接下载，请截图保存。';
+      $('modal-note').textContent = S.cardURL ? '拍立得笺已洗印，可以下载留念。' : '拍立得笺已洗印，当前浏览器限制了直接下载，请截图留念。';
       beep(700, 0.3, 'triangle', 0.05);
     });
   });
   $('btn-download-card').addEventListener('click', function () {
-    if (!S.cardURL) { toast('请截图保存这张灵签'); return; }
+    if (!S.cardURL) { toast('请截图留下这张拍立得笺'); return; }
     var a = document.createElement('a');
     a.href = S.cardURL;
     a.download = 'moirae-oracle-card-' + dateStr() + '.png';
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    toast('灵签图片已开始下载');
+    toast('拍立得笺已开始下载');
   });
   $('btn-close-modal').addEventListener('click', closeModal);
   modal.addEventListener('click', function (e) { if (e.target === modal) closeModal(); });
@@ -1230,13 +1291,13 @@
     zoneBtns.forEach(function (b) { b.disabled = true; });
     btnReswirl.disabled = true; btnSwirl.disabled = false; btnAct3.disabled = true;
     $('totem-name').textContent = '图腾待显影';
-    $('totem-read').textContent = '倾倒咖啡并凝视杯底，或在杯面上按住拖动，等待咖啡渣沉淀成形。';
+    $('totem-read').textContent = '倾倒杯中残渣，或在杯面按住轻旋，等咖啡渣贴着温热的瓷壁慢慢成形。';
     $('totem-intent').textContent = '';
     $('totem-luck').textContent = '';
-    $('zone-reading').innerHTML = '<h3>分区读数</h3><p>杯底显影之后，点选上方三个分区，咖啡渣会在对应的圆环上亮起。</p>';
+    $('zone-reading').innerHTML = '<h3>杯面絮语</h3><p>待残渣沉定，轻点上方三处，杯沿、杯壁与杯底便会依次亮起，说与你听。</p>';
     cupCanvas.setAttribute('aria-label', '俯视的土耳其骨瓷咖啡杯，杯底有咖啡渣');
     hudTotem.textContent = '杯底图腾 · 待显影';
-    hudScore.textContent = '气运值 0';
+    hudScore.textContent = '星轨契合 0';
     buildDeck();
     resetSlots();
     $('final-score').textContent = '0';
@@ -1251,7 +1312,7 @@
     updateStartHint();
     if (modal.classList.contains('is-open')) closeModal();
     showAct(1);
-    toast('已重置，换个问题再占一次');
+    toast('杯碟已收，换一桩心事再问');
   });
 
   /* ---------- jump bar & sound ---------- */
