@@ -19,6 +19,7 @@
       <span id="hud-totem" class="chip">杯底图腾 · 待显影</span>
       <span id="hud-score" class="chip">星轨契合 0</span>
       <button id="btn-bgm" class="chip chip-btn" type="button" aria-pressed="true">雨夜琴声：开</button>
+      <button type="button" class="chip chip-btn sound-toggle" id="btn-bgm-track" aria-label="切换古典曲目">曲目 · 萨蒂《裸体歌舞》</button>
       <button id="btn-sound" class="chip chip-btn" type="button" aria-pressed="true">器物声效：开</button>
     </div>
   </div>
@@ -59,6 +60,35 @@
           <button type="button" class="sign-btn reveal" style="--d:660ms" data-sign="earth" aria-pressed="false">土象 · 金牛 / 处女 / 摩羯</button>
           <button type="button" class="sign-btn reveal" style="--d:700ms" data-sign="air" aria-pressed="false">风象 · 双子 / 天秤 / 水瓶</button>
           <button type="button" class="sign-btn reveal" style="--d:740ms" data-sign="water" aria-pressed="false">水象 · 巨蟹 / 天蝎 / 双鱼</button>
+        </div>
+
+        <div class="duo-block reveal" style="--d:760ms">
+          <p class="form-label label">是否携一位同行人合占（可选）</p>
+          <div class="mode-switch mode-seg" id="duo-switch" role="group" aria-label="同占模式">
+            <button type="button" class="mode-btn is-on" id="btn-solo" data-duo="solo" aria-pressed="true">独坐夜航</button>
+            <button type="button" class="mode-btn" id="btn-duo" data-duo="duo" aria-pressed="false">携故人同占</button>
+          </div>
+          <div class="duo-panel filigree-box" id="duo-panel" hidden>
+            <input type="text" id="companion-name" maxlength="12" placeholder="如何称呼那个人？（如：远方旅人 / 某位故人）" autocomplete="off">
+            <div class="companion-grid" id="companion-grid" role="radiogroup" aria-label="同行人四象星火">
+              <button type="button" class="element-pill is-selected" data-comp-el="fire" role="radio" aria-checked="true">
+                <span class="pill-name">对方 · 火象</span>
+                <span class="pill-sub">白羊 / 狮子 / 射手</span>
+              </button>
+              <button type="button" class="element-pill" data-comp-el="earth" role="radio" aria-checked="false">
+                <span class="pill-name">对方 · 土象</span>
+                <span class="pill-sub">金牛 / 处女 / 摩羯</span>
+              </button>
+              <button type="button" class="element-pill" data-comp-el="air" role="radio" aria-checked="false">
+                <span class="pill-name">对方 · 风象</span>
+                <span class="pill-sub">双子 / 天秤 / 水瓶</span>
+              </button>
+              <button type="button" class="element-pill" data-comp-el="water" role="radio" aria-checked="false">
+                <span class="pill-name">对方 · 水象</span>
+                <span class="pill-sub">巨蟹 / 天蝎 / 双鱼</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         <label id="whisper-label" class="label reveal" style="--d:780ms" for="whisper-input">你想亲手建成什么？（可在杯底留一句低语）</label>
@@ -174,6 +204,11 @@
       <article id="slot-2" class="slot" data-slot="2"><h3>将至之兆 · 归途</h3><div class="slot-inner"></div></article>
     </div>
 
+    <aside class="filigree-box" id="spread-banner" hidden>
+      <p class="spread-banner-text">三幅石版画皆已显影 · 三姊妹已在内室备好火漆与信笺</p>
+      <button type="button" class="btn btn-primary" id="btn-banner-oracle">展读摩伊拉夜话笺</button>
+    </aside>
+
     <div class="tarot-mat" data-ui="tarot-desk">
       <p class="mat-note">十二幅石版画背面朝上，静静铺在亚麻桌布上。点任意一张，它便依次落入往昔、眼下与将至。</p>
       <div id="tarot-deck" class="deck" role="group" aria-label="十二张牌背"></div>
@@ -206,7 +241,17 @@
         </section>
       </div>
       <div class="verdict-right">
-        <article id="oracle-dossier" class="oracle reveal" style="--d:120ms" aria-live="polite"></article>
+        <article id="oracle-dossier" class="oracle reveal" style="--d:120ms" aria-live="polite">
+          <section>
+            <div class="dossier-header">
+              <h3>《摩伊拉夜话笺》</h3>
+              <span id="oracle-meta"></span>
+              <button type="button" class="btn-instant-read" id="btn-instant-read">即刻展读全文</button>
+            </div>
+            <div id="oracle-body"></div>
+          </section>
+          <section id="oracle-calendar" class="ink-line"></section>
+        </article>
         <div class="action-bar reveal" style="--d:200ms">
           <button id="btn-save-card" class="btn btn-secondary" type="button">洗印一张拍立得笺</button>
           <button id="btn-copy-comment" class="btn btn-primary" type="button">抄下暗号，赠与同行的人</button>

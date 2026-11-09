@@ -204,9 +204,9 @@
   var TOTEM_KEYS = ['owl', 'anchor', 'key', 'stag', 'crescent', 'serpent'];
 
   var ZONES = {
-    rim: { label: '杯沿 · 近七日风向', r0: 158, r1: 190, tag: '杯沿' },
-    wall: { label: '杯壁 · 暗处推手', r0: 120, r1: 158, tag: '杯壁' },
-    bottom: { label: '杯底 · 潜藏心结', r0: 0, r1: 120, tag: '杯底' }
+    rim: { label: '杯沿 · 近七日风向', r0: 118, r1: 142, tag: '杯沿' },
+    wall: { label: '杯壁 · 暗处推手', r0: 86, r1: 118, tag: '杯壁' },
+    bottom: { label: '杯底 · 潜藏心结', r0: 0, r1: 86, tag: '杯底' }
   };
 
   var CAL = {
@@ -242,7 +242,8 @@
     act: 1, reached: 1, mode: 'daily', intent: 'career', sign: 'fire', sound: true, bgm: true,
     key: null, totemKey: null, points: null, particles: null, stains: null,
     settled: false, swirling: false, zone: null,
-    fate: null, drawn: [], drawing: false, result: null, cardURL: null
+    fate: null, drawn: [], drawing: false, result: null, cardURL: null,
+    cupProgress: 0, duoMode: false, companionName: '', companionElement: 'fire'
   };
 
   var HISTORY_KEY = 'moirae_cafe_history_v1';
@@ -270,7 +271,8 @@
   }
   function whisperText() { return ($('whisper-input').value || '').trim(); }
   function seedKey() {
-    return [S.mode, dateStr(), S.intent, S.sign, whisperText()].join('|');
+    return [S.mode, dateStr(), S.intent, S.sign, whisperText()].join('|') +
+      (S.duoMode ? ('|duo|' + (S.companionName || '某位故人') + '|' + S.companionElement) : '');
   }
   function getRng(salt) {
     return S.mode === 'daily' ? mulberry(hashStr(seedKey() + '|' + salt)) : Math.random;
@@ -307,7 +309,7 @@
   }
   /* ---------- audio: Satie chamber BGM + acoustic foley ---------- */
   var actx = null, bgmGain = null, sfxBus = null, noiseBuf = null, bgmTimer = null, bgmStep = 0;
-  var NOTE_IDX = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, Ab: 8, A: 9, Bb: 10, B: 11 };
+  var NOTE_IDX = { C: 0, 'C#': 1, D: 2, 'D#': 3, E: 4, F: 5, 'F#': 6, G: 7, 'G#': 8, Ab: 8, A: 9, 'A#': 10, Bb: 10, B: 11 };
   function nf(name) {
     var m = /^([A-G](?:#|b)?)(\d)$/.exec(name);
     var semis = NOTE_IDX[m[1]] + (parseInt(m[2], 10) + 1) * 12;
@@ -334,6 +336,49 @@
     }
     return seq;
   })();
+
+  /* Debussy, Clair de Lune: descending thirds over flowing arpeggios (half-beat steps, 66 BPM) */
+  var DEBUSSY = (function () {
+    var seq = [], i;
+    for (i = 0; i < 24; i++) seq.push({});
+    [[0, ['E5', 'C5'], ['C3', 'G3', 'E4']],
+     [3, ['A4', 'F4'], ['F2', 'C3', 'A3']],
+     [6, ['G4', 'E4', 'C4'], ['C3', 'G3', 'E4']],
+     [9, ['D5', 'B4'], ['G2', 'D3', 'B3']],
+     [12, ['C5', 'A4'], ['A2', 'E3', 'C4']],
+     [15, ['G4', 'E4', 'C4'], ['C3', 'G3', 'E4']]].forEach(function (e) {
+      seq[e[0]] = { ch: e[1], arp: e[2] };
+    });
+    return seq;
+  })();
+  /* Chopin, Raindrop Prelude: repeated G#4 pedal under a lyrical melody (half-beat steps, 60 BPM) */
+  var CHOPIN = (function () {
+    var seq = [], i;
+    for (i = 0; i < 32; i++) seq.push({ drop: true });
+    var bars = [
+      { mel: [['C#5', 2], ['B4', 1], ['G#4', 1]], lo: ['C#3', 'G#3'] },
+      { mel: [['F#4', 2], ['E4', 2]], lo: ['A2', 'E3'] },
+      { mel: [['G#4', 1], ['B4', 1], ['C#5', 2]], lo: ['F#2', 'C#3'] },
+      { mel: [['B4', 1], ['G#4', 1], ['E4', 2]], lo: ['E2', 'B2'] }
+    ];
+    bars.forEach(function (bar, b) {
+      var at = b * 8;
+      seq[at].lo = bar.lo;
+      bar.mel.forEach(function (m) { seq[at].mel = m[0]; at += m[1] * 2; if (at < 32) seq[at].mel = undefined; });
+    });
+    return seq;
+  })();
+  var TRACKS = [
+    { id: 'satie', label: '曲目 · 萨蒂《裸体歌舞》', ms: 900, seq: SATIE },
+    { id: 'debussy', label: '曲目 · 德彪西《月光》', ms: 450, seq: DEBUSSY },
+    { id: 'chopin', label: '曲目 · 肖邦《雨滴》', ms: 500, seq: CHOPIN }
+  ];
+  var trackIdx = 0;
+  function startBgmLoop() {
+    clearInterval(bgmTimer);
+    bgmStep = 0;
+    bgmTimer = setInterval(bgmTick, TRACKS[trackIdx].ms);
+  }
 
   function ensureAudio() {
     var AC = window.AudioContext || window.webkitAudioContext;
@@ -365,7 +410,7 @@
         rg.gain.value = 0.025;
         rain.connect(bp); bp.connect(rg); rg.connect(bgmGain);
         rain.start();
-        bgmTimer = setInterval(bgmTick, 900);
+        startBgmLoop();
       }
       if (actx.state === 'suspended') actx.resume();
       return true;
@@ -396,9 +441,13 @@
   }
   function bgmTick() {
     if (!actx || !S.bgm || actx.state !== 'running') return;
-    var ev = SATIE[bgmStep % SATIE.length];
+    var seq = TRACKS[trackIdx].seq;
+    var ev = seq[bgmStep % seq.length];
     bgmStep++;
     var t = actx.currentTime + 0.03;
+    if (ev.drop) piano(nf('G#4'), t, 0.035, false);
+    if (ev.lo) ev.lo.forEach(function (n, i) { piano(nf(n), t + i * 0.02, 0.06, false); });
+    if (ev.arp) ev.arp.forEach(function (n, j) { piano(nf(n), t + j * 0.17, 0.035, false); });
     if (ev.bass) piano(nf(ev.bass), t, 0.07, false);
     if (ev.ch) chordOf(ev.ch).forEach(function (f, i) { piano(f, t + i * 0.012, 0.035, false); });
     if (ev.mel) piano(nf(ev.mel), t + (ev.ch ? 0.02 : 0), 0.06, true);
@@ -507,6 +556,10 @@
     ring(nf('A5'), t + 0.34, 0.03, 2.0);
     ring(nf('F#6'), t + 0.38, 0.02, 1.8);
   }
+  function sfxPen() {
+    if (!sfxReady()) return;
+    grain(actx.currentTime + 0.01, 3200, 3200, 6, 0.04, 0.085);
+  }
   var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   /* ---------- stage navigation ---------- */
@@ -557,12 +610,13 @@
   }
   function updateStartHint() {
     $('start-hint').textContent = '已推开：' + INTENTS[S.intent].label + ' · ' + SIGNS[S.sign].label +
+      (S.duoMode ? ' · 与「' + (S.companionName || '某位故人') + ' · ' + SIGNS[S.companionElement].label + '」同占' : '') +
       (whisperText() ? ' · 杯底低语已留下' : '');
   }
-  $$('.mode-btn').forEach(function (b) {
+  $$('.mode-btn[data-mode]').forEach(function (b) {
     b.addEventListener('click', function () {
       S.mode = b.getAttribute('data-mode');
-      $$('.mode-btn').forEach(function (x) {
+      $$('.mode-btn[data-mode]').forEach(function (x) {
         var on = x === b;
         x.classList.toggle('is-on', on);
         x.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -590,6 +644,38 @@
     });
   });
   $('whisper-input').addEventListener('input', updateStartHint);
+  ['btn-solo', 'btn-duo'].forEach(function (id) {
+    var b = $(id);
+    if (!b) return;
+    b.addEventListener('click', function () {
+      S.duoMode = (id === 'btn-duo');
+      $('btn-solo').setAttribute('aria-pressed', S.duoMode ? 'false' : 'true');
+      $('btn-solo').classList.toggle('is-on', !S.duoMode);
+      $('btn-duo').setAttribute('aria-pressed', S.duoMode ? 'true' : 'false');
+      $('btn-duo').classList.toggle('is-on', S.duoMode);
+      $('duo-panel').hidden = !S.duoMode;
+      updateStartHint();
+      sfxDoor();
+    });
+  });
+  if ($('companion-name')) {
+    $('companion-name').addEventListener('input', function () {
+      S.companionName = (this.value || '').trim();
+      updateStartHint();
+    });
+  }
+  $$('#companion-grid .element-pill').forEach(function (b) {
+    b.addEventListener('click', function () {
+      S.companionElement = b.getAttribute('data-comp-el');
+      $$('#companion-grid .element-pill').forEach(function (x) {
+        var on = x === b;
+        x.classList.toggle('is-selected', on);
+        x.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+      updateStartHint();
+      sfxDoor();
+    });
+  });
 
   $('btn-to-act2').addEventListener('click', function () {
     var k = seedKey();
@@ -788,10 +874,27 @@
   var cupCanvas = $('cup-canvas');
   var cg = cupCanvas.getContext('2d');
   var CW = 520, C = 260;
-  var CUP_SC = 0.95, CUP_OX = C - 100 * CUP_SC, CUP_OY = C - 100 * CUP_SC;
+  var CUP_SC = 0.72, CUP_OX = C - 100 * CUP_SC, CUP_OY = C - 100 * CUP_SC;
+  var cupTopImg = new Image();
+  cupTopImg.src = './assets/cup-topdown-4e5f6a.jpg';
+  cupTopImg.onload = function () { if (!S.swirling) drawCup(cupOpts()); };
 
   function drawCupBase(g) {
     g.clearRect(0, 0, CW, CW);
+    if (cupTopImg.complete && cupTopImg.naturalWidth > 0) {
+      g.save();
+      g.beginPath(); g.arc(C, C, 244, 0, TAU); g.clip();
+      g.drawImage(cupTopImg, C - 286, C - 286, 572, 572);
+      g.lineWidth = 4;
+      for (var vi = 1; vi <= 6; vi++) {
+        g.strokeStyle = 'rgba(12, 9, 6, ' + (0.04 * vi).toFixed(2) + ')';
+        g.beginPath(); g.arc(C, C, 222 + vi * 3.6, 0, TAU); g.stroke();
+      }
+      g.fillStyle = 'rgba(248, 241, 226, 0.22)';
+      g.beginPath(); g.arc(C, C, 136, 0, TAU); g.fill();
+      g.restore();
+      return;
+    }
     g.save();
     g.shadowColor = 'rgba(0,0,0,0.5)'; g.shadowBlur = 28; g.shadowOffsetY = 10;
     var sg = g.createRadialGradient(C - 40, C - 50, 40, C, C, 250);
@@ -838,14 +941,14 @@
   function makeStains() {
     var st = [];
     for (var i = 0; i < 30; i++) {
-      st.push({ a: Math.random() * TAU, r0: 186 - Math.random() * 6, len: 14 + Math.random() * 58,
+      st.push({ a: Math.random() * TAU, r0: 134 - Math.random() * 6, len: 10 + Math.random() * 40,
                 bend: (Math.random() - 0.5) * 0.14, w: 1.5 + Math.random() * 3.5, al: 0.1 + Math.random() * 0.2 });
     }
     return st;
   }
   function drawStains(g, st) {
     g.save();
-    g.beginPath(); g.arc(C, C, 188, 0, TAU); g.clip();
+    g.beginPath(); g.arc(C, C, 138, 0, TAU); g.clip();
     st.forEach(function (s) {
       g.strokeStyle = 'rgba(61,40,28,' + s.al + ')'; g.lineWidth = s.w; g.lineCap = 'round';
       g.beginPath();
@@ -857,21 +960,21 @@
       g.stroke();
     });
     g.restore();
-    g.fillStyle = 'rgba(61,40,28,0.14)'; g.beginPath(); g.arc(C, C, 112, 0, TAU); g.fill();
+    g.fillStyle = 'rgba(61,40,28,0.14)'; g.beginPath(); g.arc(C, C, 84, 0, TAU); g.fill();
     g.strokeStyle = 'rgba(61,40,28,0.28)'; g.lineWidth = 2;
-    g.beginPath(); g.arc(C, C, 116, 0, TAU); g.stroke();
+    g.beginPath(); g.arc(C, C, 88, 0, TAU); g.stroke();
   }
   function drawLiquid(g, amt) {
     if (amt <= 0) return;
     g.save();
     g.globalAlpha = Math.min(1, amt);
-    var lg = g.createRadialGradient(C - 30, C - 30, 10, C, C, 180);
+    var lg = g.createRadialGradient(C - 24, C - 24, 8, C, C, 138);
     lg.addColorStop(0, '#4a2c19'); lg.addColorStop(1, '#1d0f08');
-    g.fillStyle = lg; g.beginPath(); g.arc(C, C, 178, 0, TAU); g.fill();
+    g.fillStyle = lg; g.beginPath(); g.arc(C, C, 138, 0, TAU); g.fill();
     g.strokeStyle = 'rgba(201,162,75,0.28)'; g.lineWidth = 6;
-    g.beginPath(); g.arc(C, C, 150, 0.3, 2.2); g.stroke();
+    g.beginPath(); g.arc(C, C, 112, 0.3, 2.2); g.stroke();
     g.strokeStyle = 'rgba(255,230,180,0.16)'; g.lineWidth = 3;
-    g.beginPath(); g.arc(C, C, 120, 3.4, 4.8); g.stroke();
+    g.beginPath(); g.arc(C, C, 90, 3.4, 4.8); g.stroke();
     g.restore();
   }
   function drawZone(g, zone) {
@@ -888,7 +991,7 @@
     if (z.r0 > 0) { g.beginPath(); g.arc(C, C, z.r0 + 1, 0, TAU); g.stroke(); }
     g.setLineDash([]);
     g.fillStyle = '#5a3b12'; g.font = font(16, 700, SANS); g.textAlign = 'center'; g.textBaseline = 'middle';
-    var ly = (zone === 'bottom') ? C + 104 : C - (z.r0 + z.r1) / 2;
+    var ly = (zone === 'bottom') ? C + 62 : C - (z.r0 + z.r1) / 2;
     g.fillText(z.tag, C, ly);
     g.restore();
   }
@@ -988,11 +1091,11 @@
         var pt = S.points[Math.floor(Math.random() * S.points.length)];
         tx = CUP_OX + pt.x * CUP_SC; ty = CUP_OY + pt.y * CUP_SC;
       } else {
-        var a = Math.random() * TAU, r = 126 + Math.random() * 36;
+        var a = Math.random() * TAU, r = 95 + Math.random() * 28;
         tx = C + Math.cos(a) * r; ty = C + Math.sin(a) * r;
       }
       var rnd = Math.random();
-      var r0 = 20 + Math.random() * 150;
+      var r0 = 16 + Math.random() * 110;
       arr.push({ a0: Math.random() * TAU, r0: r0, w: (0.7 + Math.random() * 1.0) * (1.2 - r0 / 300),
                  tx: tx, ty: ty, sz: 1.6 + Math.random() * 2,
                  col: rnd < 0.5 ? '#23150e' : (rnd < 0.88 ? '#3d281c' : '#c9a24b') });
@@ -1137,6 +1240,8 @@
     $('drawn-counter').textContent = '0 / 3';
     $('btn-to-act4').disabled = true;
     $('btn-draw-all').disabled = false;
+    $('spread-banner').hidden = true;
+    $('btn-to-act4').classList.remove('btn-ready-pulse');
   }
   function slotReading(slot, card, rev) {
     return card.scene + '。' + (rev ? card.rev : card.up) + '。' + card.pos[slot];
@@ -1173,7 +1278,8 @@
       $('btn-to-act4').disabled = false;
       $('btn-draw-all').disabled = true;
       openStage(4);
-      toast('三幅石版画都已翻开，可请三姊妹提笔了');
+      $('spread-banner').hidden = false;
+      $('btn-to-act4').classList.add('btn-ready-pulse');
     }
   }
   deckEl.addEventListener('click', function (e) {
@@ -1228,7 +1334,8 @@
         S.fate[i] = { card: pool[i - S.drawn.length], rev: Math.random() < 0.38 };
       }
     }
-    toast(S.mode === 'daily' ? '牌已轻洗，每日一签的牌运不会更改' : '牌已重新洗切，换一副心境再翻');
+    var mn = document.querySelector('.mat-note');
+    if (mn) mn.textContent = S.mode === 'daily' ? '牌已轻洗 · 每日一签的牌运不会更改，请从下方翻开三幅石版画。' : '牌已重新洗切 · 换一副心境，从下方翻开三幅石版画。';
   });
   $('btn-draw-all').addEventListener('click', function () {
     var left = 3 - S.drawn.length;
@@ -1237,11 +1344,15 @@
       (function (d) { setTimeout(function () { drawNext(null); }, d); })(reduced ? 0 : i * 320);
     }
   });
-  $('btn-to-act4').addEventListener('click', function () {
-    if (S.drawn.length < 3) return;
-    openStage(4);
-    showAct(4);
-    sfxDoor();
+  ['btn-to-act4', 'btn-banner-oracle'].forEach(function (id) {
+    var b = $(id);
+    if (!b) return;
+    b.addEventListener('click', function () {
+      if (S.drawn.length < 3) return;
+      openStage(4);
+      showAct(4);
+      sfxDoor();
+    });
   });
 
   /* ---------- stage 4 ---------- */
@@ -1270,7 +1381,8 @@
       ji: cal.ji[Math.floor(rng() * cal.ji.length)],
       hour: HOURS[Math.floor(rng() * HOURS.length)],
       quote: rank.quotes[Math.floor(rng() * rank.quotes.length)],
-      whisper: whisperText(), intent: S.intent, sign: S.sign
+      whisper: whisperText(), intent: S.intent, sign: S.sign,
+      duoMode: !!S.duoMode, compName: S.companionName || '某位故人', compEl: S.companionElement
     };
     var cipherCode = 'MR' + hashStr(seedKey() + res.score).toString(36).toUpperCase().slice(0, 5);
     res.cipher = '摩伊拉夜话笺【' + sr.code + '】' + t.name + ' + ' +
@@ -1302,6 +1414,7 @@
     }).join('');
 
     $('oracle-dossier').innerHTML = oracleHTML(res);
+    inkReveal();
     saveHistory(res);
     renderHistory();
     sfxSeal();
@@ -1325,11 +1438,28 @@
       cards.filter(function (c) { return !c.rev; })[0].card.name + '」所指的方向上。';
     return '三幅画都倒悬着，这不是判词，只是长夜替你按下的一枚慢板记号，杯底图腾给的那句话，正是逆风里最稳的一步。';
   }
-  var WAX_SEAL = '<svg class="wax-seal" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true">' +
+  var WAX_SEAL = '<svg class="wax-seal stamp-ready" width="52" height="52" viewBox="0 0 64 64" aria-hidden="true">' +
     '<path d="M32 3C40 2 44 6 50 9C57 13 60 20 61 28C62 38 58 46 52 52C46 58 38 62 30 61C20 60 12 55 8 47C3 39 3 28 7 20C11 11 22 4 32 3Z" fill="#a8281e"/>' +
     '<circle cx="32" cy="32" r="21" fill="none" stroke="#c9a24b" stroke-width="1.5" opacity="0.8"/>' +
     '<path d="M36 19A13 13 0 1 0 36 45A10 10 0 1 1 36 19Z" fill="#c9a24b"/>' +
     '<path d="M42 26L43.5 30.5L48 32L43.5 33.5L42 38L40.5 33.5L36 32L40.5 30.5Z" fill="#c9a24b"/></svg>';
+  var DUO = {
+    fire_fire: '两支火把在加拉塔桥头相遇，夜雾为之退让；同燃者亦需一隅暗处歇息。',
+    fire_earth: '你点灯，他守炉；佩拉街石阶记得这份脚步，慢一些，火才烧得长久。',
+    fire_air: '风替火传信，火替风取暖；独立大街的电车铃，正为你们报时。',
+    fire_water: '沸水遇炭，满室蒸汽如雾中楼阁；各退半步，便是一壶好咖啡。',
+    earth_earth: '两块老墙砖并肩百年，不言而固；莫让沉默长成青苔。',
+    earth_air: '一人是根，一人是帆；系好缆绳，博斯普鲁斯的风只吹向肯等的人。',
+    earth_water: '河床承接流水，流水润泽河床；你们的誓约比金角湾潮汐更准时。',
+    air_air: '两封信在海峡上空交错，各自抵达；记得落款，免得只剩回声。',
+    air_water: '雨落海面，涟漪替风写诗；温柔是你们的语言，也要学会说不。',
+    water_water: '两只杯底的咖啡渣竟画出同一座岛；深情如此，也请为彼此留一盏灯。'
+  };
+  var DUO_ORD = ['fire', 'earth', 'air', 'water'];
+  function duoProse(a, b, name, totemName, cardName) {
+    var k = [a, b].sort(function (x, y) { return DUO_ORD.indexOf(x) - DUO_ORD.indexOf(y); }).join('_');
+    return '双人星轨合参：你与' + name + '，' + DUO[k] + totemName + '在杯底作证，' + cardName + '为你们执灯。';
+  }
   function oracleHTML(r) {
     var t = TOTEMS[r.totem];
     var I = INTENTS[r.intent];
@@ -1347,15 +1477,41 @@
       (aff ? '这图腾与你的' + S_.label + '同声相应，今夜的星轨，便向你又靠近了一些。' : '这图腾与你的' + S_.label + '并不同频，倒像是特意来补你缺着的那一角。');
     var p3 = '烛芯轻轻爆了一声，我们翻开亚麻桌布上的三幅石版画。' + cardLine(0) + cardLine(1) + cardLine(2) +
       synthLine(c) + r.quote;
-    return '<section><h3>《摩伊拉夜话笺》</h3>' +
-      '<p>' + esc(p1) + '</p><p>' + esc(p2) + '</p><p>' + esc(p3) + '</p>' +
-      '<div class="sign-row"><p class="sign-off">摩伊拉三姊妹 · 书于佩拉区雨夜</p>' + WAX_SEAL + '</div></section>' +
+    var paras = [p1, p2, p3];
+    if (r.duoMode) paras.push(duoProse(r.sign, r.compEl, r.compName, t.name, c[1].card.name));
+    return '<section><div class="dossier-header"><h3>《摩伊拉夜话笺》</h3><span id="oracle-meta">' +
+      esc(r.rankName + ' · ' + r.score + ' / 100' + (r.duoMode ? ' · 与「' + r.compName + '」同占' : '')) + '</span>' +
+      '<button type="button" class="btn-instant-read" id="btn-instant-read">即刻展读全文</button></div>' +
+      '<div id="oracle-body">' + paras.map(function (p) { return '<p class="ink-line">' + esc(p) + '</p>'; }).join('') + '</div>' +
+      '<div class="sign-row stamp-ready" id="oracle-sign"><p class="sign-off">摩伊拉三姊妹 · 书于佩拉区雨夜</p>' + WAX_SEAL + '</div></section>' +
       '<section><h3>今夜行事笺</h3><dl>' +
       '<dt>今日宜</dt><dd>' + esc(r.yi) + '</dd>' +
       '<dt>今日忌</dt><dd>' + esc(r.ji) + '</dd>' +
       '<dt>吉时</dt><dd>' + esc(r.hour) + '</dd>' +
       '<dt>随身信物</dt><dd>' + esc(t.item) + '</dd></dl></section>';
   }
+
+  var inkTimers = [];
+  function inkClear() { inkTimers.forEach(clearTimeout); inkTimers = []; }
+  function inkReveal() {
+    inkClear();
+    var lines = $$('#oracle-dossier .ink-line');
+    var stamps = $$('#oracle-dossier .stamp-ready');
+    lines.forEach(function (p, i) {
+      inkTimers.push(setTimeout(function () { p.classList.add('on'); sfxPen(); }, i * 480));
+    });
+    inkTimers.push(setTimeout(function () {
+      stamps.forEach(function (n) { n.classList.add('on'); });
+      sfxSeal();
+    }, 1900));
+  }
+  function inkDone() {
+    if (!inkTimers.length) return;
+    inkClear();
+    $$('#oracle-dossier .ink-line').forEach(function (p) { p.classList.add('on'); });
+    $$('#oracle-dossier .stamp-ready').forEach(function (n) { n.classList.add('on'); });
+  }
+  $('oracle-dossier').addEventListener('click', inkDone);
 
   /* ---------- history ---------- */
   function loadHistory() {
@@ -1482,7 +1638,8 @@
       // caption
       g.fillStyle = '#2a1a10'; g.textAlign = 'center';
       g.font = font(24, 700, SERIF);
-      g.fillText('「' + INTENTS[r.intent].label + '」 · ' + SIGNS[r.sign].label, W / 2, 928, 620);
+      g.fillText('「' + INTENTS[r.intent].label + '」 · ' + SIGNS[r.sign].label +
+        (r.duoMode ? ' · 与「' + r.compName + '·' + SIGNS[r.compEl].label + '」同占' : ''), W / 2, 928, 620);
       g.font = font(20, 400, SERIF); g.fillStyle = '#5a3b12';
       var line = r.whisper ? '杯底留言：' + r.whisper : r.quote;
       g.fillText(line, W / 2, 966, 620);
@@ -1569,6 +1726,7 @@
     buildDeck();
     resetSlots();
     $('final-score').textContent = '0';
+    inkClear();
     $('oracle-dossier').innerHTML = '';
     $('strip-cards').innerHTML = '';
     drawCup(cupOpts());
@@ -1599,6 +1757,15 @@
     if (S.sound) sfxDoor();
   });
   $('btn-bgm').addEventListener('click', function () { setBgm(!S.bgm); });
+  if ($('btn-bgm-track')) {
+    $('btn-bgm-track').addEventListener('click', function () {
+      trackIdx = (trackIdx + 1) % TRACKS.length;
+      this.textContent = TRACKS[trackIdx].label;
+      ensureAudio();
+      if (!S.bgm) setBgm(true); else startBgmLoop();
+      sfxClink();
+    });
+  }
 
   /* ---------- init ---------- */
   selectInGroup('.intent-btn', 'data-intent', S.intent);

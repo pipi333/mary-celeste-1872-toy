@@ -1,6 +1,6 @@
 :root {
-  --font-display: "Songti SC", "Noto Serif SC", "SimSun", Georgia, serif;
-  --font-text: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+  --font-display: "Songti SC", "STSong", "Noto Serif SC", "SimSun", Georgia, serif;
+  --font-text: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
   --step-display: clamp(2.625rem, 6.2vw, 5.5rem);
   --step-head: clamp(1.75rem, 3.2vw, 2.75rem);
   --step-lead: 1.25rem;
@@ -146,8 +146,8 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
 
 /* Stage 1 controls */
 .mode-seg { display: inline-flex; gap: 0.25rem; margin-top: 1.75rem; background: var(--surface); padding: 0.25rem; border-radius: 2px; }
-.mode-btn { min-height: 44px; padding: 0.4rem 1rem; font-size: var(--step-small); background: transparent; border: 0; border-radius: 2px; color: var(--muted); }
-.mode-btn.is-on { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.mode-btn, .duo-btn { min-height: 44px; padding: 0.4rem 1rem; font-size: var(--step-small); background: transparent; border: 0; border-radius: 2px; color: var(--muted); }
+.mode-btn.is-on, .duo-btn.is-on { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
 .intent-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
 .intent-btn {
   text-align: left; display: flex; flex-direction: column; gap: 0.25rem; padding: 1rem;
@@ -166,11 +166,11 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
 }
 .sign-btn:hover { background: var(--surface-2); }
 .sign-btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
-#whisper-input {
-  width: 100%; min-height: 48px; padding: 0.6rem 1rem; background: var(--surface); border: 0;
+#whisper-input, #companion-name, .whisper-input {
+  width: 100%; min-height: 48px; padding: 0.6rem 1rem; background: var(--surface-2); color: var(--ink); border: 0;
   border-radius: 2px; font-size: var(--step-body);
 }
-#whisper-input::placeholder { color: var(--muted); }
+#whisper-input::placeholder, #companion-name::placeholder, .whisper-input::placeholder { color: var(--muted); }
 #start-hint { min-height: 1.5rem; color: var(--accent); }
 
 /* Dossier */
@@ -192,7 +192,7 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
 .desk { align-items: start; }
 .cup-col { grid-column: 1 / span 7; }
 .totem-col { grid-column: 8 / span 5; display: grid; gap: var(--gap); }
-#cup-canvas { width: 100%; max-width: 560px; aspect-ratio: 1; margin-inline: auto; background: var(--surface); border-radius: 50%; touch-action: none; cursor: grab; }
+#cup-canvas { width: 100%; max-width: 560px; aspect-ratio: 1; margin-inline: auto; background: var(--ink-bg); border-radius: 50%; touch-action: none; cursor: grab; }
 #cup-canvas:active { cursor: grabbing; }
 .cup-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; margin-top: 1.25rem; }
 .zone-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 1.25rem; }
@@ -311,7 +311,7 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
   .counter { margin-left: 0; width: 100%; }
 }
 @media (max-width: 560px) {
-  .intent-grid, .sign-grid { grid-template-columns: 1fr; }
+  .intent-grid, .sign-grid, .companion-grid { grid-template-columns: 1fr; }
   .plates { grid-template-columns: 1fr 1fr; }
   .plate:nth-child(n) { margin-top: 0; }
   .zone-tabs { grid-template-columns: 1fr; }
@@ -328,14 +328,14 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
 /* ===== v3.0 Ceremonial Edition ===== */
 
 /* 1909 bookplate corner filigree */
-.intent-btn, .panel, .slot, .rank-card, .oracle {
+.intent-btn, .panel, .slot, .rank-card, .oracle, .filigree-box {
   --fil-a: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M2 22V7Q2 2 7 2H22M6 22V10Q6 6 10 6H22' fill='none' stroke='%23c9a24b' stroke-width='1.2' opacity='.6'/%3E%3Ccircle cx='4' cy='4' r='1.5' fill='%23c9a24b'/%3E%3C/svg%3E");
   --fil-b: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(90 12 12)'%3E%3Cpath d='M2 22V7Q2 2 7 2H22M6 22V10Q6 6 10 6H22' fill='none' stroke='%23c9a24b' stroke-width='1.2' opacity='.6'/%3E%3Ccircle cx='4' cy='4' r='1.5' fill='%23c9a24b'/%3E%3C/g%3E%3C/svg%3E");
   --fil-c: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(270 12 12)'%3E%3Cpath d='M2 22V7Q2 2 7 2H22M6 22V10Q6 6 10 6H22' fill='none' stroke='%23c9a24b' stroke-width='1.2' opacity='.6'/%3E%3Ccircle cx='4' cy='4' r='1.5' fill='%23c9a24b'/%3E%3C/g%3E%3C/svg%3E");
   --fil-d: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg transform='rotate(180 12 12)'%3E%3Cpath d='M2 22V7Q2 2 7 2H22M6 22V10Q6 6 10 6H22' fill='none' stroke='%23c9a24b' stroke-width='1.2' opacity='.6'/%3E%3Ccircle cx='4' cy='4' r='1.5' fill='%23c9a24b'/%3E%3C/g%3E%3C/svg%3E");
 }
 .intent-btn, .intent-btn:hover, .intent-btn[aria-pressed="true"],
-.panel, .slot, .rank-card, .oracle {
+.panel, .slot, .rank-card, .oracle, .filigree-box {
   background-image: var(--fil-a), var(--fil-b), var(--fil-c), var(--fil-d);
   background-repeat: no-repeat;
   background-position: left 6px top 6px, right 6px top 6px, left 6px bottom 6px, right 6px bottom 6px;
@@ -379,11 +379,53 @@ figcaption { font-size: var(--step-small); color: var(--muted); margin-top: 0.6r
 
 /* Stage 4 wax seal */
 .oracle .sign-row { display: flex; align-items: center; justify-content: flex-end; gap: 1rem; }
-.wax-seal { flex: none; transform-origin: center; animation: sealStamp 0.8s var(--ease) 0.5s both; }
-@keyframes sealStamp {
-  from { opacity: 0; transform: scale(1.35) rotate(-12deg); }
-  to { opacity: 1; transform: scale(1) rotate(0deg); }
-}
+.wax-seal { flex: none; transform-origin: center; }
 @media (prefers-reduced-motion: reduce) {
-  .card-3d, .wax-seal, #cup-canvas.cup-invert { animation: none; }
+  .card-3d, #cup-canvas.cup-invert { animation: none; }
+}
+
+/* ===== v4.0 Collector Edition ===== */
+
+/* Stage 3 inline salon invitation banner */
+.filigree-box { background-color: var(--surface); padding: 1.25rem 1.75rem; border-radius: 2px; }
+#spread-banner {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem 1.5rem;
+  margin-top: var(--gap); background-color: #2a1c12; color: #ede6d6;
+}
+.spread-banner-text { font-family: var(--font-display); font-size: var(--step-body); line-height: 1.8; letter-spacing: 0.04em; }
+#spread-banner .btn-primary { background-color: #c9a24b; color: #1a0f09; }
+.btn-ready-pulse { animation: goldPulse 1.8s ease-in-out infinite; }
+@keyframes goldPulse { 50% { background-color: #c23a2e; } }
+
+/* Stage 4 fountain-pen reveal and wax-seal stamp */
+.dossier-header { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.75rem; }
+#oracle-meta { font-family: var(--font-display); font-size: var(--step-small); color: var(--muted); letter-spacing: 0.06em; }
+.btn-instant-read {
+  font-family: var(--font-text); font-size: var(--step-small); background: var(--surface-2); color: var(--muted);
+  border: 0; padding: 6px 14px; min-height: 44px; cursor: pointer; border-radius: 2px;
+}
+#oracle-body { display: grid; gap: 1.5rem; }
+.ink-line { opacity: 0; transform: translateY(6px); transition: opacity 650ms ease, transform 650ms ease; }
+.ink-line.on { opacity: 1; transform: translateY(0); }
+.stamp-ready { opacity: 0; }
+.stamp-ready.on { animation: waxStamp 420ms cubic-bezier(0.2, 1.4, 0.4, 1) forwards; }
+@keyframes waxStamp { 0% { transform: scale(1.65); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+/* Stage 1 dual-seeker synastry */
+.duo-block { margin-top: 0.25rem; }
+.duo-panel { margin-top: 0.75rem; display: grid; gap: 0.75rem; }
+.companion-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.element-pill {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem; min-height: 56px; padding: 0.5rem 0.75rem;
+  background-color: var(--surface-2); color: var(--ink); border: 0; border-radius: 2px; text-align: left;
+  font-family: var(--font-text); font-size: var(--step-small); transition: background-color 0.25s;
+}
+.element-pill .pill-name { font-size: var(--step-small); font-weight: 700; }
+.element-pill .pill-sub { font-size: var(--step-small); color: var(--muted); }
+.element-pill.is-selected { background-color: var(--accent); color: var(--accent-ink); }
+.element-pill.is-selected .pill-sub { color: var(--accent-ink); }
+.sound-toggle { font-family: var(--font-text); font-size: var(--step-small); }
+@media (prefers-reduced-motion: reduce) {
+  .btn-ready-pulse { animation: none; }
+  .ink-line { transition-duration: 0.01ms; }
 }
