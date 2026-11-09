@@ -9,57 +9,79 @@
 <link rel="stylesheet" href="./assets/style-3c4d5e.css">
 </head>
 <body data-field="ink">
-<a class="skip" href="#main">跳到主内容</a>
-
-<header class="masthead">
-  <div class="hud">
-    <p class="brand reveal" style="--d:0ms">摩伊拉咖啡馆 · 佩拉区雨夜卷宗</p>
-    <div class="hud-chips reveal" style="--d:60ms">
-      <span id="hud-act" class="chip">第 1 幕 / 4</span>
-      <span id="hud-totem" class="chip">杯底图腾 · 待显影</span>
-      <span id="hud-score" class="chip">星轨契合 0</span>
-      <button id="btn-bgm" class="chip chip-btn" type="button" aria-pressed="true">雨夜琴声：开</button>
-      <button type="button" class="chip chip-btn sound-toggle" id="btn-bgm-track" aria-label="切换古典曲目">曲目 · 萨蒂《裸体歌舞》</button>
-      <button id="btn-sound" class="chip chip-btn" type="button" aria-pressed="true">器物声效：开</button>
-    </div>
-  </div>
-  <nav class="jumpbar reveal" style="--d:120ms" aria-label="夜谈四幕">
-    <button type="button" class="jump is-current" data-jump="1" aria-current="step">一 · 问讯之门</button>
-    <button type="button" class="jump" data-jump="2" disabled>二 · 杯底显影</button>
-    <button type="button" class="jump" data-jump="3" disabled>三 · 石版三牌</button>
-    <button type="button" class="jump" data-jump="4" disabled>四 · 夜话回笺</button>
-  </nav>
-</header>
-
-<main id="main">
+<main id="main-content">
 
   <!-- Stage 1 -->
   <section id="act-1" class="act" data-act="1" data-field="ink" aria-labelledby="act1-title">
     <div class="grid12 hero">
       <div class="hero-copy">
-        <h1 id="act1-title" tabindex="-1" class="reveal" style="--d:100ms">摩伊拉咖啡馆</h1>
-        <p id="act1-sub" class="act-sub reveal" style="--d:180ms">佩拉区的雨落了一整夜，三姊妹在烛下温好咖啡，等你推门。一九〇九年石版塔罗与骨瓷杯底显影卷宗。</p>
-
+        <div class="sign-head">
+          <h1 id="act1-title" tabindex="-1" class="reveal" style="--d:100ms">摩伊拉咖啡馆</h1>
+          <p id="act1-sub" class="act-sub reveal" style="--d:180ms">佩拉区的雨落了一整夜，三姊妹在烛下温好咖啡，等你推门。一九〇九年石版塔罗与骨瓷杯底显影案台。</p>
+        </div>
         <div class="mode-seg reveal" style="--d:240ms" role="group" aria-label="夜谈方式">
           <button type="button" class="mode-btn is-on" data-mode="daily" aria-pressed="true">每日一签</button>
           <button type="button" class="mode-btn" data-mode="free" aria-pressed="false">夜夜重占</button>
         </div>
         <p id="mode-note" class="hint reveal" style="--d:290ms">每日一签：同一天、同一桩心事，三姊妹会写下同一封回信；明夜再来，雨声便不同了。</p>
 
-        <p class="label reveal" style="--d:340ms">推开哪一扇问讯之门</p>
+        <p class="label reveal" style="--d:340ms">从天鹅绒盘中拈一枚信物</p>
         <div class="intent-grid" role="group" aria-label="四扇问讯之门">
-          <button type="button" class="intent-btn reveal" style="--d:380ms" data-intent="career" aria-pressed="false"><b>前程与器业</b><span>炉火未冷，案上图纸正等一枚落定的印章</span></button>
-          <button type="button" class="intent-btn reveal" style="--d:430ms" data-intent="love" aria-pressed="false"><b>故人与羁绊</b><span>旧信里夹着的那朵花，至今仍未肯完全褪色</span></button>
-          <button type="button" class="intent-btn reveal" style="--d:480ms" data-intent="study" aria-pressed="false"><b>灯火与登科</b><span>夜深灯下，书页翻过的声音像远处的潮汐</span></button>
-          <button type="button" class="intent-btn reveal" style="--d:530ms" data-intent="luck" aria-pressed="false"><b>流年与晴雨</b><span>窗外云脚低垂，风正替你打听下一个季节</span></button>
+          <button type="button" class="intent-btn reveal" style="--d:380ms" data-intent="career" aria-pressed="false" aria-label="旧铜钥 · 前程与器业"><b>旧铜钥 · 前程与器业</b><span>炉火未冷，案上图纸正等一枚落定的印章</span></button>
+          <button type="button" class="intent-btn reveal" style="--d:430ms" data-intent="love" aria-pressed="false" aria-label="金婚戒 · 故人与羁绊"><b>金婚戒 · 故人与羁绊</b><span>旧信里夹着的那朵花，至今仍未肯完全褪色</span></button>
+          <button type="button" class="intent-btn reveal" style="--d:480ms" data-intent="study" aria-pressed="false" aria-label="白羽笔 · 灯火与登科"><b>白羽笔 · 灯火与登科</b><span>夜深灯下，书页翻过的声音像远处的潮汐</span></button>
+          <button type="button" class="intent-btn reveal" style="--d:530ms" data-intent="luck" aria-pressed="false" aria-label="古银币 · 流年与晴雨"><b>古银币 · 流年与晴雨</b><span>窗外云脚低垂，风正替你打听下一个季节</span></button>
         </div>
 
-        <p class="label reveal" style="--d:580ms">报上你的四象星火</p>
+
+        <div id="saucer-preview" class="saucer reveal" style="--d:540ms" role="status" aria-live="polite" aria-label="杯碟上的信物">
+          <svg class="saucer-disc" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="58" fill="#13100d"/>
+            <circle cx="60" cy="60" r="54" fill="none" stroke="#c9a24b" stroke-width="2"/>
+            <circle cx="60" cy="60" r="44" fill="#221b15"/>
+            <circle cx="60" cy="60" r="36" fill="none" stroke="#c9a24b" stroke-width="1" stroke-dasharray="2 4"/>
+            <g id="saucer-keepsake" transform="translate(36 36) scale(1.5)" color="#c9a24b" opacity="0.35"><circle cx="10" cy="10" r="6" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="10" cy="10" r="2" fill="currentColor"/><path d="M14.5 14.5L27 27M22 22l3-3M25 25l3-3" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></g>
+          </svg>
+          <div class="saucer-copy">
+            <b id="saucer-title">杯碟尚空</b>
+            <span id="saucer-crest">星火未报</span>
+            <span id="saucer-note">信物落碟，星火落盘，低语折入碟下。</span>
+          </div>
+        </div>
+
+        <p class="label reveal" style="--d:580ms">拨动黄铜星盘，报上你的四象星火</p>
+        <div class="astrolabe-wrap">
+          <div id="astrolabe-dial" class="astrolabe reveal" style="--d:600ms" role="group" aria-label="1660 黄铜星盘，点按象限或拖动盘面转动指针">
+            <svg width="180" height="180" viewBox="0 0 180 180" focusable="false" aria-hidden="true">
+              <circle cx="90" cy="90" r="87" fill="#13100d" stroke="#c9a24b" stroke-width="3"/>
+              <circle cx="90" cy="90" r="79" fill="#221b15" stroke="#c9a24b" stroke-width="1"/>
+              <circle cx="90" cy="90" r="74" fill="none" stroke="#c9a24b" stroke-width="6" stroke-dasharray="1 4.65" opacity="0.7"/>
+              <circle cx="90" cy="90" r="68" fill="none" stroke="#c9a24b" stroke-width="1"/>
+              <circle cx="90" cy="90" r="42" fill="none" stroke="#c9a24b" stroke-width="1" stroke-dasharray="3 3"/>
+              <circle cx="90" cy="90" r="24" fill="none" stroke="#c9a24b" stroke-width="1"/>
+              <path d="M31 31L149 149M149 31L31 149" fill="none" stroke="#c9a24b" stroke-width="0.8" opacity="0.5"/>
+              <circle cx="130" cy="50" r="12" fill="#171310" stroke="#c9a24b" stroke-width="1.5"/>
+              <circle cx="130" cy="130" r="12" fill="#171310" stroke="#c9a24b" stroke-width="1.5"/>
+              <circle cx="50" cy="130" r="12" fill="#171310" stroke="#c9a24b" stroke-width="1.5"/>
+              <circle cx="50" cy="50" r="12" fill="#171310" stroke="#c9a24b" stroke-width="1.5"/>
+              <text x="130" y="50">火</text>
+              <text x="130" y="130">土</text>
+              <text x="50" y="130">风</text>
+              <text x="50" y="50">水</text>
+              <g id="astrolabe-needle" style="transform-origin: 90px 90px; transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);">
+                <path d="M90 14L96 90L90 100L84 90Z" fill="#c9a24b"/>
+                <path d="M90 100L93 126L90 132L87 126Z" fill="#ede6d6" opacity="0.6"/>
+                <circle cx="90" cy="90" r="7" fill="#c9a24b"/>
+                <circle cx="90" cy="90" r="2.5" fill="#13100d"/>
+              </g>
+            </svg>
+          </div>
         <div class="sign-grid" role="group" aria-label="四象星火">
           <button type="button" class="sign-btn reveal" style="--d:620ms" data-sign="fire" aria-pressed="false">火象 · 白羊 / 狮子 / 射手</button>
           <button type="button" class="sign-btn reveal" style="--d:660ms" data-sign="earth" aria-pressed="false">土象 · 金牛 / 处女 / 摩羯</button>
           <button type="button" class="sign-btn reveal" style="--d:700ms" data-sign="air" aria-pressed="false">风象 · 双子 / 天秤 / 水瓶</button>
           <button type="button" class="sign-btn reveal" style="--d:740ms" data-sign="water" aria-pressed="false">水象 · 巨蟹 / 天蝎 / 双鱼</button>
+        </div>
         </div>
 
         <div class="duo-block reveal" style="--d:760ms">
@@ -152,10 +174,10 @@
           <button id="btn-swirl-cup" class="btn btn-primary" type="button">倾倒杯中残渣，凝神细看</button>
           <button id="btn-reswirl" class="btn btn-ghost" type="button" disabled>再轻旋一回</button>
         </div>
-        <div class="zone-tabs reveal" style="--d:220ms" role="group" aria-label="杯面三处">
-          <button id="zone-rim" class="zone-btn" type="button" data-zone="rim" aria-pressed="false" disabled>杯沿 · 近七日风向</button>
-          <button id="zone-wall" class="zone-btn" type="button" data-zone="wall" aria-pressed="false" disabled>杯壁 · 暗处推手</button>
-          <button id="zone-bottom" class="zone-btn" type="button" data-zone="bottom" aria-pressed="false" disabled>杯底 · 潜藏心结</button>
+        <div class="zone-tabs reveal" style="--d:220ms" role="group" aria-label="黄铜放大镜，勘察杯沿、杯壁与杯底">
+          <button id="zone-rim" class="zone-btn" type="button" data-zone="rim" aria-pressed="false" aria-label="黄铜放大镜 · 勘察杯沿，近七日风向" disabled><svg class="loupe-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12.5 12.5L18 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><b>勘察杯沿</b><span>近七日风向</span></button>
+          <button id="zone-wall" class="zone-btn" type="button" data-zone="wall" aria-pressed="false" aria-label="黄铜放大镜 · 勘察杯壁，暗处推手" disabled><svg class="loupe-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12.5 12.5L18 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><b>勘察杯壁</b><span>暗处推手</span></button>
+          <button id="zone-bottom" class="zone-btn" type="button" data-zone="bottom" aria-pressed="false" aria-label="黄铜放大镜 · 勘察杯底，潜藏心结" disabled><svg class="loupe-icon" width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="8" r="6" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12.5 12.5L18 18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><b>勘察杯底</b><span>潜藏心结</span></button>
         </div>
         <div id="zone-reading" class="zone-reading reveal" style="--d:280ms" aria-live="polite">
           <h3>杯面絮语</h3>
@@ -187,7 +209,7 @@
   </section>
 
   <!-- Stage 3 -->
-  <section id="act-3" class="act" data-act="3" data-field="paper" hidden aria-labelledby="act3-title">
+  <section id="act-3" class="act" data-act="3" data-field="ink" hidden aria-labelledby="act3-title">
     <div class="act-head">
       <h2 id="act3-title" tabindex="-1" class="reveal" style="--d:0ms">古董塔罗圣三角</h2>
       <p class="act-sub reveal" style="--d:60ms">十二幅一九〇九年史密斯石版画覆于亚麻桌布，凭直觉翻开三张，分立往昔、眼下与将至。</p>
@@ -199,9 +221,9 @@
     </div>
 
     <div id="spread-slots" class="spread" aria-label="往昔、眼下、将至三幅石版画">
-      <article id="slot-0" class="slot" data-slot="0"><h3>往昔之因 · 来处</h3><div class="slot-inner"></div></article>
-      <article id="slot-1" class="slot" data-slot="1"><h3>眼下之局 · 结症</h3><div class="slot-inner"></div></article>
-      <article id="slot-2" class="slot" data-slot="2"><h3>将至之兆 · 归途</h3><div class="slot-inner"></div></article>
+      <article id="slot-0" class="slot" data-slot="0"><h3><svg class="slot-candle" width="14" height="28" viewBox="0 0 14 28" aria-hidden="true"><path class="slot-flame" d="M7 1C9 5 11 8 11 11A4 4 0 0 1 3 11C3 8 5 5 7 1Z" fill="#3a3026"/><rect x="3" y="14" width="8" height="13" fill="#ede6d6"/></svg>往昔之因 · 来处</h3><div class="slot-inner"></div></article>
+      <article id="slot-1" class="slot" data-slot="1"><h3><svg class="slot-candle" width="14" height="28" viewBox="0 0 14 28" aria-hidden="true"><path class="slot-flame" d="M7 1C9 5 11 8 11 11A4 4 0 0 1 3 11C3 8 5 5 7 1Z" fill="#3a3026"/><rect x="3" y="14" width="8" height="13" fill="#ede6d6"/></svg>眼下之局 · 结症</h3><div class="slot-inner"></div></article>
+      <article id="slot-2" class="slot" data-slot="2"><h3><svg class="slot-candle" width="14" height="28" viewBox="0 0 14 28" aria-hidden="true"><path class="slot-flame" d="M7 1C9 5 11 8 11 11A4 4 0 0 1 3 11C3 8 5 5 7 1Z" fill="#3a3026"/><rect x="3" y="14" width="8" height="13" fill="#ede6d6"/></svg>将至之兆 · 归途</h3><div class="slot-inner"></div></article>
     </div>
 
     <aside class="filigree-box" id="spread-banner" hidden>
@@ -220,7 +242,7 @@
   </section>
 
   <!-- Stage 4 -->
-  <section id="act-4" class="act" data-act="4" data-field="paper" hidden aria-labelledby="act4-title">
+  <section id="act-4" class="act" data-act="4" data-field="ink" hidden aria-labelledby="act4-title">
     <div class="act-head">
       <h2 id="act4-title" tabindex="-1" class="reveal" style="--d:0ms">摩伊拉夜话笺</h2>
       <p class="act-sub reveal" style="--d:60ms">烛火将尽，三姊妹将杯底图腾与三张石版画合参，为你写下今夜的回信。</p>
@@ -228,8 +250,17 @@
     <div class="grid12 verdict">
       <div class="verdict-left">
         <div id="rank-card" class="rank-card reveal" style="--d:100ms">
+          <svg id="fate-thread-svg" class="fate-thread" width="320" height="96" viewBox="0 0 320 96" aria-hidden="true" focusable="false">
+            <path d="M8 70C60 10 110 90 160 48S260 20 292 40" fill="none" stroke="#c9a24b" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="8" cy="70" r="5" fill="#c9a24b"/>
+            <g transform="translate(276 28) rotate(-18)">
+              <path d="M0 0L26 22M0 22L26 0" fill="none" stroke="#ede6d6" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="-3" cy="-3" r="5" fill="none" stroke="#c9a24b" stroke-width="2"/>
+              <circle cx="-3" cy="25" r="5" fill="none" stroke="#c9a24b" stroke-width="2"/>
+            </g>
+          </svg>
           <p id="rank-name" class="rank-name">A · 顺水行舟</p>
-          <p class="rank-score">今夜星轨契合度 <b id="final-score">0</b> / 100</p>
+          <p class="rank-score">星轨共鸣 · <b id="final-score">0</b></p>
         </div>
         <div id="summary-strip" class="strip reveal" style="--d:160ms" aria-label="三牌与杯底图腾总览">
           <canvas id="totem-mini" width="240" height="240" role="img" aria-label="杯底图腾缩略图"></canvas>
@@ -252,6 +283,12 @@
           </section>
           <section id="oracle-calendar" class="ink-line"></section>
         </article>
+        <div class="stage-foot reveal" style="--d:180ms">
+          <button id="btn-stamp-seal" class="btn btn-seal" type="button" aria-label="亲手加盖摩伊拉火漆印">
+            <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><circle cx="14" cy="14" r="12" fill="#a8281e"/><circle cx="14" cy="14" r="8" fill="none" stroke="#e8b84b" stroke-width="1.5"/><path d="M14 8v12M8 14h12" fill="none" stroke="#e8b84b" stroke-width="1.5"/></svg>
+            <span>亲手加盖摩伊拉火漆印</span>
+          </button>
+        </div>
         <div class="action-bar reveal" style="--d:200ms">
           <button id="btn-save-card" class="btn btn-secondary" type="button">洗印一张拍立得笺</button>
           <button id="btn-copy-comment" class="btn btn-primary" type="button">抄下暗号，赠与同行的人</button>
@@ -266,6 +303,25 @@
   <p>摩伊拉咖啡馆 · 仅供娱乐与自我观照，不构成任何现实决策建议。牌面为1909年莱德·伟特塔罗公版石版画。</p>
 </footer>
 
+<aside class="parlor-dock" id="status-bar" aria-label="占卜案台烛火与留声机">
+  <p id="sister-voice" class="sister-voice" aria-live="polite"><svg id="sister-emblem" width="24" height="24" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="#c9a24b" stroke-width="1.5"/><path d="M12 3v18M5 8c5 2 9 6 14 8M19 8c-5 2-9 6-14 8" fill="none" stroke="#c9a24b" stroke-width="1.2"/><circle cx="12" cy="12" r="2.5" fill="#c9a24b"/></svg><b id="sister-name">克洛托 · 纺线之姊</b> <span id="voice-line">夜雨寒重，请先从天鹅绒盘中拈一枚信物置于杯碟，再拨动黄铜星盘。</span></p>
+  <nav class="jumpbar" aria-label="夜谈四幕烛台">
+    <button type="button" class="jump is-current" data-jump="1" aria-current="step" aria-label="第一幕 · 叩门奉物"><svg class="candle-flame" width="14" height="18" viewBox="0 0 14 18" aria-hidden="true"><path d="M7 1C9 5 11 8 11 11A4 4 0 0 1 3 11C3 8 5 5 7 1Z" fill="#c9a24b"/><rect x="5" y="13" width="4" height="4" fill="#ede6d6"/></svg><span>一 · 叩门</span></button>
+    <button type="button" class="jump" data-jump="2" aria-label="第二幕 · 覆杯窥兆" disabled><svg class="candle-flame" width="14" height="18" viewBox="0 0 14 18" aria-hidden="true"><path d="M7 1C9 5 11 8 11 11A4 4 0 0 1 3 11C3 8 5 5 7 1Z" fill="#c9a24b"/><rect x="5" y="13" width="4" height="4" fill="#ede6d6"/></svg><span>二 · 窥兆</span></button>
+    <button type="button" class="jump" data-jump="3" aria-label="第三幕 · 扇牌燃烛" disabled><svg class="candle-flame" width="14" height="18" viewBox="0 0 14 18" aria-hidden="true"><path d="M7 1C9 5 11 8 11 11A4 4 0 0 1 3 11C3 8 5 5 7 1Z" fill="#c9a24b"/><rect x="5" y="13" width="4" height="4" fill="#ede6d6"/></svg><span>三 · 燃烛</span></button>
+    <button type="button" class="jump" data-jump="4" aria-label="第四幕 · 金线封缄" disabled><svg class="candle-flame" width="14" height="18" viewBox="0 0 14 18" aria-hidden="true"><path d="M7 1C9 5 11 8 11 11A4 4 0 0 1 3 11C3 8 5 5 7 1Z" fill="#c9a24b"/><rect x="5" y="13" width="4" height="4" fill="#ede6d6"/></svg><span>四 · 封缄</span></button>
+  </nav>
+  <div class="hud-chips">
+    <span id="hud-act" class="chip">第 1 幕 / 4</span>
+    <span id="hud-totem" class="chip">杯底图腾 · 待显影</span>
+    <span id="hud-score" class="chip">星轨契合 0</span>
+  </div>
+  <div class="gramophone" role="group" aria-label="留声机">
+    <button id="btn-bgm" class="chip chip-btn" type="button" aria-pressed="true">雨夜琴声：开</button>
+    <button type="button" class="chip chip-btn sound-toggle" id="btn-bgm-track" aria-label="切换古典曲目">曲目 · 萨蒂《裸体歌舞》</button>
+    <button id="btn-sound" class="chip chip-btn" type="button" aria-pressed="true">器物声效：开</button>
+  </div>
+</aside>
 <div id="card-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-hidden="true">
   <div class="modal-body">
     <h3 id="modal-title">摩伊拉夜话拍立得笺</h3>

@@ -113,11 +113,20 @@
   var SLOT_NAMES = ['往昔之因', '眼下之局', '将至之兆'];
   var SLOT_SHORT = ['往昔', '眼下', '将至'];
 
+  /* ---------- Madame Moirae's live whisper strip ---------- */
+  var SISTERS = ['克洛托 · 纺线之姊', '拉刻西斯 · 量线之姊', '阿特洛波斯 · 剪线之姊'];
+  function saySister(idx, text) {
+    if ($('sister-name')) $('sister-name').textContent = SISTERS[idx || 0];
+    if ($('voice-line')) $('voice-line').textContent = text;
+  }
+  var ASTRO_ANG = { fire: 45, earth: 135, air: 225, water: 315 };
+  var TOKEN_SVGS = {};
+
   var INTENTS = {
-    career: { label: '前程与器业', short: '前程', whisperAsk: '你想亲手建成什么？', motif: '案上那张迟迟未落印的图纸' },
-    love: { label: '故人与羁绊', short: '故人', whisperAsk: '那个名字，还在你舌尖吗？', motif: '旧信里那朵未肯褪尽颜色的花' },
-    study: { label: '灯火与登科', short: '灯火', whisperAsk: '哪一页，你迟迟不肯翻过？', motif: '灯下那页翻不过去的书' },
-    luck: { label: '流年与晴雨', short: '流年', whisperAsk: '你在等哪一场雨停？', motif: '窗外低垂不动的云脚' }
+    career: { tokenName: '旧铜钥 · 前程与器业', label: '前程与器业', short: '前程', whisperAsk: '你想亲手建成什么？', motif: '案上那张迟迟未落印的图纸' },
+    love: { tokenName: '金婚戒 · 故人与羁绊', label: '故人与羁绊', short: '故人', whisperAsk: '那个名字，还在你舌尖吗？', motif: '旧信里那朵未肯褪尽颜色的花' },
+    study: { tokenName: '白羽笔 · 灯火与登科', label: '灯火与登科', short: '灯火', whisperAsk: '哪一页，你迟迟不肯翻过？', motif: '灯下那页翻不过去的书' },
+    luck: { tokenName: '古银币 · 流年与晴雨', label: '流年与晴雨', short: '流年', whisperAsk: '你在等哪一场雨停？', motif: '窗外低垂不动的云脚' }
   };
 
   var SIGNS = {
@@ -608,10 +617,23 @@
       b.classList.toggle('is-on', on);
     });
   }
+  function companionLabel() {
+    return (S.companionName || '某位故人') + ' · ' + SIGNS[S.companionElement].label;
+  }
+  $$('.intent-btn').forEach(function (b) {
+    var ic = b.querySelector('.token-icon');
+    if (ic) TOKEN_SVGS[b.getAttribute('data-intent')] = ic.innerHTML;
+  });
   function updateStartHint() {
     $('start-hint').textContent = '已推开：' + INTENTS[S.intent].label + ' · ' + SIGNS[S.sign].label +
-      (S.duoMode ? ' · 与「' + (S.companionName || '某位故人') + ' · ' + SIGNS[S.companionElement].label + '」同占' : '') +
+      (S.duoMode ? ' · 与「' + companionLabel() + '」同占' : '') +
       (whisperText() ? ' · 杯底低语已留下' : '');
+    if ($('saucer-title')) $('saucer-title').textContent = '已奉信物：' + INTENTS[S.intent].tokenName;
+    if ($('saucer-crest')) $('saucer-crest').textContent = '星盘校准：' + SIGNS[S.sign].label + (S.duoMode ? ' · 与「' + companionLabel() + '」同占' : '');
+    if ($('saucer-note')) $('saucer-note').textContent = whisperText() ? ('碟下纸条：「' + whisperText() + '」') : '可在下方纸条写一句心事，折入杯碟下。';
+    var kp = $('saucer-keepsake');
+    if (kp && TOKEN_SVGS[S.intent]) { kp.innerHTML = TOKEN_SVGS[S.intent]; kp.setAttribute('opacity', '1'); }
+    if ($('astrolabe-needle')) $('astrolabe-needle').style.transform = 'rotate(' + ASTRO_ANG[S.sign] + 'deg)';
   }
   $$('.mode-btn[data-mode]').forEach(function (b) {
     b.addEventListener('click', function () {
@@ -633,16 +655,44 @@
       $('whisper-input').placeholder = INTENTS[S.intent].whisperAsk + '轻声写一句，也可以留白';
       updateStartHint();
       sfxDoor();
+      saySister(0, '「' + INTENTS[S.intent].tokenName + '」已落在杯碟上。' + INTENTS[S.intent].whisperAsk);
     });
   });
+  function setSign(sign) {
+    S.sign = sign;
+    selectInGroup('.sign-btn', 'data-sign', S.sign);
+    updateStartHint();
+    saySister(1, '星盘指向' + SIGNS[S.sign].label + '。' + SIGNS[S.sign].trait);
+  }
   $$('.sign-btn').forEach(function (b) {
     b.addEventListener('click', function () {
-      S.sign = b.getAttribute('data-sign');
-      selectInGroup('.sign-btn', 'data-sign', S.sign);
-      updateStartHint();
+      setSign(b.getAttribute('data-sign'));
       sfxDoor();
     });
   });
+  var dial = $('astrolabe-dial');
+  function dialPick(e, quiet) {
+    var r = dial.getBoundingClientRect();
+    if (!r.width) return;
+    var x = (e.clientX - r.left) * 180 / r.width, y = (e.clientY - r.top) * 180 / r.height;
+    var ang = Math.atan2(y - 90, x - 90);
+    var right = Math.cos(ang) >= 0, down = Math.sin(ang) >= 0;
+    var sign = right ? (down ? 'earth' : 'fire') : (down ? 'air' : 'water');
+    if (quiet && sign === S.sign) return;
+    setSign(sign);
+    sfxClink();
+  }
+  if (dial) {
+    var dialDown = false;
+    dial.addEventListener('pointerdown', function (e) {
+      dialDown = true;
+      try { dial.setPointerCapture(e.pointerId); } catch (err) { /* ignore */ }
+      dialPick(e, false);
+    });
+    dial.addEventListener('pointermove', function (e) { if (dialDown) dialPick(e, true); });
+    dial.addEventListener('pointerup', function () { dialDown = false; });
+    dial.addEventListener('pointercancel', function () { dialDown = false; });
+  }
   $('whisper-input').addEventListener('input', updateStartHint);
   ['btn-solo', 'btn-duo'].forEach(function (id) {
     var b = $(id);
@@ -1061,7 +1111,70 @@
     if (o.particles) drawParticleSet(g, o.particles, 1);
     if (o.points) drawSteam(g);
     if (o.zone) drawZone(g, o.zone);
+    if (o.points && S.settled) {
+      drawNodes(g, o.pulse || 0);
+      if (o.zone) drawLoupe(g, o.zone, o.points);
+    }
   }
+  /* in-cup golden star-nodes and on-canvas brass loupe */
+  var NODES = {
+    rim: { x: C, y: C - 128 },
+    wall: { x: C + 98, y: C + 18 },
+    bottom: { x: C - 18, y: C + 44 }
+  };
+  function drawNodes(g, ph) {
+    g.save();
+    Object.keys(NODES).forEach(function (k, i) {
+      var n = NODES[k], pu = 0.5 + 0.5 * Math.sin(ph * 0.004 + i * 2.1);
+      var rg = g.createRadialGradient(n.x, n.y, 1, n.x, n.y, 14 + pu * 6);
+      rg.addColorStop(0, 'rgba(232,184,75,0.85)'); rg.addColorStop(1, 'rgba(232,184,75,0)');
+      g.fillStyle = rg; g.beginPath(); g.arc(n.x, n.y, 14 + pu * 6, 0, TAU); g.fill();
+      g.fillStyle = '#e8b84b'; g.beginPath();
+      for (var j = 0; j < 8; j++) {
+        var rr = (j % 2 === 0) ? 6 + pu * 2 : 2.2, a = -Math.PI / 2 + j * Math.PI / 4;
+        var px = n.x + Math.cos(a) * rr, py = n.y + Math.sin(a) * rr;
+        if (j === 0) g.moveTo(px, py); else g.lineTo(px, py);
+      }
+      g.closePath(); g.fill();
+    });
+    g.restore();
+  }
+  function drawLoupe(g, zone, pts) {
+    var n = NODES[zone];
+    if (!n) return;
+    var lx = n.x, ly = n.y, LR = 52, Z = 1.55;
+    g.save();
+    // brass handle
+    g.lineCap = 'round';
+    g.strokeStyle = '#6e5220'; g.lineWidth = 11;
+    g.beginPath(); g.moveTo(lx + LR * 0.72, ly + LR * 0.72); g.lineTo(lx + LR * 0.72 + 38, ly + LR * 0.72 + 38); g.stroke();
+    g.strokeStyle = '#c9a24b'; g.lineWidth = 6;
+    g.beginPath(); g.moveTo(lx + LR * 0.72, ly + LR * 0.72); g.lineTo(lx + LR * 0.72 + 38, ly + LR * 0.72 + 38); g.stroke();
+    // magnified lens
+    g.beginPath(); g.arc(lx, ly, LR, 0, TAU); g.clip();
+    g.fillStyle = 'rgba(246, 238, 220, 0.92)'; g.fillRect(lx - LR, ly - LR, LR * 2, LR * 2);
+    g.translate(lx, ly); g.scale(Z, Z); g.translate(-lx, -ly);
+    if (S.stains) drawStains(g, S.stains);
+    drawPoints(g, pts, CUP_OX, CUP_OY, CUP_SC, 0.75, PAL_DARK);
+    drawConstellation(g, pts);
+    g.restore();
+    g.save();
+    g.strokeStyle = '#c9a24b'; g.lineWidth = 3.5;
+    g.beginPath(); g.arc(lx, ly, LR, 0, TAU); g.stroke();
+    g.lineWidth = 1.2;
+    g.beginPath(); g.arc(lx, ly, LR - 5, 0, TAU); g.stroke();
+    g.restore();
+  }
+  var pulseLast = 0;
+  function pulseLoop(now) {
+    requestAnimationFrame(pulseLoop);
+    if (reduced || !S.settled || S.swirling || S.act !== 2 || document.hidden) return;
+    if (now - pulseLast < 50) return;
+    pulseLast = now;
+    var o = cupOpts(); o.pulse = now;
+    drawCup(o);
+  }
+  requestAnimationFrame(pulseLoop);
 
   /* ---------- swirl ---------- */
   var btnSwirl = $('btn-swirl-cup');
@@ -1117,6 +1230,7 @@
     $('totem-intent').textContent = '';
     $('totem-luck').textContent = '';
     sfxClink(); sfxSwirl();
+    saySister(1, '拉刻西斯执起骨瓷杯轻轻旋转，渣粒正沿着温热的瓷壁慢慢沉淀……');
     if (!reduced) cupCanvas.classList.add('cup-invert');
     cupCanvas.style.transform = '';
     var dur = reduced ? 600 : 2400;
@@ -1150,6 +1264,7 @@
     openStage(3);
     sfxClink();
     setTimeout(sfxClink, 160);
+    saySister(1, '渣粒落定，成了「' + t.name + '」：' + t.gist + '。点杯中金星，或按下黄铜放大镜细看。');
   }
   btnSwirl.addEventListener('click', startSwirl);
   btnReswirl.addEventListener('click', startSwirl);
@@ -1173,6 +1288,17 @@
     cupCanvas.style.transform = 'perspective(900px) rotateX(' + (-py * 14).toFixed(2) + 'deg) rotateY(' + (px * 14).toFixed(2) + 'deg)';
   });
   cupCanvas.addEventListener('pointerleave', function () { cupCanvas.style.transform = ''; });
+  cupCanvas.addEventListener('click', function (e) {
+    if (!S.settled || S.swirling || drag.acc > 12) return;
+    var rc = cupCanvas.getBoundingClientRect();
+    if (!rc.width) return;
+    var x = (e.clientX - rc.left) * CW / rc.width, y = (e.clientY - rc.top) * CW / rc.height;
+    var r = Math.hypot(x - C, y - C);
+    if (r > 165) return;
+    var z = r >= 112 ? 'rim' : (r >= 78 ? 'wall' : 'bottom');
+    var zb = $('zone-' + z);
+    if (zb && !zb.disabled) zb.click();
+  });
   function endDrag() { drag.on = false; }
   cupCanvas.addEventListener('pointerup', endDrag);
   cupCanvas.addEventListener('pointercancel', endDrag);
@@ -1191,6 +1317,7 @@
       var t = TOTEMS[S.totemKey];
       $('zone-reading').innerHTML = '<h3>' + esc(ZONES[z].label) + '</h3><p>' + esc(t.zones[z]) + '</p>';
       sfxClink();
+      saySister(z === 'rim' ? 0 : (z === 'wall' ? 1 : 2), '黄铜放大镜停在' + ZONES[z].label + '：' + t.zones[z]);
     });
   });
   btnAct3.addEventListener('click', function () {
@@ -1230,12 +1357,18 @@
       b.className = 'deck-card';
       b.setAttribute('aria-label', '第 ' + (pos + 1) + ' 幅石版画牌背，点击翻开');
       b.innerHTML = '<span class="back">' + BACK_SVG + '</span>';
+      var d = pos - 5.5, m = (pos % 6) - 2.5;
+      b.style.setProperty('--fan-rot', (d * 3.8).toFixed(2) + 'deg');
+      b.style.setProperty('--fan-y', (Math.abs(d) * 3.5).toFixed(1) + 'px');
+      b.style.setProperty('--m-fan-rot', (m * 3.2).toFixed(2) + 'deg');
+      b.style.setProperty('--m-fan-y', (Math.abs(m) * 2.5).toFixed(1) + 'px');
       deckEl.appendChild(b);
     });
   }
   function resetSlots() {
     [0, 1, 2].forEach(function (i) {
       $('slot-' + i).querySelector('.slot-inner').innerHTML = '<div class="slot-empty">此处静候一幅石版画</div>';
+      $('slot-' + i).classList.remove('is-lit');
     });
     $('drawn-counter').textContent = '0 / 3';
     $('btn-to-act4').disabled = true;
@@ -1273,6 +1406,8 @@
       '<span class="orient">' + (f.rev ? '逆位' : '正位') + '</span>' +
       '<p>' + esc(slotReading(slot, f.card, f.rev)) + '</p></div>';
     $('drawn-counter').textContent = S.drawn.length + ' / 3';
+    $('slot-' + slot).classList.add('is-lit');
+    saySister(slot, SLOT_SHORT[slot] + '之烛已燃：「' + f.card.name + (f.rev ? '·逆位' : '·正位') + '」，' + (f.rev ? f.card.rev : f.card.up));
     sfxFlip(slot);
     if (S.drawn.length === 3) {
       $('btn-to-act4').disabled = false;
@@ -1512,6 +1647,13 @@
     $$('#oracle-dossier .stamp-ready').forEach(function (n) { n.classList.add('on'); });
   }
   $('oracle-dossier').addEventListener('click', inkDone);
+  if ($('btn-stamp-seal')) {
+    $('btn-stamp-seal').addEventListener('click', function () {
+      inkDone();
+      sfxSeal();
+      saySister(2, '摩伊拉朱砂火漆已落印封缄，今夜的回信已归你所有。');
+    });
+  }
 
   /* ---------- history ---------- */
   function loadHistory() {
